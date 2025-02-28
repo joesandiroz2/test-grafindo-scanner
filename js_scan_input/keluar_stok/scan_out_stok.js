@@ -56,7 +56,7 @@ export async function ScanOutStok(pb, input, dataItems) {
             });
 
             // Memutar suara
-            const audio = new Audio('suara/kuantiti_penuh.mp3');
+            const audio = new Audio('./suara/kuantiti_sudah_full.mp3');
             audio.play();
 
             // Clear input field and set focus back
@@ -105,12 +105,16 @@ export async function ScanOutStok(pb, input, dataItems) {
 
         // Tampilkan SweetAlert
         Swal.fire({
-            title: 'Berhasil!',
+            toast:true,
+            title: 'OKEH !!!!',
             text: 'Data berhasil disimpan ke kartu stok.',
             icon: 'success',
-            timer: 2000,
+            timer: 1500,
             showConfirmButton: false
         });
+        const audio = new Audio('./suara/suara_ok.mp3');
+        audio.play();
+        
         inputField.value = ''; // Clear the input field
         inputField.focus(); // Set focus back to the input field
 

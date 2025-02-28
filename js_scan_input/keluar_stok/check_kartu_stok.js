@@ -1,5 +1,6 @@
 
 const pb = new PocketBase(pocketbaseUrl);
+const playedNoDn = new Set(); // Menyimpan no_dn yang sudah diputar suaranya
 
 export async function searchKartuStok(noDn) {
 const scannedItemsContainer = $("#scanned-items-container"); // New container for scanned items
@@ -45,18 +46,16 @@ try {
             scannedList += '</ul>';
             scannedItemsContainer.append(scannedList);
 
-        // Memutar suara sudah diproses
-        const audio = document.getElementById('scan-audio');
-        audio.src = './suara/sudah_proses.mp3';
-        audio.load();
-        audio.play();
+       
     } else {
         // Jika tidak ada data, tampilkan pesan
-        resultContainer.append('<h6>Belum di proses.</h6>');
-        const audio = document.getElementById('scan-audio');
-        audio.src = './suara/belum_proses.mp3';
-        audio.load();
-        audio.play();
+        if (!playedNoDn.has(noDn)) {
+                playedNoDn.add(noDn); // Tambahkan ke Set agar tidak diputar lagi
+                const audio = document.getElementById('scan-audio');
+                audio.src = './suara/belum_proses.mp3';
+                audio.load();
+                audio.play();
+        }
     }
 } catch (error) {
     console.log(error);
