@@ -24,7 +24,7 @@ async function fetchData(partNumber, noLot) {
 
         // Ambil data dari koleksi kartu_stok
         const filter = `part_number = "${partNumber}" && lot = "${noLot}"`; // Filter pencarian
-        const resultList = await pb.collection('kartu_stok').getList(1, perPage, {
+        const resultList = await pb.collection('kartu_stok').getList(1, 1, {
             sort: '-created', // Mengurutkan berdasarkan tanggal terbaru
             filter: filter, // Ganti dengan filter yang sesuai
         });
@@ -54,7 +54,7 @@ async function displayResults(items, partNumber, noLot) {
         let tableRows = items.map(item => {
             const lastDate = formatDate(item.created); // Format tanggal terakhir
             const balanceStyle = item.balance < 0 ? 'color: red; font-weight: bold;' : ''; // Gaya untuk balance
-
+            document.getElementById('nama_barang').value = item.nama_barang
             return `
                 <tr>
                     <td>${item.no_dn}</td>

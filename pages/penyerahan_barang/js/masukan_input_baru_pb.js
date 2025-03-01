@@ -29,9 +29,9 @@ async function Masukkan_stok_baru() {
         let balance = 0;
 
         if (latestItem) {
-            balance = latestItem.balance + qtyMasuk; // Tambahkan qtyMasuk ke balance terakhir
+            balance = parseInt(latestItem.balance, 10) + parseInt(qtyMasuk); // Konversi ke integer sebelum menjumlahkan
         } else {
-            balance = qtyMasuk; // Jika tidak ada item, set balance ke qtyMasuk
+            balance = qtyMasuk;
         }
 
         // Buat data untuk disimpan
@@ -91,4 +91,6 @@ function resetInputs() {
     $("#nama_barang").val('');
     $("#qty_masuk").val('');
     $("#inputan_pb_baru").hide(); // Sembunyikan inputan setelah reset
+$("#result-container, #latest-data-container, #error-container").empty().hide();
+    window.location.href = "/pages/penyerahan_barang/index.html"
 }
