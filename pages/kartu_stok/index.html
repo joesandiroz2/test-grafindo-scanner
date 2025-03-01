@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kartu Stok</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class=" mt-2">
+           <nav>
+            <ul class="pagination" id="pagination">
+                <!-- Pagination akan ditambahkan di sini -->
+            </ul>
+        </nav>
+        <h2>Kartu Stok</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>No DN</th>
+                    <th>Part Number</th>
+                    <th>Nama Barang</th>
+                    <th>Qty Do</th>
+                    <th>Qty Scan</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="data-table-body">
+                <!-- Data akan ditambahkan di sini -->
+            </tbody>
+        </table>
+     
+    </div>
+
+</body>
+    <script src="../../js/sdk/pocketbase.umd.js"></script>
+    <script src="../../js/pocket_config.js"></script>
+    <script src="./js/kartu_stok_global.js"></script>
+</html>
