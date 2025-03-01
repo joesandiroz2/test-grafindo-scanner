@@ -1,6 +1,6 @@
 
+
 const pb = new PocketBase(pocketbaseUrl);
-const playedNoDn = new Set(); // Menyimpan no_dn yang sudah diputar suaranya
 
 export async function searchKartuStok(noDn) {
 const scannedItemsContainer = $("#scanned-items-container"); // New container for scanned items
@@ -26,6 +26,10 @@ try {
     });
     console.log("Recors stok",noDn)
 
+
+
+
+
    if (records.length > 0) {
     let scannedList = `
         <h6>Data yg udah di scan :</h6>
@@ -34,10 +38,15 @@ try {
     records.forEach((item, index) => {
         scannedList += `
             <li style="background-color: green; border-bottom: 2px solid white; color: white; padding: 10px; margin: 5px 0; border-radius: 5px; display: flex; justify-content: space-evenly; align-items: center;">
-                <span ><b>${index + 1}. ${item.nama_barang}</b> </span>
-            <p class="card" style="color:black">🛒 ${item.qty_ambil}</p>
-             <p class="card" style="color:black">⏰ ${formatDate(item.created)}</p>
-                <span class="card" style="color: green; font-weight: bold; padding: 3px 8px; border-radius: 3px;">✅ Success</span>
+                <div >
+                <span>
+                <b>${index + 1}. ${item.nama_barang}</b> 
+                </span>
+                <span style="background-color:white;color:purple;padding:3px;font-weight:bold">${item.part_number}</span>
+             <span class="card" style="color:black; font-style: italic;">⏰ ${formatDate(item.created)}</span>
+                </div>
+            <p class="card" style="color:black">🛒 ${item.qty_ambil} Pcs</p>
+                <span class="card" style="color: green; font-weight: bold; padding: 3px 8px; border-radius: 3px;">✅</span>
             </li>
         `;
     });
@@ -47,16 +56,8 @@ try {
             scannedItemsContainer.append(scannedList);
 
        
-    } else {
-        // Jika tidak ada data, tampilkan pesan
-        if (!playedNoDn.has(noDn)) {
-                playedNoDn.add(noDn); // Tambahkan ke Set agar tidak diputar lagi
-                const audio = document.getElementById('scan-audio');
-                audio.src = './suara/belum_proses.mp3';
-                audio.load();
-                audio.play();
-        }
-    }
+    } 
+      // return qtyScanMap;
 } catch (error) {
     console.log(error);
     resultContainer.append('<h6>Terjadi error saat pencarian kartu stok, harap coba lagi.</h6>');

@@ -121,6 +121,21 @@ export async function ScanOutStok(pb, input, dataItems) {
         // Panggil kembali searchKartuStok
         await searchKartuStok(item.Delivery_Note_No);
     } else {
-        console.log('Data tidak ditemukan di data_do.');
+        
+        Swal.fire({
+            title: 'Barang Tidak ada di Do ini',
+            text: 'Data berhasil disimpan ke kartu stok.',
+            icon: 'error',
+            timer: 1500,
+            showConfirmButton: false
+        });
+
+        const audio = new Audio('./suara/barang_kagak_ada_di_do_ini.mp3');
+        audio.play();
+        
+        inputField.value = ''; // Clear the input field
+        inputField.focus(); // Set focus back to the input field
+
+        console.log('barang tidak ditemukan di data_do.');
     }
 }

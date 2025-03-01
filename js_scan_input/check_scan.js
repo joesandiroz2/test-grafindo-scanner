@@ -70,23 +70,29 @@ try {
 }
 }
 
-function displayResults(items) {
+async function displayResults(items) {
 const resultContainer = $("#result-container");
 resultContainer.empty(); // Kosongkan hasil sebelumnya
 
 if (items.length > 0) {
-    let table = '<table class="table table-bordered"><thead><tr><th>Part Number Desc</th><th>Supplier Part Number</th><th>Qty DN</th><th>Plant Desc</th><th>Plant ID</th><th>PO Number</th><th>Gate ID</th><th>Delivery Note No</th></tr></thead><tbody>';
+     const deliveryNoteNo = items[0].Delivery_Note_No;
+
+    let table = `
+    <h5 style="text-align:center;font-weight:bold">${deliveryNoteNo}</h5>
+    <table class="table table-bordered">
+    <thead>
+    <tr>
+    <th>nama_barang</th>
+    <th>Part Number</th>
+    <th>Qty </th>
+    </tr>
+    </thead><tbody>`;
     items.forEach(item => {
         table += `
             <tr>
                 <td>${item.Part_Number_Desc}</td>
                 <td>${item.Supplier_Part_Number}</td>
                 <td>${item.Qty_DN}</td>
-                <td>${item.Plant_Desc}</td>
-                <td>${item.Plant_ID}</td>
-                <td>${item.PO_Number}</td>
-                <td>${item.Gate_ID}</td>
-                <td>${item.Delivery_Note_No}</td>
             </tr>`;
     });
     table += '</tbody></table>';

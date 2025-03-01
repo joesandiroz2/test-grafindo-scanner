@@ -26,12 +26,22 @@
     <div class="container mt-5">
        <h5>Scan Do Disini </h5>
        <input type="text" id="do-input" class="form-control" autofocus placeholder="scan do disini">
-       <div id="result-container" class="mt-3"></div>
-        <div id="scanned-items-container" class="mt-3"></div> 
+      
+
+
       <audio id="scan-audio" hidden>
            <source id="audio-source" type="audio/mpeg">
            Your browser does not support the audio element.
        </audio>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+        <div class="col s12 m4 l4">
+             <div id="result-container" ></div>
+        </div>
+        <div class="col s12 m8 l8">
+          <div id="scanned-items-container" ></div> 
+        </div>
     </div>
 
     <!-- Link ke jQuery dan JS Bootstrap -->
@@ -44,6 +54,10 @@
 
         $(document).ready(function() {
             $("#navbar-container").load("./component/nav.html");
+               // Set focus kembali ke input setiap kali ada klik di halaman
+            $(document).on('click', function() {
+                $("#do-input").focus();
+            });
         });
 
     </script>
