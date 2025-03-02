@@ -43,9 +43,9 @@ try {
                 <b>${index + 1}. ${item.nama_barang}</b> 
                 </span>
                 <span style="background-color:white;color:purple;padding:3px;font-weight:bold">${item.part_number}</span>
-             <span class="card" style="color:black; font-style: italic;">⏰ ${formatDate(item.created)}</span>
+             <span class="card" style="color:black; font-style: italic;">⏰ ${formatDate(item.created)} - Lot : ${item.lot}</span>
                 </div>
-            <p class="card" style="color:black">🛒 ${item.qty_ambil} Pcs</p>
+            <p class="card" style="color:red;font-weight:bold">🛒 ${item.qty_ambil} Pcs</p>
                 <span class="card" style="color: green; font-weight: bold; padding: 3px 8px; border-radius: 3px;">✅</span>
             </li>
         `;

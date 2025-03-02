@@ -22,7 +22,7 @@ export async function ScanOutStok(pb, input, dataItems) {
         });
 
         // Memutar suara
-        const audio = new Audio('suara/lu_belum_scan_do.mp3');
+        const audio = new Audio('./suara/lu_belum_scan_do.mp3');
         audio.play();
 
         // Clear input field and set focus back
