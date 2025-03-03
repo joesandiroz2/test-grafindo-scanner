@@ -167,7 +167,7 @@ document.getElementById("masukkanQty").addEventListener("click", async function 
             const imageUrl = gambar ? `${pocketbaseUrl}/api/files/data_barang/${id}/${gambar}` : 'tidak ada gambar';
 
             // Cek apakah part_number dengan lot sudah ada di kartu_stok
-            const existingKartu = kartuRecords.filter(item => item.part_number === partNumber && item.lot === nomorLot);
+            const existingKartu = kartuRecords.filter(item => item.part_number === partNumber );
 
             let newBalance = qty; // Default balance = qty input jika tidak ada data lama
 
