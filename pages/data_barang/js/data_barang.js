@@ -1,0 +1,224 @@
+const pb = new PocketBase(pocketbaseUrl);
+
+let currentPage = 1; // Halaman saat ini
+const pageSize = 5; // Jumlah item per halaman
+
+async function authenticate() {
+    try {
+        const authData = await pb.collection('users').authWithPassword(username_pocket, user_pass_pocket);
+        console.log('Authenticated:', authData);
+        loadData(currentPage);
+
+    } catch (error) {
+        console.error('Authentication failed:', error);
+    }
+}
+
+async function loadData(pageini) {
+    Swal.fire({
+        title: 'Sedang memuat data barang...',
+        allowOutsideClick: false,
+        onBeforeOpen: () => {
+            Swal.showLoading()
+        }
+    });
+    await loadIkutSetOptions('ikut_set'); // Pastikan opsi diisi sebelum menampilkan modal
+
+    try {
+        // Ambil data dengan pagination
+        const result = await pb.collection('data_barang').getList(pageini, pageSize, {
+            sort: "-created"
+        });
+        console.log(result)
+        console.log(pageini, pageSize)
+        const records = result.items; // Ambil data item
+        const totalItems = result?.totalItems ?? 0;
+        let totalPages = Math.ceil(totalItems / pageSize);
+        updatePagination(pageini, totalPages);
+
+        const dataBody = document.getElementById('dataBody');
+        dataBody.innerHTML = '';
+
+        records.forEach(record => {
+            const imageUrl = `${pocketbaseUrl}/api/files/data_barang/${record.id}/${record.gambar}`;
+            const imageCell = record.gambar ? 
+                `<img src="${imageUrl}" alt="${record.nama_barang}" width="50">` : 
+                'Tidak ada gambar'; // Teks jika tidak ada gambar
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${imageCell}</td>
+                <td>${record.nama_barang}</td>
+                <td>${record.part_number}</td>
+                <td>${record.ikut_set}</td>
+                <td>
+                    <button class="btn btn-warning" onclick="editData('${record.id}')">Edit</button>
+                    <button class="btn btn-danger" onclick="deleteData('${record.id}')">Delete</button>
+                </td>
+            `;
+            dataBody.appendChild(row);
+        });
+
+        // Update pagination
+        updatePagination(currentPage, totalPages);
+    } catch (error) {
+        console.error('Error loading data:', error);
+    } finally {
+        Swal.close();
+    }
+}
+
+document.getElementById('addForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Ambil nilai dari input
+    const nama_barang = document.getElementById('nama_barang').value;
+    const part_number = document.getElementById('part_number').value.trim().toUpperCase(); // Normalisasi input
+    const ikut_set = document.getElementById('ikut_set').value;
+    const gambar = document.getElementById('gambar').files[0];
+
+    // Cek apakah part_number sudah ada
+    const existingRecords = await pb.collection('data_barang').getFullList();
+    const partNumbers = existingRecords.map(record => record.part_number.trim().toUpperCase());
+
+    if (partNumbers.includes(part_number)) {
+        Swal.fire(`Part number "${part_number}" sudah pernah dimasukkan!`, `janga masukkan partnumber yg sudah pernah dimasukkan`, 'error');
+        // Clear input fields
+        document.getElementById('part_number').value = '';
+        document.getElementById('nama_barang').value = '';
+        document.getElementById('ikut_set').value = '';
+        document.getElementById('gambar').value = ''; // Clear file input
+        return; // Hentikan eksekusi lebih lanjut
+    }
+
+    // Jika part_number belum ada, lanjutkan untuk menambahkan data
+    const formData = new FormData();
+    formData.append('nama_barang', nama_barang);
+    formData.append('part_number', part_number);
+    formData.append('ikut_set', ikut_set);
+    formData.append('gambar', gambar);
+
+    try {
+        await pb.collection('data_barang').create(formData);
+        Swal.fire('Success', 'Data barang berhasil ditambahkan!', 'success');
+        loadData();
+        $('#addModal').modal('hide');
+    } catch (error) {
+        console.error('Error adding data:', error);
+        Swal.fire('Error', 'Gagal menambahkan data barang!', 'error');
+    }
+});
+
+async function editData(id) {
+    try {
+        const record = await pb.collection('data_barang').getOne(id);
+        
+        // Isi modal dengan data yang ada
+        document.getElementById('edit_nama_barang').value = record.nama_barang;
+        document.getElementById('edit_part_number').value = record.part_number;
+        document.getElementById('edit_ikut_set').value = record.ikut_set;
+        document.getElementById('edit_record_id').value = record.id; // Simpan ID record
+         await loadIkutSetOptions('edit_ikut_set'); // Pastikan opsi diisi sebelum menampilkan modal
+
+        // Tampilkan modal
+        $('#editModal').modal('show');
+    } catch (error) {
+        console.error('Error fetching record for edit:', error);
+    }
+}
+
+async function deleteData(id) {
+    const confirmDelete = await Swal.fire({
+        title: 'Yakin DI hapus ?',
+        text: "Data ini akan dihapus!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (confirmDelete.isConfirmed) {
+        try {
+            await pb.collection('data_barang').delete(id);
+            Swal.fire('Deleted!', 'Data barang telah dihapus.', 'success');
+            loadData();
+        } catch (error) {
+            console.error('Error deleting data:', error);
+            Swal.fire('Error', 'Gagal menghapus data barang!', 'error');
+        }
+    }
+}
+
+function updatePagination(currentPage, totalPages) {
+    const paginationContainer = document.getElementById('pagination');
+    paginationContainer.innerHTML = '';
+
+    // Previous button
+    const prevButton = document.createElement('button');
+    prevButton.innerText = 'Previous';
+    prevButton.className = 'btn btn-secondary';
+    prevButton.disabled = currentPage <= 1; // Disable jika di halaman pertama
+    prevButton.onclick = () => {
+        if (currentPage > 1) {
+            loadData(currentPage - 1);
+        }
+    };
+
+    paginationContainer.appendChild(prevButton);
+
+    // Page info
+    const pageInfo = document.createElement('span');
+    pageInfo.innerText = `Halaman ${currentPage} dari ${totalPages}`;
+    pageInfo.style.margin = "0 10px";
+    paginationContainer.appendChild(pageInfo);
+
+    // Next button
+    const nextButton = document.createElement('button');
+    nextButton.innerText = 'Next';
+    nextButton.className = 'btn btn-secondary';
+    nextButton.disabled = currentPage >= totalPages; // Disable jika di halaman terakhir
+    nextButton.onclick = () => {
+        if (currentPage < totalPages) {
+            loadData(currentPage + 1);
+        }
+    };
+
+    paginationContainer.appendChild(nextButton);
+}
+
+
+authenticate();
+
+
+
+
+document.getElementById('editForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const id = document.getElementById('edit_record_id').value; // Ambil ID record
+    const nama_barang = document.getElementById('edit_nama_barang').value;
+    const part_number = document.getElementById('edit_part_number').value.trim().toUpperCase();
+    const ikut_set = document.getElementById('edit_ikut_set').value;
+    const gambar = document.getElementById('edit_gambar').files[0];
+
+    const formData = new FormData();
+    formData.append('nama_barang', nama_barang);
+    formData.append('part_number', part_number);
+    formData.append('ikut_set', ikut_set);
+    if (gambar) {
+        formData.append('gambar', gambar); // Hanya tambahkan gambar jika ada
+    }
+
+    try {
+        await pb.collection('data_barang').update(id, formData);
+        Swal.fire('Success', 'Data barang berhasil diperbarui!', 'success');
+        loadData(currentPage); // Muat ulang data setelah pembaruan
+        $('#editModal').modal('hide'); // Sembunyikan modal setelah berhasil
+    } catch (error) {
+        console.error('Error updating data:', error);
+        Swal.fire('Error', 'Gagal memperbarui data barang!', 'error');
+    }
+});
+
+
