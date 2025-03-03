@@ -10,15 +10,13 @@ function formatDate(dateString) {
         day: 'numeric', 
         hour: '2-digit', 
         minute: '2-digit', 
-        timeZone: 'UTC'
+        timeZone: 'Asia/Jakarta'
     };
-    
-    // Membuat objek tanggal dari string
-    const date = new Date(dateString);
 
-    // Mengembalikan tanggal dalam format yang diinginkan
+    const date = new Date(dateString);
     return date.toLocaleString('id-ID', options);
 }
+
 
     async function authenticateUser() {
         try {
@@ -89,7 +87,7 @@ function formatDate(dateString) {
             <tr>
                 <td colspan="6">
                     <div style="display:flex;font-style:italic;font-size:15px;justify-content:end;margin-right:4px">
-                        ${nama_barang} - Lot : ${lot} - Qty: ${qty_ambil} - (${formattedDate})
+                        ${nama_barang} - Lot : ${lot} - (${formattedDate})
                     </div>
                 </td>
             </tr>
