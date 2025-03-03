@@ -5,23 +5,20 @@ let totalPages = 0;
 // Function to format the date
 function formatDate(dateString) {
     const date = new Date(dateString);
-    
-    // Define options for formatting
-    const options = { 
-        day: '2-digit', 
-        month: 'long', 
-        year: 'numeric', 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        hour12: false 
-    };
 
-    // Format the date
-    const formattedDate = date.toLocaleString('id-ID', options);
-    
-    // Remove the comma and format the output
-    return formattedDate.replace(',', '').replace(' ', ' '); // Adjust space if needed
+    // Ambil bagian tanggal
+    const day = date.getDate().toString().padStart(2, '0'); // Pastikan selalu 2 digit
+    const month = date.toLocaleString('id-ID', { month: 'long' }); // Nama bulan dalam bahasa Indonesia
+    const year = date.getFullYear();
+
+    // Ambil bagian jam & menit
+    const hours = date.getHours().toString().padStart(2, '0'); // Pastikan selalu 2 digit
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    // Gabungkan tanpa "pukul"
+    return `${day} ${month} ${year} ${hours}:${minutes}`;
 }
+
 
 async function authenticate() {
     try {
@@ -54,8 +51,9 @@ async function fetchData(page) {
 function renderTable(data) {
     const tableBody = document.getElementById('data-table-body');
     tableBody.innerHTML = '';
-    data.items.forEach(item => {
+    data.items.forEach((item, index) => {
         const formattedDate = formatDate(item.created);
+         const nomorUrut = (currentPage - 1) * 60 + index + 1;
 
         // Determine the status style and icon
         let statusStyle = '';
@@ -72,10 +70,17 @@ function renderTable(data) {
             statusIcon = ''; // No icon for other statuses
         }
 
+        
         const row = `<tr>
+          <td>${nomorUrut}</td>
             <td>${item.no_dn.toUpperCase()}</td>
             <td style="background-color:yellow;font-weight:bold">${item.part_number}</td>
+                <td>
+                ${/^https?:\/\//.test(item.gambar) ? `<img src="${item.gambar}" style="width:100px"/>` : 'Tidak ada gambar'}
+            </td>
+
             <td style="font-weight:bold">${item.nama_barang}</td>
+            
             <td style="background-color:black;font-weight:bold;color:white">${item.lot}</td>
             <td>${item.qty_minta}</td>
             <td>${item.tgl_pb}</td>

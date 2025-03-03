@@ -125,8 +125,12 @@ $("#modalPB").modal("show");
 document.getElementById("masukkanQty").addEventListener("click", async function () {
     const setName = document.getElementById("setName").value;
     const tglPBInput = document.getElementById("tglPB").value;
-    const nomorPB = document.getElementById("nomorPB").value;
-    const nomorLot = document.getElementById("nomorLot").value;
+    // Format nomor PB: Hilangkan spasi & ubah huruf besar
+    let nomorPB = document.getElementById("nomorPB").value.trim().toUpperCase().replace(/\s+/g, '');
+    
+    // Format nomor lot: Hapus spasi & angka 0 di depan
+    let nomorLot = document.getElementById("nomorLot").value.replace(/\s+/g, '').replace(/^0+/, '');
+
     const qty = parseInt(document.getElementById("qty").value, 10);
 
     if (!nomorPB || !nomorLot || isNaN(qty) || qty <= 0) {
@@ -159,7 +163,8 @@ document.getElementById("masukkanQty").addEventListener("click", async function 
 
         // Proses semua barang yang cocok
         for (const barang of matchingBarangList) {
-            const { part_number: partNumber, nama_barang: namaBarang, gambar } = barang;
+            const { id,part_number: partNumber, nama_barang: namaBarang, gambar } = barang;
+            const imageUrl = gambar ? `${pocketbaseUrl}/api/files/data_barang/${id}/${gambar}` : 'tidak ada gambar';
 
             // Cek apakah part_number dengan lot sudah ada di kartu_stok
             const existingKartu = kartuRecords.filter(item => item.part_number === partNumber && item.lot === nomorLot);
@@ -180,7 +185,7 @@ document.getElementById("masukkanQty").addEventListener("click", async function 
                 nama_barang: namaBarang,
                 lot: nomorLot,
                 no_dn: nomorPB,
-                gambar: gambar,
+                gambar: imageUrl,
                 status: "masuk",
                 balance: newBalance, // Balance baru = balance lama + qty input
                 qty_masuk: qty,
