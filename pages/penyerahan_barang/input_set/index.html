@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafindo Scanner</title>
+    <!-- Link ke CSS Bootstrap -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<!-- SweetAlert2 JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <script src="../../../js/sdk/pocketbase.umd.js"></script>
+    <script src="../../../js/pocket_config.js"></script>
+</head>
+<body>
+
+    <!-- Tempat untuk memuat navbar -->
+    <div id="navbar-container"></div>
+<div class="container mt-4">
+    <h5 style="font-weight: bold;">Input SET penyerahan Barang</h5>
+    <div id="data-container"></div>
+</div>
+
+
+<!-- Modal Tambah PB -->
+<div class="modal fade show" id="modalPB" tabindex="-1"
+     aria-labelledby="modalPBLabel"
+     aria-modal="true"
+     role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalPBLabel">Tambah PB</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formPB">
+                    <div class="form-group">
+                        <label for="setName">Set Name</label>
+                        <input type="text" class="form-control" id="setName" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="tglPB">Tanggal PB</label>
+                        <input type="date" class="form-control" id="tglPB">
+                    </div>
+                    <div class="form-group">
+                        <label for="nomorPB">Nomor PB</label>
+                        <input type="text" class="form-control" id="nomorPB">
+                    </div>
+                    <div class="form-group">
+                        <label for="nomorLot">Nomor Lot</label>
+                        <input type="text" class="form-control" id="nomorLot">
+                    </div>
+                    <div class="form-group">
+                        <label for="qty">Qty</label>
+                        <input type="number" class="form-control" id="qty">
+                    </div>
+                    <button type="button" class="btn btn-success" id="masukkanQty">Masukkan Qty</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <!-- Link ke jQuery dan JS Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script  src="./js/input_dengan_set.js"></script>
+    <script>
+
+        $(document).ready(function() {
+            $("#navbar-container").load("../../../component/nav.html");
+                    });
+
+    </script>
+</body>
+</html>
