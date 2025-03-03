@@ -124,6 +124,7 @@ function renderTable(data) {
             <td>${item.lot}</td>
             <td>${item.no_dn.toUpperCase()}</td>
             <td>${item.dn_date}</td>
+            <td>${item.nama_barang}</td>
             <td>${item.tgl_pb}</td>
             <td>${item.status}</td>
             <td><i>${formatDate(item.created)}</i></td>

@@ -73,7 +73,7 @@ function renderTable(data) {
         
         const row = `<tr>
           <td>${nomorUrut}</td>
-            <td>${item.no_dn.toUpperCase()}</td>
+            <td style="font-weight:bold">${item.no_dn.toUpperCase()}</td>
             <td style="background-color:yellow;font-weight:bold">${item.part_number}</td>
                 <td>
                 ${/^https?:\/\//.test(item.gambar) ? `<img src="${item.gambar}" style="width:100px"/>` : 'Tidak ada gambar'}

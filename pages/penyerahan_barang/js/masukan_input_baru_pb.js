@@ -7,7 +7,7 @@ async function Masukkan_stok_baru() {
     const qtyMasuk = parseInt($("#qty_masuk").val(), 10);
 
     if (!partNumber || !noLot || !noPB || !tglPB || !namaBarang || isNaN(qtyMasuk)) {
-        Swal.fire('Error', 'Semua field harus diisi dengan benar.', 'error');
+        Swal.fire('Ada Inputan yg Kosong , lengkapi dulu', 'Semua field harus diisi dengan benar.', 'error');
         return;
     }
 
@@ -24,6 +24,21 @@ async function Masukkan_stok_baru() {
             }
         });
 
+        const result_barang = await pb.collection('data_barang').getList(1, 1, {
+            filter: `part_number="${partNumber}"`
+        });
+
+        const existingItem = result_barang.items.length > 0 ? result_barang.items[0] : null;
+
+        
+        if (!existingItem) {
+            // Jika tidak ada, buat data baru
+            await pb.collection('data_barang').create({
+                nama_barang: namaBarang,
+                part_number: partNumber,
+                ikut_set: ""
+            });
+        }
         // Ambil balance terakhir
         const latestItem = await getBalanceTerakhir(partNumber);
         let balance = 0;
