@@ -10,6 +10,15 @@
   
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
 
+    <style>
+        @media print{
+            body { print-color-adjust: exact; }
+            table td {
+                font-weight: bold;
+                color: black;
+            }
+        }
+    </style>
 
 
 </head>
@@ -18,7 +27,11 @@
     <div id="navbar-container"></div>
 
     <div class="container mt-4">
-        <h2>Kartu Stok PerBarang</h2>
+        <div style="display: flex;justify-content: space-between;">
+        <h4 style="font-weight: bold;">Kartu Stok PerBarang</h4>
+            <button id="print-btn" class="btn btn-primary">Print</button>
+
+        </div>
         <form id="filter-form">
             <div class="row">
                 <div class="col-12">
@@ -30,13 +43,15 @@
                 </div>
                 <div class="col-12">
                     <div class="form-group">
-                        <label for="start-date">Tanggal Dari:</label>
+                        <label for="start-date">Tanggal Dari: 
+                        <span id="tgldari"></span>
+                        </label>
                         <input type="date" class="form-control" id="start-date" required>
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="form-group">
-                        <label for="end-date">Tanggal Sampai:</label>
+                        <label for="end-date">Tanggal Sampai:  <span id="tglsampai"></span></label>
                         <input type="date" class="form-control" id="end-date" required>
                     </div>
                 </div>
@@ -45,6 +60,11 @@
                 </div>
             </div>
         </form>
+
+        <div style="border:1px solid black">
+            <div id="detail_barang"></div>
+        </div>
+
 
         <table class="table table-bordered mt-4 table-responsive">
             <thead>
@@ -90,4 +110,18 @@
 });
 
 </script>
+
+<script>
+    document.querySelector("#print-btn").addEventListener("click", function() {
+        let printContents = document.querySelector("#detail_barang").outerHTML + 
+            document.querySelector("table").outerHTML;
+        let originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        location.reload(); // Refresh halaman agar tidak rusak setelah print
+    });
+</script>
+
 </html>
