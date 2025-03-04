@@ -53,12 +53,31 @@ try {
 
             scannedList += '</ul>';
             scannedItemsContainer.append(scannedList);
-
-       
+        console.log("kartustok",records)
+        return updateQtyScan(records);
     } 
-      // return qtyScanMap;
 } catch (error) {
     console.log(error);
     resultContainer.append('<h6>Terjadi error saat pencarian kartu stok, harap coba lagi.</h6>');
 }
+}
+
+
+async function updateQtyScan(records) {
+    console.log("RECORD update qty",records)
+    const qtyScanMap = {};
+    if (!records || records.length === 0) {
+        alert(qtyScanMap)
+        return qtyScanMap; // Kembalikan objek kosong jika tidak ada records
+    }
+    records.forEach(record => {
+        const qtyAmbil = parseInt(record.qty_ambil) || 0; // Konversi qty_ambil ke angka, default ke 0 jika NaN
+        if (qtyScanMap[record.part_number]) {
+            qtyScanMap[record.part_number] += qtyAmbil; // Tambahkan qty jika sudah ada
+        } else {
+            qtyScanMap[record.part_number] = qtyAmbil; // Inisialisasi qty
+        }
+    });
+
+    return qtyScanMap; // Kembalikan qtyScanMap
 }

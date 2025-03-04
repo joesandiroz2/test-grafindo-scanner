@@ -4,6 +4,7 @@ import { searchKartuStok } from './check_kartu_stok.js';
 let inputField = document.getElementById('do-input'); // Replace with your actual input field ID
 
 export async function ScanOutStok(pb, input, dataItems) {
+    console.log("dataItems",dataItems)
     const [partNumber, supplierId, qty, noLot] = input.split('|');
     console.log(partNumber);
 
@@ -106,10 +107,11 @@ export async function ScanOutStok(pb, input, dataItems) {
         // Tampilkan SweetAlert
         Swal.fire({
             toast:true,
+            position:"top-end",
             title: 'OKEH !!!!',
             text: 'Data berhasil disimpan ke kartu stok.',
             icon: 'success',
-            timer: 1500,
+            timer: 1300,
             showConfirmButton: false
         });
         const audio = new Audio('./suara/suara_ok.mp3');

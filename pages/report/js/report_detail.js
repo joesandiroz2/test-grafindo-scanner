@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async function () {
 const pb = new PocketBase(pocketbaseUrl);
 let currentPage = 1;
-const perPage = 400;
+const perPage = 1000;
 
 function formatDate(dateString) {
 const options = {
@@ -96,6 +96,7 @@ async function fetchData(page) {
     } catch (error) {
         console.error("Error fetching data:", error);
     } finally {
+          document.getElementById("loading_report").style.display = "none"; // Sembunyikan spinner
         Swal.close();
     }
 }
@@ -126,36 +127,22 @@ function renderTable(data) {
         }
         noDnGroups[item.no_dn].push(item);
     });
-    // Buat tampilan HTML
-    function generateScanRows(no_dn) {
-    return noDnGroups[no_dn].map(({ nama_barang,part_number, lot, qty_ambil, created }) => {
-        const formattedDate = formatDate(created);
-        return `
-        <tr>
-            <td colspan="6">
-                <div style="display:flex;font-style:italic;font-size:15px;justify-content:end;margin-right:4px">
-                    ${nama_barang} - Lot : ${lot} - (${formattedDate})
-                </div>
-            </td>
-        </tr>
-        `;
-    }).join("");
-}
+   
 
 
     Object.keys(noDnGroups).forEach(no_dn => {
         let rowIndex = 1;
         const dataHead = noDnGroups[no_dn][0];
         const totalItemsOk = noDnGroups[no_dn].filter(item => item.qty_minta == item.qty_ambil).length;
-        console.log(no_dn,totalItemsOk)
+
         const tableHtml = `
             <hr style="border:2px solid black"/>
             <div style="border:1px solid black">
                 <div class="row">
-                <div class="col-sm-12 col-md-3 col-lg-3">
-                    <h5 class="mt-4" style="font-weight:bold;text-align:center">${no_dn}</h5>
+                <div class="col-sm-12 col-md-2 col-lg-2">
+                    <h6 class="mt-4" style="background-color:black;color:white;padding:3px;font-weight:bold;text-align:center">${no_dn}</h6>
                 </div>
-                <div class="col-sm-12 col-md-3 col-lg-3">
+                <div class="col-sm-12 col-md-2 col-lg-2">
                     <h6>Tanggal DO : </h6>
                     <b>${dataHead.dn_date}</b>
                 </div>
@@ -165,6 +152,12 @@ function renderTable(data) {
                 <div class="col-sm-12 col-md-2 col-lg-2">
                         <h6>Jumlah barang:</h6>
                     <b style="text-align:center">${dataHead.jumlah_barang_do}</b>
+
+                    </div>
+                <div class="col-sm-12 col-md-2 col-lg-2">
+                    <b style="font-size:13px;text-align:center">Plant ID : ${dataHead.plant_id}</b><br/>
+                    <b style="font-size:13px;text-align:center">${dataHead.plant_desc}</b><br/>
+                    <b style="font-size:13px;text-align:center">Gate : ${dataHead.gate_id}</b>
 
                     </div>
                 <div class="col-sm-12 col-md-2 col-lg-2">
@@ -184,6 +177,8 @@ function renderTable(data) {
                         <th>No</th>
                         <th>Part Number</th>
                         <th>Nama Barang</th>
+                        <th>Lot</th>
+                        <th>Scan Terakhir</th>
                         <th>Qty Do</th>
                         <th>Qty Scan</th>
                         <th>Status</th>
@@ -197,17 +192,18 @@ function renderTable(data) {
                         return `
                         <tr>
                             <td>${rowIndex++}</td>
-                            <td>${item.part_number}</td>
-                            <td>${item.nama_barang}</td>
-                            <td>${item.qty_minta}</td>
-                            <td>${item.qty_ambil}</td>
-                            <td>${status}</td>
+                            <td style="font-weight:bold">${item.part_number}</td>
+                            <td style="font-weight:bold">${item.nama_barang}</td>
+                            <td><i>${item.lot}</i></td>
+                            <td><i>${formatDate(item.created)}</i></td>
+                            <td style="font-weight:bold">${item.qty_minta}</td>
+                            <td style="font-weight:bold">${item.qty_ambil}</td>
+                            <td style="text-align:center">${status}</td>
                         </tr>
                             `;
                     }).join("")}
                 </tbody>
             </table>
-        ${generateScanRows(no_dn)}
 
 
         `;
