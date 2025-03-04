@@ -85,7 +85,9 @@ try {
 } catch (error) {
     console.log(error);
     if (error.message.includes("not found")) {
-        resultContainer.html('<h6>DO ini belum ada di sistem ini.</h6>');
+         const audio = new Audio('../suara/do_belum_di_upload.mp3');
+            audio.play();
+        resultContainer.html('<h5 style="color:red;font-weight:bold">DO ini belum Di UPLOAD di sistem ini.</h5>');
     } else {
         resultContainer.html('<h6>Terjadi error saat pencarian DO, harap coba lagi.</h6>');
     }
@@ -104,22 +106,29 @@ if (items.length > 0) {
     <table class="table table-bordered">
     <thead>
     <tr>
+    <th>No</th> 
     <th>nama_barang</th>
     <th>Part Number</th>
     <th>Qty </th>
     </tr>
     </thead><tbody>`;
+      let nomorUrut = 1;
+
     items.forEach(item => {
         table += `
             <tr>
-                <td>${item.Part_Number_Desc}</td>
+            <td>${nomorUrut}</td> 
+                <td style="font-weight:bold">${item.Part_Number_Desc}</td>
                 <td>${item.Supplier_Part_Number}</td>
                 <td>${item.Qty_DN}</td>
             </tr>`;
+            nomorUrut++; 
     });
     table += '</tbody></table>';
     resultContainer.html(table);
 } else {
-    resultContainer.html('<h6>DO ini belum ada di sistem ini.</h6>');
+    const audio = new Audio('../suara/do_belum_di_upload.mp3');
+            audio.play();
+    resultContainer.html('<h5 style="color:red;text-align:center;font-weight:bold">Nomor DO ini belum Di UPLOAD di sistem ini. Minta Pa DEDE untuk Upload DO Excel</h5>');
 }
 }

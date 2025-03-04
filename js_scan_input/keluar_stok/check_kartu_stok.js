@@ -1,5 +1,4 @@
 
-
 const pb = new PocketBase(pocketbaseUrl);
 
 export async function searchKartuStok(noDn) {
@@ -32,7 +31,7 @@ try {
 
    if (records.length > 0) {
     let scannedList = `
-        <h6>Data yg udah di scan :</h6>
+        <h6 style="text-align:center;font-weight:bold">Barang  yg udah di scan :</h6>
         <ul class="collection" style="background-color: green; color: white; padding: 10px; border-radius: 5px;">
     `;
     records.forEach((item, index) => {
