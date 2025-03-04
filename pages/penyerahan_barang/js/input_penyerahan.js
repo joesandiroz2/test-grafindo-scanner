@@ -192,6 +192,16 @@ $("#search-button").on("click", function() {
         Swal.fire('Warning', 'Silakan masukkan Part Number dan No Lot.', 'warning');
         return;
     }
+     $(this).prop('disabled', true).text('Sedang Mencari...');
 
-    fetchData(partNumber, noLot); // Panggil fetchData dengan inputan
+     fetchData(partNumber, noLot)
+        .then(() => {
+            // Mengembalikan tombol ke keadaan semula
+            $("#search-button").prop('disabled', false).text('Cari');
+        })
+        .catch((error) => {
+            console.error(error);
+            // Mengembalikan tombol ke keadaan semula jika terjadi kesalahan
+            $("#search-button").prop('disabled', false).text('Cari');
+        });
 });
