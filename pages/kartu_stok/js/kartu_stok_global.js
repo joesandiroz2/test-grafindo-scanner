@@ -37,7 +37,7 @@ async function fetchData(page) {
         }
     });
     try {
-        const resultList = await pb.collection('kartu_stok').getList(page, 100, {
+        const resultList = await pb.collection('kartu_stok').getList(page, 30, {
             sort: '-created' // Mengurutkan berdasarkan field 'created' secara menurun
         });
         Swal.close();
