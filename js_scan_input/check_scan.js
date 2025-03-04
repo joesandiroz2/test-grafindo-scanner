@@ -17,7 +17,29 @@ $("#do-input").on("input", function() {
 
     if (inputValue) {
         timeout = setTimeout(async function() {
-            // Mengatur src audio dari JavaScript
+     const parts = inputValue.split('|');
+
+        // Validasi: harus ada 4 blok jika menggunakan '|', atau inputan standar tanpa '|'
+    if ((parts.length === 4 && inputValue.endsWith('|')) || (parts.length !== 4 && !/^[A-Z0-9-]+$/.test(inputValue))) {
+        // Tampilkan SweetAlert2 jika tidak sesuai
+        Swal.fire({
+            timer:1300,
+            icon: 'error',
+            title: 'Partnumber scan Tidak Standar, hanya 3 block',
+            text: 'Partnumber scan harus terdiri dari 4 blok dan tidak boleh diakhiri dengan "|", atau input standar tanpa "|".',
+        });
+
+        // Memutar suara
+        const audio = new Audio('../../suara/partnumber_ga_standar_scan.mp3');
+        audio.play();
+
+        // Menghapus inputan setelah menampilkan pesan
+        $('#do-input').val('');
+        return; // Keluar dari fungsi jika format tidak sesuai
+    }
+
+
+         // Mengatur src audio dari JavaScript
             const audioSource = document.getElementById('audio-source');
             audioSource.src = './suara/scan_do.wav'; // Ganti dengan path audio yang diinginkan
             const audio = document.getElementById('scan-audio');

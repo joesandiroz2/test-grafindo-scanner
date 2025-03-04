@@ -26,12 +26,12 @@ class="btn btn-success"
 <div class="col-sm-12 col-md-12 col-lg-12">
 <div
 style="border: 2px solid black;padding: 3px;margin:15px;padding: 5px;"
- class="container">
- <h6 style="font-weight:bold">Scan Qr Partnumber Di Sini</h6>
-   <input type="text" 
-   autofocus
-   id="scan-qr-partnumber"
-   class="form-control"placeholder="Scan Qr Partnumber disini">
+class="container">
+<h6 style="font-weight:bold">Scan Qr Partnumber Di Sini</h6>
+<input type="text" 
+autofocus
+id="scan-qr-partnumber"
+class="form-control"placeholder="Scan Qr Partnumber disini">
 </div>
 </div>
 </div>
@@ -40,18 +40,18 @@ style="border: 2px solid black;padding: 3px;margin:15px;padding: 5px;"
 <div class="row">
 <div class="col-md-6 col-sm-12 col-lg-6">
 <div class="form-group">
-    <label for="part-number">Part Number</label>
-    <input type="text"
-    style="font-weight: bold;font-size: 25px;"
-     id="part-number" class="form-control" placeholder="Masukkan Part Number">
+<label for="part-number">Part Number</label>
+<input type="text"
+style="font-weight: bold;font-size: 25px;"
+ id="part-number" class="form-control" placeholder="Masukkan Part Number">
 </div>
 </div>
 <div class="col-md-6">
 <div class="form-group">
-    <label for="no-lot">No Lot</label>
-    <input type="text"
-    style="font-weight: bold;font-size: 25px;"
-     id="no-lot" class="form-control" placeholder="Masukkan No Lot">
+<label for="no-lot">No Lot</label>
+<input type="text"
+style="font-weight: bold;font-size: 25px;"
+ id="no-lot" class="form-control" placeholder="Masukkan No Lot">
 </div>
 </div>
 </div>
@@ -61,28 +61,28 @@ style="border: 2px solid black;padding: 3px;margin:15px;padding: 5px;"
 <h5 style="font-weight: bold;">Input Stok Baru</h5>
 <div class="row">
 <div class="col-sm-12 col-md-4 col-lg-4">
-    <div class="form-group">
-        <label for="no_pb">No PB</label>
-        <input type="text" id="no_pb" class="form-control" placeholder="Masukkan No PB">
-    </div>
+<div class="form-group">
+    <label for="no_pb">No PB</label>
+    <input type="text" id="no_pb" class="form-control" placeholder="Masukkan No PB">
+</div>
 </div>
 <div class="col-sm-12 col-md-4 col-lg-4">
-    <div class="form-group">
-        <label for="tgl_pb">Tanggal PB</label>
-        <input type="date" id="tgl_pb" class="form-control">
-    </div>
+<div class="form-group">
+    <label for="tgl_pb">Tanggal PB</label>
+    <input type="date" id="tgl_pb" class="form-control">
+</div>
 </div>
 <div class="col-sm-12 col-md-4 col-lg-4">
-    <div class="form-group">
-        <label for="nama_barang">Nama Barang</label>
-        <input type="text" id="nama_barang" class="form-control" style="font-weight:bold;"placeholder="Masukkan Nama Barang">
-    </div>
+<div class="form-group">
+    <label for="nama_barang">Nama Barang</label>
+    <input type="text" id="nama_barang" class="form-control" style="font-weight:bold;"placeholder="Masukkan Nama Barang">
+</div>
 </div>
 <div class="col-sm-12 col-md-4 col-lg-4">
-    <div class="form-group">
-        <label for="qty_masuk">Qty Masuk</label>
-        <input type="number" id="qty_masuk" class="form-control" placeholder="Masukkan Qty Masuk">
-    </div>
+<div class="form-group">
+    <label for="qty_masuk">Qty Masuk</label>
+    <input type="number" id="qty_masuk" class="form-control" placeholder="Masukkan Qty Masuk">
+</div>
 </div>
 </div>
 <button id="masukkan-qty-button" class="btn btn-info">Masukkan Qty</button>
@@ -101,53 +101,53 @@ const pb = new PocketBase(pocketbaseUrl);
 
 $(document).ready(function() {
 $("#navbar-container").load("../../component/nav.html");
- $("#masukkan-qty-button").on("click", function() {
-    Masukkan_stok_baru(); // Panggil fungsi dari file masukkan_qty.js
+$("#masukkan-qty-button").on("click", function() {
+Masukkan_stok_baru(); // Panggil fungsi dari file masukkan_qty.js
 });
- let inputTimeout;
+let inputTimeout;
 
-    // Event listener untuk inputan QR Partnumber menggunakan ID
-    $('#scan-qr-partnumber').on('input', function() {
-        clearTimeout(inputTimeout);
-        
-        const inputValue = $(this).val();
-        
-        // Set timeout untuk 1.3 detik
-        inputTimeout = setTimeout(function() {
-            if (inputValue) {
-                // Memisahkan input berdasarkan '|'
-                const parts = inputValue.split('|');
-                
-                // Validasi jumlah blok dan tidak diakhiri dengan '|'
-                if (parts.length !== 4 || inputValue.endsWith('|')) {
-                    // Tampilkan SweetAlert2 jika tidak sesuai
-            Swal.fire({
-                timer:1400,
-                icon: 'error',
-                title: 'Partnumber Tidak Standar ditemukan hanyak 3 blok',
-                text: 'Partnumber harus terdiri dari 4 blok dan tidak boleh diakhiri dengan "|".',
-            });
+// Event listener untuk inputan QR Partnumber menggunakan ID
+$('#scan-qr-partnumber').on('input', function() {
+    clearTimeout(inputTimeout);
+    
+    const inputValue = $(this).val();
+    
+    // Set timeout untuk 1.3 detik
+    inputTimeout = setTimeout(function() {
+        if (inputValue) {
+            // Memisahkan input berdasarkan '|'
+            const parts = inputValue.split('|');
+            
+            // Validasi jumlah blok dan tidak diakhiri dengan '|'
+            if (parts.length !== 4 || inputValue.endsWith('|')) {
+                // Tampilkan SweetAlert2 jika tidak sesuai
+        Swal.fire({
+            timer:1400,
+            icon: 'error',
+            title: 'Partnumber Tidak Standar ditemukan hanyak 3 blok',
+            text: 'Partnumber harus terdiri dari 4 blok dan tidak boleh diakhiri dengan "|".',
+        });
 
-                    // Memutar suara
-                const audio = new Audio('../../suara/partnumber_ga_standar_scan.mp3');
-                audio.play();
+                // Memutar suara
+            const audio = new Audio('../../suara/partnumber_ga_standar_scan.mp3');
+            audio.play();
 
-                    // Menghapus inputan QR setelah menampilkan pesan
-                    $('#scan-qr-partnumber').val('');
-                    return; // Keluar dari fungsi jika format tidak sesuai
-                }
-
-                // Jika format sesuai, lanjutkan
-                $('#part-number').val(parts[0]); // Part Number
-                $('#no-lot').val(parts[3]); // Lot
-                
-                // Memicu klik pada tombol Cari
-                $('#search-button').click();
+                // Menghapus inputan QR setelah menampilkan pesan
+                $('#scan-qr-partnumber').val('');
+                return; // Keluar dari fungsi jika format tidak sesuai
             }
-            // Menghapus inputan QR setelah 1.3 detik
-            $('#scan-qr-partnumber').val('');
-        }, 1300);
-    });
+
+            // Jika format sesuai, lanjutkan
+            $('#part-number').val(parts[0]); // Part Number
+            $('#no-lot').val(parts[3]); // Lot
+            
+            // Memicu klik pada tombol Cari
+            $('#search-button').click();
+        }
+        // Menghapus inputan QR setelah 1.3 detik
+        $('#scan-qr-partnumber').val('');
+    }, 1300);
+});
 });
 </script>
 </body>
