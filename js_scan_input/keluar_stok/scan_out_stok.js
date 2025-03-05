@@ -5,8 +5,10 @@ let inputField = document.getElementById('do-input'); // Replace with your actua
 
 export async function ScanOutStok(pb, input, dataItems) {
     console.log("dataItems",dataItems)
-    const [partNumber, supplierId, qty, noLot] = input.split('|');
-    console.log(partNumber);
+    const [partNumber, supplierId, qtyRaw, noLot] = input.split('|');
+     const qty = parseInt(qtyRaw, 10);
+
+    console.log(partNumber,qty);
 
     // Menghilangkan leading zero dari noLot
     const formattedNoLot = noLot.replace(/^0+/, '');
