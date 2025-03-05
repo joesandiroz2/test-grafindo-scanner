@@ -24,7 +24,7 @@ async function checkBarang() {
     try {
         // Mencari barang berdasarkan nomor_barang
         const resultList = await pb.collection('system2_barang_data').getList(1, 50, {
-            filter: `nomor_barang = '${nomorcari}'`
+            filter: `nomor_barang = '${nomor_barang}'`
         });
         console.log("resultList",resultList)
         if (resultList.items.length > 0) {
