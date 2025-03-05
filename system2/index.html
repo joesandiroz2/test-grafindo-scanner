@@ -356,13 +356,16 @@ $("#navbar-container").load("../component/nav.html");
 $("#supplier_id").val("7603");
 
 // Change Supplier ID based on selected Merk
-$("input[name='merk']").change(function() {
-if ($(this).val() === "Yamaha") {
-    $("#supplier_id").val("7603");
-} else if ($(this).val() === "Honda") {
-    $("#supplier_id").val("1201591");
-}
+ $("#merk").change(function() {
+    if ($(this).val() === "Yamaha") {
+        $("#supplier_id").val("7603");
+    } else if ($(this).val() === "Honda") {
+        $("#supplier_id").val("1201591");
+    } else {
+        $("#supplier_id").val(""); // Reset jika tidak ada pilihan yang valid
+    }
 });
+ 
  const today = new Date().toISOString().split('T')[0];
     document.getElementById('tgl_inspeksi').value = today;
 });

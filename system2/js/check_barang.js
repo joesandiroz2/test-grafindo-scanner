@@ -23,10 +23,17 @@ async function checkBarang() {
     console.log("nomorcari",nomorcari)
     try {
         // Mencari barang berdasarkan nomor_barang
-        const resultList = await pb.collection('system2_barang_data').getList(1, 50, {
-            filter: `nomor_barang = '${nomor_barang}'`
-        });
+         const response = await fetch(`${pocketbaseUrl}/api/collections/system2_barang_data/records?page=1&perPage=50&filter=nomor_barang%20%3D%20%27${nomorcari}%27`);
+       
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const resultList = await response.json();
+
         console.log("resultList",resultList)
+        
+
         if (resultList.items.length > 0) {
             const item = resultList.items[0]; // Ambil item pertama yang ditemukan
             document.getElementById('part_number').value = item.nomor_barang; // Set part_number
