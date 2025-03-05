@@ -19,11 +19,12 @@ async function checkBarang() {
 
     const nomor_barang = parts[0]; // Ambil nomor barang
     const qty = parts[1]; // Ambil qty
-
+    let nomorcari = `${nomor_barang.toUpperCase()}`
+    console.log("nomorcari",nomorcari)
     try {
         // Mencari barang berdasarkan nomor_barang
         const resultList = await pb.collection('system2_barang_data').getList(1, 50, {
-            filter: `nomor_barang = "${nomor_barang.toUpperCase()}"`
+            filter: `nomor_barang = "${nomorcari}"`
         });
         console.log("resultList",resultList)
         if (resultList.items.length > 0) {
