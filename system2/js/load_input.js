@@ -129,7 +129,7 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, lot, depo, su
         for (let i = 0; i < satuan; i++) {
             // Menentukan format QR Code berdasarkan merk
             let qrData = (merk.toLowerCase() === 'yamaha') 
-                ? `${partNumber}|${supplierId}|${lot}`
+                ? `${partNumber}|${supplierId}|${qty}`
                 : `${partNumber}|${supplierId}|${qty}|${lot}`;
 
             tglInspeksi = new Date(tglInspeksi).toLocaleDateString('id-ID', { 

@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async function () {
 const pb = new PocketBase(pocketbaseUrl);
 let currentPage = 1;
-const perPage = 1000;
+const perPage = 500;
 
 function formatDate(dateString) {
 const options = {
