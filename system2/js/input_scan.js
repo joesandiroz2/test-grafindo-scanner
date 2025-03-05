@@ -22,7 +22,7 @@ $(document).ready(function() {
         console.log(data); // Debugging: lihat data yang akan dikirim
 
         // Mengirim data ke PocketBase menggunakan fetch
-        fetch(pocketbaseUrl + '/api/collections/system2_barang_data/records', {
+        fetch(pocketbaseUrl + '/api/collections/system2_scan_input/records', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
