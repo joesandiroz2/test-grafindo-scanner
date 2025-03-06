@@ -126,6 +126,12 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, lot, depo, su
 
         const labelContainer = document.getElementById('labelContainer');
 
+        // Menentukan nama penerima berdasarkan merk
+        const penerima = (merk.toLowerCase() === 'yamaha') 
+            ? 'PT YAMAHA INDONESIA' 
+            : (merk.toLowerCase() === 'honda' ? 'PT ASTRA HONDA MOTOR' : ''); // Tambahkan kondisi lain jika perlu
+
+
         for (let i = 0; i < satuan; i++) {
             // Menentukan format QR Code berdasarkan merk
             let qrData = (merk.toLowerCase() === 'yamaha') 
@@ -138,25 +144,25 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, lot, depo, su
 
 
             let labelHTML = `
-            <div class="col-sm-12 col-md-4 col-lg-4">
-                <div class="label" style="border-radius:10px; border: 2px solid black; margin: 5px; padding: 10px; position: relative;">
-                    <span style="font-weight:bold;text-align:center; display:block;">PT. GRAFINDO MITRASEMESTA</span>
-                    <hr style="border:1px solid black; margin-top:0px;"/>
-                    <div style="display:flex;justify-content:space-between">
-                        <div>
-                            <p style="border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Nama Part: <b>${namaBarang}</b></p>
-                            <p style="border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">No Part: <b>${partNumber}</b></p>
-                            <p style="border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Lot Produksi : <b>${lot}</b></p>
-                            <p style="border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Quantity : <b>${qty}</b></p>
-                            <p style="border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Tanggal Packing: <b>${tglInspeksi}</b></p>
+            <div class="label-container" style="color:black;padding: 15px; width: calc(33.33% - 5px);margin:2px">
+                <div class=" label" style="border-radius:10px; border: 2px solid black;  padding: 5px; position: relative;">
+                    <span style="line-height:0.5;font-size:13px;padding:0px;margin:0px;font-weight:bold;text-align:center; display:block;">PT. GRAFINDO MITRASEMESTA</span>
+                    <hr style="line-height:0;border:1px solid black; "/>
+                     <p class="no-margin" style="font-size:13px;border-bottom: 1px solid black; display: block; width: 100%; margin: 1px 0; line-height: 1;">Part Name: <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${namaBarang}</b></p>
+                            <p class="no-margin" style="font-size:13px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Part Number: <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${partNumber}</b></p>
+                            <p class="no-margin" style="font-size:13px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Penerima: <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${penerima}</b></p>
+                            
+                    <div style="line-height:0.5;display:flex;justify-content:space-between">
+                        <div style="line-height:0.2;margin-top:0px">
+                           <p class="no-margin" style="font-size:13px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">No Lot : <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${lot}</b></p>
+                            <span class="no-margin" style="font-size:13px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Qty : <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${qty} Pcs </b> <span style="border:2px solid black;padding:1px;font-weight:bold">OK</span><span style="font-weight:bold"> NG</span></span>
+                            <p class="no-margin" style="font-size:13px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Tgl Packing: <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${tglInspeksi}</b></p>
+                        <p class="no-margin" style="font-size:13px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Opr Packing: <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${depo}</b></p>
+                            
                         </div>
-                        <div style="text-align: right;">
+                        <div style="text-align: right;margin-top:2px">
                             <div id="qrcode-${i}"></div>
                         </div>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <p style="border-bottom: 1px solid black; flex-grow: 1; margin-right: 10px; padding-bottom: 2px;">Inspector: <b>${depo}</b></p>
-                        <p style="padding: 2px;">Status part: <b style="border: 1px solid black;">OK</b></p>
                     </div>
                 </div>
             </div>
@@ -168,8 +174,8 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, lot, depo, su
             setTimeout(() => {
                 new QRCode(document.getElementById(`qrcode-${i}`), {
                     text: qrData,
-                    width: 80,
-                    height: 80
+                    width: 60,
+                    height: 60
                 });
             }, 100);
         }
