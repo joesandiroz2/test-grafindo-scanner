@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js
+"></script>
+
     <title>Grafindo Scanner</title>
     <!-- Link ke CSS Bootstrap -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -22,12 +25,16 @@
     <!-- Tempat untuk memuat navbar -->
     <div id="navbar-container"></div>
 
+ <div id="qr-reader" style="width:500px"></div>
+
+
     <!-- Konten Utama -->
     <div class="container mt-2">
        <h5>Scan Do / Part Disini </h5>
-       <input type="text" id="do-input" class="form-control" autofocus placeholder="scan do disini">
+       <!-- <input type="text" id="do-input" class="form-control" autofocus placeholder="scan do disini"> -->
       
-
+        <input type="text" id="do-input" class="form-control" autofocus placeholder="scan do disini" >
+        
 
       <audio id="scan-audio" hidden>
            <source id="audio-source" type="audio/mpeg">
@@ -58,7 +65,25 @@
             $(document).on('click', function() {
                 $("#do-input").focus();
             });
+
+              const html5QrCode = new Html5Qrcode("qr-reader");
+
+               const onScanSuccess = (decodedText, decodedResult) => {
+
+            document.getElementById("do-input").value = decodedText;
+               
+            };
+             // Mulai pemindaian
+            const config = { fps: 10, qrbox: 250 };
+            html5QrCode.start(
+                { facingMode: "environment" }, // Menggunakan kamera belakang
+                config,
+                onScanSuccess)
+            .catch(err => {
+                console.error("Error starting the QR Code scanner: ", err);
+            });
         });
+         
 
     </script>
 </body>
