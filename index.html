@@ -34,7 +34,12 @@
        <!-- <input type="text" id="do-input" class="form-control" autofocus placeholder="scan do disini"> -->
       
         <input type="text" id="do-input" class="form-control" autofocus placeholder="scan do disini" >
-        
+    
+     <div class="form-check">
+           <input type="checkbox" class="form-check-input" id="toggle-camera" checked>
+           <label class="form-check-label" for="toggle-camera">Aktifkan kamera</label>
+       </div>
+
 
       <audio id="scan-audio" hidden>
            <source id="audio-source" type="audio/mpeg">
@@ -87,6 +92,19 @@
             .catch(err => {
                 console.error("Error starting the QR Code scanner: ", err);
             });
+
+  $("#toggle-camera").change(function() {
+        if ($(this).is(":checked")) {
+            // J23ika checkbox dicentang, matikan autofocus
+            $("#do-input").blur(); // Menghilangkan fokus dari input
+            startScanning(); // Mulai pemindaian
+        } else {
+            // Jika checkbox tidak dicentang, aktifkan autofocus
+            $("#do-input").focus(); // Mengembalikan fokus ke input
+            startScanning(); // Hentikan pemindaian
+        }
+    });
+
         });
          
 
