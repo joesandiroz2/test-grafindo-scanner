@@ -15,7 +15,15 @@
 
 <style>
 
-
+@media print {
+     @page {
+        margin: 0;
+    }
+    body {
+        margin: 0; /* Mengatur margin body menjadi 0 */
+        padding: 0; /* Mengatur padding body menjadi 0 */
+        }
+    }
 
 .label-container {
     margin-bottom: 20px; /* Space between labels */
@@ -218,10 +226,13 @@
             <div class="modal-body">
                 <form id="editForm">
                     <input type="hidden" id="editId">
-                    <div class="form-group">
-                        <label>Merk</label>
-                        <input type="text" class="form-control" id="editMerk">
-                    </div>
+            <div class="form-group">
+            <label for="editMerk">Merk</label>
+            <select class="form-control" id="editMerk">
+                <option value="Yamaha">Yamaha</option>
+                <option value="Honda">Honda</option>
+            </select>
+        </div>
                     <div class="form-group">
                         <label>Part Number</label>
                         <input type="text" class="form-control" id="editPartNumber">

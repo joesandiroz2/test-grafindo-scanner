@@ -48,6 +48,9 @@ async function checkBarang() {
                 confirmButtonText: 'OK',
                 timer:1300
             });
+            document.getElementById('partnumber_scan').value = '';
+                document.getElementById('qty_scan').value = '';
+                document.getElementById('partnumber_scan').focus();
         }
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -57,10 +60,7 @@ async function checkBarang() {
             icon: 'error',
             confirmButtonText: 'OK'
         });
-    } finally {
-        // Kosongkan input txtscan setelah proses selesai
-        document.getElementById('txtscan').value = ""; 
-    }
+    } 
 }
 
 // Event listener untuk menangani input scan
