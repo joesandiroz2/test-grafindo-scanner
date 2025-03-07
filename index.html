@@ -73,8 +73,12 @@
             document.getElementById("do-input").value = decodedText;
                
             };
+            const qrboxSize = Math.min(window.innerWidth, window.innerHeight) * 0.8; // 80% dari ukuran layar
+            
              // Mulai pemindaian
-            const config = { fps: 10, qrbox: 250 };
+            const config = { fps: 10, qrbox: { width: qrboxSize, height: qrboxSize } };
+
+
             html5QrCode.start(
                 { facingMode: "environment" }, // Menggunakan kamera belakang
                 config,
