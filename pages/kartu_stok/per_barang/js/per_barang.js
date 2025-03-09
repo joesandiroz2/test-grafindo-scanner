@@ -228,3 +228,86 @@ async function renderDetailBarang(query) {
         document.getElementById("detail_barang").innerHTML = "<p class='text-danger'>Gagal mengambil data</p>";
     }
 }
+
+
+
+// Download Excel
+// Event listener untuk tombol Download Excel
+document.getElementById('excel-btn').addEventListener('click', async function() {
+    const query = document.getElementById('part-number').value; // Ambil query dari input
+    const startDate = convertToTimestamp(document.getElementById('start-date').value);
+    const endDate = convertToTimestamp(document.getElementById('end-date').value, true);
+
+    // Ambil data menggunakan getFullList
+    const records = await pb.collection('kartu_stok').getFullList({
+        filter: `(part_number ~ "${query}" || nama_barang ~ "${query}") && created >= "${startDate}" && created <= "${endDate}"`
+    });
+
+    if (records.length === 0) {
+        Swal.fire('Data Kosong', 'Anda belum klik tampilkan atau belum ada datanya.', 'warning');
+        return;
+    }
+
+    // Panggil fungsi untuk mengunduh Excel
+    downloadExcel(records, query); // Pass query as partNumber
+});
+// Fungsi untuk mengunduh data sebagai Excel
+// Fungsi untuk mengunduh data sebagai Excel
+function downloadExcel(data) {
+    // Ambil partNumber dan namaBarang dari data
+    const partNumber = data[0].part_number; // Ambil part_number dari item pertama
+    const namaBarang = data[0].nama_barang; // Ambil nama_barang dari item pertama
+
+    // Format data untuk worksheet
+    const formattedData = data.map((item, index) => ({
+        No: index + 1,
+        qty_masuk: item.qty_masuk,
+        balance: item.balance,
+        qty_scan: item.qty_ambil,
+        part_number: item.part_number,
+        nama_barang: item.nama_barang,
+        no_dn: item.no_dn,
+        dn_date: formatDateExcel(item.dn_date), // Format tanggal
+        tgl_pb: formatDateExcel(item.tgl_pb), // Format tanggal
+        created: formatDateExcel(item.created) // Format tanggal
+    }));
+
+    // Buat workbook dan worksheet
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+
+    // Tambahkan worksheet ke workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Kartu Stok');
+
+    // Buat nama file dengan format yang diinginkan
+    const currentDate = new Date();
+    const formattedDate = formatDate(currentDate); // Format tanggal saat ini
+    const fileName = `${partNumber}_${namaBarang}_${formattedDate}.xlsx`;
+
+    // Buat file Excel dan unduh
+    XLSX.writeFile(workbook, fileName);
+
+    // Tampilkan notifikasi bahwa file telah berhasil diunduh
+    Swal.fire({
+        title: 'Berhasil!',
+        text: 'File Excel telah berhasil diunduh.',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+    });
+}
+
+// Fu
+// Fungsi untuk memformat tanggal
+function formatDateExcel(dateString) {
+    const date = new Date(dateString);
+    const options = { 
+        day: '2-digit', 
+        month: 'long', 
+        year: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: false 
+    };
+    return date.toLocaleString('id-ID', options).replace(',', '').replace(' ', ' '); // Format date
+}

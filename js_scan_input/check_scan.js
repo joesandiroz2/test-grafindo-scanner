@@ -66,6 +66,65 @@ $("#do-input").on("input", function() {
         $("#result-container").empty(); // Kosongkan hasil jika input kosong
     }
 });
+
+$(document).on('click', '.hapus-button', async function() {
+    const deliveryNoteNo = $(this).data('delivery-note');
+    const supplierPartNumber = $(this).data('supplier-part');
+
+    // Konfirmasi password
+    const { value: password } = await Swal.fire({
+        title: 'Konfirmasi Password',
+        input: 'password',
+        inputLabel: 'Masukkan password admin',
+        inputPlaceholder: 'Password',
+        showCancelButton: true,
+        confirmButtonText: 'Hapus',
+        cancelButtonText: 'Batal',
+        allowOutsideClick: false
+    });
+
+    // Cek password
+    if (password === 'sp102103') { // Ganti dengan password yang sesuai
+        try {
+            // Mencari record ID berdasarkan Delivery_Note_No dan Supplier_Part_Number
+            const records = await pb.collection('data_do').getList(1, 1, {
+                filter: `Delivery_Note_No="${deliveryNoteNo}" && Supplier_Part_Number="${supplierPartNumber}"`
+            });
+
+            if (records.items.length > 0) {
+                const recordId = records.items[0].id; // Ambil ID dari record yang ditemukan
+
+                // Hapus data dari data_do
+                await pb.collection('data_do').delete(recordId);
+
+                Swal.fire({
+                    title: 'Sukses!',
+                    text: 'Data berhasil dihapus.',
+                    icon: 'success',
+                    timer: 1300,
+                    showConfirmButton: false
+                });
+
+                // Refresh data setelah penghapusan
+                await searchDO(deliveryNoteNo); // Panggil kembali untuk memperbarui tampilan
+            } else {
+                Swal.fire('Data tidak ditemukan', 'Tidak ada data yang cocok untuk dihapus.', 'warning');
+            }
+        } catch (error) {
+            console.error(error);
+            Swal.fire('Error', 'Terjadi kesalahan saat menghapus data.', 'error');
+        }
+    } else {
+        Swal.fire({
+            title: 'Password Salah',
+            text: 'Hubungi Admin untuk menghapus data.',
+            icon: 'error',
+            timer: 1300,
+            showConfirmButton: false
+        });
+    }
+});
+
 });
 
 async function searchDO(deliveryNoteNo) {
@@ -120,6 +179,7 @@ if (items.length > 0) {
     <table class="table table-bordered">
     <thead>
     <tr>
+    <th>Aksi</th> 
     <th>No</th> 
     <th>nama_barang</th>
     <th>Part Number</th>
@@ -145,6 +205,9 @@ if (items.length > 0) {
         const rowStyle = (qtyDN === qtyScanParsed) ? 'background-color: green; color: white; font-weight: bold;' : '';
         table += `
             <tr style="${rowStyle}">
+         <td>
+        <button  class="btn btn-danger hapus-button" data-delivery-note="${item.Delivery_Note_No}" data-supplier-part="${item.Supplier_Part_Number}">Hapus</button>
+        </td> 
             <td>${nomorUrut}</td> 
                 <td style="font-weight:bold">${item.Part_Number_Desc}</td>
                 <td>${item.Supplier_Part_Number}</td>
