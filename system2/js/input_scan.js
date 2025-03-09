@@ -9,6 +9,7 @@ $(document).ready(function() {
 
         // Mengambil data dari input
         const data = {
+            "operator": localStorage.getItem('operator_label'), // Ambil operator dari localStorage
             "merk": $("#merk").val(),
             "part_number": $("#part_number").val(),
             "nama_barang": $("#nama_barang").val(),
