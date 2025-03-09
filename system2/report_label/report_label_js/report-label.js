@@ -6,8 +6,8 @@ async function loadInputData(page = 1) {
     document.getElementById('loadinput').innerHTML = '<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>';
 
     try {
-        const response = await fetch(`${pocketbaseUrl}/api/collections/system2_scan_input/records?page=${page}&perPage=${itemsPerPageLoad}`);
-        
+        const response = await fetch(`${pocketbaseUrl}/api/collections/system2_scan_input/records?page=${page}&perPage=${itemsPerPageLoad}&sort=-created`);
+
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }

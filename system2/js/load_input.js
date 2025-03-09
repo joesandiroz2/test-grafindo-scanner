@@ -40,12 +40,12 @@ function displayDataInTable(items) {
                     <th>Merk</th>
                     <th>Part Number</th>
                     <th>Nama Barang</th>
-                    <th>Quantity</th>
+                    <th>qty</th>
                     <th>Satuan</th>
                     <th>Lot</th>
                     <th>Depo</th>
-                    <th>Supplier ID</th>
-                    <th>Tanggal Inspeksi</th>
+                    <th>Suplier</th>
+                    <th>tgl Inspeksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -65,8 +65,8 @@ function displayDataInTable(items) {
             ` : ''}
                 </td>
                 <td>${item.operator}</td>
-                <td>${item.merk}</td>
-                <td>${item.part_number}</td>
+                <td style="font-weight:bold">${item.merk}</td>
+                <td style="font-weight:bold">${item.part_number}</td>
                 <td>${item.nama_barang}</td>
                 <td>${item.qty}</td>
                 <td>${item.satuan}</td>
@@ -219,12 +219,25 @@ function openEditModal(id, merk, partNumber, namaBarang, qty, satuan) {
 // Simpan Perubahan Data
 async function saveEdit() {
     const id = document.getElementById('editId').value;
+    let merk = document.getElementById('editMerk').value;
+    
+    // Menentukan supplierId berdasarkan merk
+    let supplierId;
+    if (merk.toLowerCase() === 'yamaha') {
+        supplierId = '7603';
+    } else if (merk.toLowerCase() === 'honda') {
+        supplierId = '1201591';
+    } else {
+        supplierId = ''; // Atau nilai default jika merk tidak dikenal
+    }
+
     const updatedData = {
-        merk: document.getElementById('editMerk').value,
+        merk: merk,
         part_number: document.getElementById('editPartNumber').value,
         nama_barang: document.getElementById('editNamaBarang').value,
         qty: document.getElementById('editQty').value,
         satuan:document.getElementById('editSatuan').value,
+        supplier_id:supplierId
     };
 
     try {
