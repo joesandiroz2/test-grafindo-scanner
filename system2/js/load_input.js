@@ -129,7 +129,7 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, lot, depo, su
     if (modalBody) {
         // Mengisi modal untuk menampilkan detail
         modalBody.innerHTML = `
-            <div style="background-color:white;height:40px;color:white"></div>
+            <div style="background-color:white;height:30px;color:white"></div>
             <div class="row" id="labelContainer"></div>`;
 
         const labelContainer = document.getElementById('labelContainer');
@@ -164,17 +164,17 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, lot, depo, su
             let labelHTML = `
             <div  style="color:black;padding: 3px  55px; width: calc(33.33% - 5px);">
                 <div class=" label" style="border-radius:10px; border: 2px solid black;  padding: 2px; position: relative;">
-                    <p style="font-size:9px;padding:0px;border-bottom:1px solid black;margin:0px;font-weight:bold;text-align:center; display:block;">PT. GRAFINDO MITRASEMESTA</p>
-                     <p class="no-margin" style="font-size:10px;border-bottom: 1px solid black; display: block; width: 100%; margin: 1px 0; line-height: 1;">Part Name: &nbsp;${namaBarang}</p>
+                    <p style="font-size:12px;padding:0px;border-bottom:1px solid black;margin:0px;font-weight:bold;text-align:center; display:block;">PT. GRAFINDO MITRASEMESTA</p>
+                     <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 1px 0; line-height: 1;">Part Name: &nbsp;${namaBarang}</p>
                     <div style="line-height:0.5;display:flex;justify-content:space-between">
                         <div style="line-height:0.2;margin-top:0px">
-                            <p class="no-margin" style="font-size:10px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Part Number: &nbsp;${partNumber}</p>
-                            <p class="no-margin" style="font-size:10px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Penerima: &nbsp;${penerima}</p>
+                            <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Part Number: &nbsp;${partNumber}</p>
+                            <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Penerima: &nbsp;${penerima}</p>
                             
-                           <p class="no-margin" style="font-size:10px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">No Lot : &nbsp;${lot}</p>
-                            <span class="no-margin" style="font-size:10px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Qty : &nbsp;${qty} Pcs  <span style="border:1px solid black;font-weight:bold;padding:0.5px;">OK</span><span > NG</span></span>
-                            <p class="no-margin" style="font-size:10px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Tgl Packing: &nbsp;${tglInspeksi}</p>
-                        <p class="no-margin" style="font-size:10px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Opr Packing: &nbsp;${depo}</p>
+                           <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">No Lot : &nbsp;${lot}</p>
+                            <span class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Qty : &nbsp;${qty} Pcs  <span style="border:1px solid black;font-weight:bold;padding:0.5px;">OK</span><span > NG</span></span>
+                            <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Tgl Packing: &nbsp;${tglInspeksi}</p>
+                        <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Opr Packing: &nbsp;${depo}</p>
                             
                         </div>
                         <div style="text-align: right;padding-top:3px;padding-left:3px;padding-bottom:3px;padding-right:10px">
