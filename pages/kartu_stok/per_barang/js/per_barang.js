@@ -181,6 +181,25 @@ async function loadPartNumbers() {
     }
 }
 
+async function fetchLastBalance(partNumber) {
+    try {
+        await authenticate(); // Pastikan user sudah login
+        
+        const result = await pb.collection('kartu_stok').getList(1, 1, {
+            filter: `part_number = "${partNumber}"`,
+            sort: '-created' // Mengambil data terbaru
+        });
+
+        if (result.items.length > 0) {
+            return result.items[0].balance; // Mengembalikan balance terakhir
+        } else {
+            return 'Data tidak ditemukan'; // Jika tidak ada data
+        }
+    } catch (error) {
+        console.error("Error fetching last balance:", error);
+        return 'Error fetching data'; // Mengembalikan pesan error
+    }
+}
 
 async function renderDetailBarang(query) {
     try {
@@ -213,6 +232,7 @@ async function renderDetailBarang(query) {
             const date = new Date(dateStr);
             return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
         };
+         const lastBalance = await fetchLastBalance(item.part_number);
 
         detailDiv.innerHTML = `
             <div class="p-3">
@@ -221,6 +241,8 @@ async function renderDetailBarang(query) {
                 <p><strong>Part Number:</strong> ${item.part_number}</p>
                 <p><strong>Dari Tanggal:</strong> ${formatDate(startDate)}</p>
                 <p><strong>Sampai Tanggal:</strong> ${formatDate(endDate)}</p>
+                <p><strong>Stok Sekarang:</strong> ${lastBalance}</p> 
+
             </div>
         `;
     } catch (error) {

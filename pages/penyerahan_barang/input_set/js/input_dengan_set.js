@@ -159,7 +159,7 @@ document.getElementById("masukkanQty").addEventListener("click", async function 
         }
 
         // Ambil semua kartu_stok untuk pengecekan
-        const kartuRecords = await pb.collection("kartu_stok").getFullList();
+        // const kartuRecords = await pb.collection("kartu_stok").getFullList();
 
         // Proses semua barang yang cocok
         for (const barang of matchingBarangList) {
@@ -167,13 +167,16 @@ document.getElementById("masukkanQty").addEventListener("click", async function 
             const imageUrl = gambar ? `${pocketbaseUrl}/api/files/data_barang/${id}/${gambar}` : 'tidak ada gambar';
 
             // Cek apakah part_number dengan lot sudah ada di kartu_stok
-            const existingKartu = kartuRecords.filter(item => item.part_number === partNumber );
+             const existingKartu = await pb.collection("kartu_stok").getList(1, 1, {
+                filter: `part_number = "${partNumber}"`,
+                sort: "-created" // Ambil data terbaru
+            });
 
             let newBalance = qty; // Default balance = qty input jika tidak ada data lama
 
-            if (existingKartu.length > 0) {
-                // Ambil balance dari data lama yang paling baru
-                const lastBalance = Math.max(...existingKartu.map(item => parseInt(item.balance, 10)));
+            if (existingKartu.items.length > 0) {
+                // Ambil balance dari data terbaru
+                const lastBalance = parseInt(existingKartu.items[0].balance, 10);
                 newBalance = lastBalance + qty; // Tambahkan qty input ke balance terbaru
             }
 
