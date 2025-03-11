@@ -31,6 +31,7 @@ async function Kurangi_stok_part() {
             title: 'Sedang Mengurangi...',
             text: 'Sedang Mengurangi Stok, harap tunggu...',
             allowOutsideClick: false,
+             showConfirmButton: false,
             onBeforeOpen: () => {
                 Swal.showLoading();
             }

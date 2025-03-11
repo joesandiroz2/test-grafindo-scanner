@@ -3,15 +3,8 @@ const pb = new PocketBase(pocketbaseUrl);
 
 async function fetchData(page = 1,filter = '') {
     try {
-        // Tampilkan loading indicator
-        Swal.fire({
-            title: 'Loading...',
-            text: 'Mengambil data, harap tunggu...',
-            allowOutsideClick: false,
-            onBeforeOpen: () => {
-                Swal.showLoading();
-            }
-        });
+        $("#loading-indicator").show();
+        
 
         // Autentikasi
         await pb.collection('users').authWithPassword(username_pocket, user_pass_pocket);
@@ -23,7 +16,7 @@ async function fetchData(page = 1,filter = '') {
         });
 
         // Hapus loading indicator
-        Swal.close();
+        $("#loading-indicator").hide();
 
         // Tampilkan data di tabel
         displayResults(resultList.items);
