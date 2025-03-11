@@ -4,6 +4,9 @@ async function checkBarang() {
     const qty = document.getElementById('qty_scan').value.trim(); // Ambil qty
     let nomorcari = `${nomor_barang.toUpperCase()}`
     console.log("nomorcari",nomorcari)
+    document.getElementById('part_number').value = nomor_barang; // Set part_number
+    document.getElementById('qty').value = qty; // Set qty
+           
     try {
         // Mencari barang berdasarkan nomor_barang
          const response = await fetch(`${pocketbaseUrl}/api/collections/system2_barang_data/records?page=1&perPage=50&filter=nomor_barang%20%3D%20%27${nomorcari}%27`);
@@ -19,8 +22,6 @@ async function checkBarang() {
 
         if (resultList.items.length > 0) {
             const item = resultList.items[0]; // Ambil item pertama yang ditemukan
-            document.getElementById('part_number').value = nomor_barang; // Set part_number
-            document.getElementById('qty').value = qty; // Set qty
             document.getElementById('nama_barang').value = item.nama_barang; // Set nama_barang
 
             const audio = new Audio('../../suara/suara_ok.mp3');
