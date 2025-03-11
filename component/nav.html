@@ -1,14 +1,6 @@
 <style>
     .navbar-nav .nav-item {
-        border-right: 1px solid rgba(255, 255, 255, 0.5); /* Light border */
-    }
-
-    .navbar-nav .nav-item:last-child {
-        border-right: none; /* Remove border from the last item */
-    }
-
-    .nav-link {
-        padding: 15px 20px; /* Adjust padding for better spacing */
+        display: none; /* Semua menu disembunyikan secara default */
     }
 </style>
 
@@ -20,7 +12,7 @@
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
             <li class="nav-item" id="scan-do-nav">
-                <a class="nav-link" href="/index.html">Scan Do</a>
+                <a class="nav-link" href="/scan.html">Scan Do</a>
             </li>
             <li class="nav-item" id="semua-do-nav">
                 <a class="nav-link" href="/pages/semua_do">Semua Do</a>
@@ -28,56 +20,185 @@
             <li class="nav-item" id="penyerahan-barang-nav">
                 <a class="nav-link" href="/pages/penyerahan_barang/index.html">Penyerahan Barang</a>
             </li>
-             <li class="nav-item" id="input-excel-nav">
+            <li class="nav-item" id="data-barang-nav">
                 <a class="nav-link" href="/pages/data_barang">Data Barang</a>
             </li>
             <li class="nav-item" id="input-excel-nav">
                 <a class="nav-link" href="/pages/input_excel/">Input Excel Do</a>
             </li>
-            <li class="nav-item" id="kesalahan">
-                <a class="nav-link" 
-            style="background-color:red;color:white;border-radius: 30px;"
-                href="/pages/kesalahan/">Kesalahan</a>
+            <li class="nav-item" id="kesalahan-nav">
+                <a class="nav-link" style="background-color:red;color:white;border-radius: 30px;" href="/pages/kesalahan/">Kesalahan</a>
             </li>
-            <li class="nav-item " id="kartu-stok-nav">
-                <a class="nav-link" href="/pages/kartu_stok">kartu stok</a>
+            <li class="nav-item" id="kartu-stok-nav">
+                <a class="nav-link" href="/pages/kartu_stok">Kartu Stok</a>
             </li>
-            <li class="nav-item" id="input-excel-nav">
-                <a class="nav-link" href="/pages/kartu_stok/per_barang">Kartu stok perbarang</a>
+            <li class="nav-item" id="kartu-stok-perbarang-nav">
+                <a class="nav-link" href="/pages/kartu_stok/per_barang">Kartu Stok Per Barang</a>
             </li>
-            <li class="nav-item" id="input-excel-nav">
+            <li class="nav-item" id="report-detail-nav">
                 <a class="nav-link" href="/pages/report">Report Detail</a>
             </li>
-            <li class="nav-item" 
-            style="background-color:yellow;color:black;border-radius: 30px;"
-            id="buatlabel-nav">
-                <a style="color:black"class="nav-link" href="/system2/index.html">Buat Label</a>
+            <li class="nav-item" id="buatlabel-nav" style="background-color:yellow;color:black;border-radius: 30px;">
+                <a style="color:black" class="nav-link" href="/system2/index.html">Buat Label</a>
             </li>
-             <li class="nav-item" 
-            style="background-color:yellow;color:black;border-radius: 30px;"
-            id="reportlabel-nav">
-                <a style="color:black"class="nav-link" href="/system2/report_label/index.html">Report Label</a>
+            <li class="nav-item" id="reportlabel-nav" style="background-color:yellow;color:black;border-radius: 30px;">
+                <a style="color:black" class="nav-link" href="/system2/report_label/index.html">Report Label</a>
             </li>
         </ul>
     </div>
 </nav>
 
-<script>
-    // Fungsi untuk menambahkan kelas active pada item navigasi yang sesuai
-    function setActiveNav() {
-        const currentPath = window.location.pathname; // Mendapatkan path saat ini
-        const navItems = document.querySelectorAll('.nav-item');
+<!-- Info User dan Logout -->
+<div style="background-color: orange; color: black; font-weight: bold; padding: 5px;">
+    <span id="user-info"></span>
+    <button id="login-btn" class="btn btn-info">Login</button>
+    <button id="logout-btn" class="btn btn-danger">Logout</button>
+</div>
 
-        navItems.forEach(item => {
-            const link = item.querySelector('a');
-            if (link.href.includes(currentPath)) {
-                item.classList.add('active'); // Menambahkan kelas active
-            } else {
-                item.classList.remove('active'); // Menghapus kelas active jika tidak sesuai
-            }
-        });
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    restrictMenu();
+});
+
+// Fungsi login
+async function loginUser() {
+    const userEmail = localStorage.getItem("user-grafindo");
+    if (userEmail) {
+        restrictMenu(); // Jika sudah login, jalankan menu update
+        return;
     }
 
-    // Memanggil fungsi saat halaman dimuat
-    document.addEventListener('DOMContentLoaded', setActiveNav);
+    const { value: formValues } = await Swal.fire({
+        title: "Login Aplikasi",
+        html: `
+            <input id="swal-input-email" class="swal2-input" placeholder="Email">
+            <input id="swal-input-password" type="password" class="swal2-input" placeholder="Password">`,
+        focusConfirm: false,
+        showCancelButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+          showClass: { popup: '' }, // Menonaktifkan animasi muncul
+        hideClass: { popup: '' }, // Menonaktifkan animasi hilang
+        preConfirm: async () => {
+            const email = document.getElementById("swal-input-email").value;
+            const password = document.getElementById("swal-input-password").value;
+
+            if (!email || !password) {
+                Swal.showValidationMessage("Email dan Password harus diisi!");
+                return false;
+            }
+
+            try {
+                const pb = new PocketBase(pocketbaseUrl);
+                const authData = await pb.collection("users").authWithPassword(email, password);
+                localStorage.setItem("user-grafindo", email);
+                return email;
+            } catch (error) {
+                Swal.showValidationMessage("Login gagal! Periksa email dan password.");
+                return false;
+            }
+        },
+    });
+
+    if (formValues) {
+        restrictMenu();
+    }
+}
+
+// Fungsi untuk menampilkan menu berdasarkan user yang login
+function restrictMenu() {
+    const userEmail = localStorage.getItem("user-grafindo");
+    console.log("User Email:", userEmail);
+
+    const userInfo = document.getElementById("user-info");
+    const logoutBtn = document.getElementById("logout-btn");
+    const loginBtn = document.getElementById("login-btn");
+
+     if (userEmail) {
+        userInfo.innerHTML = `Akun: <strong>${userEmail}</strong>`;
+        logoutBtn.style.display = "inline-block"; // Tampilkan tombol Logout
+        loginBtn.style.display = "none"; // Sembunyikan tombol Login
+    } else {
+        userInfo.innerHTML = "";
+        logoutBtn.style.display = "none"; // Sembunyikan tombol Logout
+        loginBtn.style.display = "inline-block"; // Tampilkan tombol Login
+    }
+
+    let menuItems = {
+        "scan-do-nav": document.getElementById("scan-do-nav"),
+        "semua-do-nav": document.getElementById("semua-do-nav"),
+        "penyerahan-barang-nav": document.getElementById("penyerahan-barang-nav"),
+        "data-barang-nav": document.getElementById("data-barang-nav"),
+        "input-excel-nav": document.getElementById("input-excel-nav"),
+        "kesalahan-nav": document.getElementById("kesalahan-nav"),
+        "kartu-stok-nav": document.getElementById("kartu-stok-nav"),
+        "kartu-stok-perbarang-nav": document.getElementById("kartu-stok-perbarang-nav"),
+        "report-detail-nav": document.getElementById("report-detail-nav"),
+        "buatlabel-nav": document.getElementById("buatlabel-nav"),
+        "reportlabel-nav": document.getElementById("reportlabel-nav"),
+    };
+
+    // Semua menu disembunyikan dulu
+    Object.values(menuItems).forEach(item => {
+        if (item) item.style.display = "none";
+    });
+
+    if (userEmail === "sopian@gmail.com" || userEmail === "daren.rasyidx@gmail.com") {
+        // Jika user sopian@gmail.com, tampilkan semua menu
+        Object.values(menuItems).forEach(item => {
+            if (item) item.style.display = "block";
+        });
+    } else if (userEmail === "pika@gmail.com") {
+        // Jika user pika@gmail.com, hanya tampilkan beberapa menu
+        let allowedMenus = ["buatlabel-nav", "reportlabel-nav"];
+        allowedMenus.forEach(menuId => {
+            if (menuItems[menuId]) menuItems[menuId].style.display = "block";
+        });
+    }else if (userEmail === "dede@gmail.com") {
+    // Jika user dede@gmail.com, hanya tampilkan "input-excel-nav" dan "semua-do-nav"
+    let allowedMenus = ["input-excel-nav", "semua-do-nav"];
+    allowedMenus.forEach(menuId => {
+        if (menuItems[menuId]) menuItems[menuId].style.display = "block";
+    });
+    }else if (userEmail === "dian@gmail.com") {
+    // Jika user dian@gmail.com, tampilkan menu tertentu
+    let allowedMenus = [
+        "scan-do-nav",
+        "semua-do-nav",
+        "penyerahan-barang-nav",
+        "data-barang-nav",
+        "kesalahan-nav",
+        "kartu-stok-nav",
+        "kartu-stok-perbarang-nav",
+        "report-detail-nav"
+    ];
+    allowedMenus.forEach(menuId => {
+        if (menuItems[menuId]) menuItems[menuId].style.display = "block";
+    });
+}
+
+}
+
+// Fungsi logout
+document.getElementById("logout-btn").addEventListener("click", function () {
+    Swal.fire({
+        title: "Konfirmasi Logout",
+        text: "Apakah Anda yakin ingin logout?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Ya, Logout!",
+        cancelButtonText: "Batal",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            localStorage.removeItem("user-grafindo");
+            Swal.fire("Berhasil Logout!", "Anda telah keluar.", "success").then(() => {
+            window.location.href = "/index.html"
+            });
+        }
+    });
+});
+
+document.getElementById("login-btn").addEventListener("click", loginUser);
+
 </script>

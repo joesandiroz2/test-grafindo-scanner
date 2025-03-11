@@ -390,7 +390,10 @@ document.getElementById("printButton").addEventListener("click", function () {
 
 
 $(document).ready(function() {
-$("#navbar-container").load("../component/nav.html");
+$("#navbar-container").load("../component/nav.html",function(){
+        setTimeout(loginUser, 500);
+    
+});
 
 // Set default Supplier ID for Yamaha
 $("#supplier_id").val("7603");

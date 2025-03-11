@@ -88,7 +88,10 @@ style="font-weight: bold;color:red;font-size: 25px;"
 const pb = new PocketBase(pocketbaseUrl);
 
 $(document).ready(function() {
-$("#navbar-container").load("../../component/nav.html");
+$("#navbar-container").load("../../component/nav.html",function(){
+        setTimeout(loginUser, 500);
+    
+});
 
 $("#kurangi-button").on("click", function() {
 Kurangi_stok_part(); // Panggil fungsi dari file masukkan_qty.js

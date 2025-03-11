@@ -27,7 +27,6 @@
             <thead>
                 <tr>
                     <th>No </th>
-                    <th>No DN</th>
                     <th>Part Number</th>
                     <th>Nama Barang</th>
                     <th>Lot</th>
@@ -36,6 +35,8 @@
 
                     <th style="background-color: red;color:white">Qty Scan</th>
                     <th>Status</th>
+                    <th>No DN</th>
+                    
                     <th>Tgl System</th>
                 </tr>
             </thead>
@@ -53,7 +54,10 @@
 
     <script>
         $(document).ready(function() {
-            $("#navbar-container").load("../../component/nav.html");
+            $("#navbar-container").load("../../component/nav.html",function(){
+        setTimeout(loginUser, 500);
+                
+            });
         })
     </script>
 </html>

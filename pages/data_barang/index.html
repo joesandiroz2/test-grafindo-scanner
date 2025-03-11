@@ -126,7 +126,9 @@
 </body>
 <script>
 $(document).ready(function() {
-    $("#navbar-container").load("../../component/nav.html");
+    $("#navbar-container").load("../../component/nav.html",function(){
+        setTimeout(loginUser, 500);
+    });
 })
 </script>
 </html>

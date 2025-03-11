@@ -73,7 +73,6 @@ function renderTable(data) {
         
         const row = `<tr>
           <td>${nomorUrut}</td>
-            <td style="font-weight:bold">${item.no_dn.toUpperCase()}</td>
             <td style="background-color:yellow;font-weight:bold">${item.part_number}</td>
                 
 
@@ -84,6 +83,8 @@ function renderTable(data) {
             <td style=" font-weight:bold;text-align:center; color:black">${item.balance}</td>
             <td style="background-color: red; font-weight:bold;text-align:center; color:white">${item.qty_ambil}</td>
             <td style="${statusStyle}">${statusIcon} ${item.status}</td>
+            <td style="font-weight:bold">${item.no_dn.toUpperCase()}</td>
+            
             <td><i>${formattedDate}</i></td>
         </tr>`;
         tableBody.innerHTML += row;

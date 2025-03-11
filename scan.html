@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js
+"></script>
+
+    <title>Grafindo Scanner</title>
+    <!-- Link ke CSS Bootstrap -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<!-- SweetAlert2 JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <script src="./js/sdk/pocketbase.umd.js"></script>
+    <script src="./js/pocket_config.js"></script>
+</head>
+<body>
+
+    <!-- Tempat untuk memuat navbar -->
+    <div id="navbar-container"></div>
+
+ <div id="qr-reader" style="width:100vw"></div>
+
+
+    <!-- Konten Utama -->
+    <div class="container mt-2">
+       <h5>Scan Do / Part Disini </h5>
+      
+      
+        <input type="text" id="do-input" class="form-control" autofocus placeholder="scan do disini" >
+    
+     <div class="form-check">
+           <input type="checkbox" class="form-check-input" id="toggle-camera" checked>
+           <label class="form-check-label" for="toggle-camera">Aktifkan kamera</label>
+       </div>
+
+
+      <audio id="scan-audio" hidden>
+           <source id="audio-source" type="audio/mpeg">
+           Your browser does not support the audio element.
+       </audio>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+        <div class="col s12 m4 l4">
+             <div id="result-container" ></div>
+        </div>
+        <div class="col s12 m8 l8">
+          <div id="scanned-items-container" ></div> 
+        </div>
+    </div>
+
+    <!-- Link ke jQuery dan JS Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script type="module" src="./js_scan_input/check_scan.js"></script>
+    <script>
+
+        $(document).ready(function() {
+        $("#navbar-container").load("./component/nav.html", function() {
+    setTimeout(loginUser, 500);
+});
+
+               // Set focus kembali ke input setiap kali ada klik di halaman
+            $(document).on('click', function() {
+                $("#do-input").focus();
+            });
+
+              const html5QrCode = new Html5Qrcode("qr-reader");
+
+               const onScanSuccess = (decodedText, decodedResult) => {
+
+            document.getElementById("do-input").value = decodedText ;
+             $("#do-input").trigger("input");
+                
+            };
+            const qrboxSize = Math.min(window.innerWidth, window.innerHeight) * 0.8; // 80% dari ukuran layar
+            
+             // Mulai pemindaian
+            const config = { fps: 10, qrbox: { width: qrboxSize, height: qrboxSize } };
+
+
+            html5QrCode.start(
+                { facingMode: "environment" }, // Menggunakan kamera belakang
+                config,
+                onScanSuccess)
+            .catch(err => {
+                console.error("Error starting the QR Code scanner: ", err);
+            });
+
+  $("#toggle-camera").change(function() {
+        if ($(this).is(":checked")) {
+            // J23ika checkbox dicentang, matikan autofocus
+            $("#do-input").blur(); // Menghilangkan fokus dari input
+            startScanning(); // Mulai pemindaian
+        } else {
+            // Jika checkbox tidak dicentang, aktifkan autofocus
+            $("#do-input").focus(); // Mengembalikan fokus ke input
+            startScanning(); // Hentikan pemindaian
+        }
+    });
+
+        });
+         
+
+    </script>
+</body>
+</html>

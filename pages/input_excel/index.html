@@ -76,7 +76,10 @@
     <script src="./js/check_input_excel.js"></script>
     <script>
         $(document).ready(function() {
-            $('#navbar').load('../../component/nav.html');
+            $('#navbar').load('../../component/nav.html',function(){
+        setTimeout(loginUser, 500);
+                
+            });
         });
     </script>
 </body>

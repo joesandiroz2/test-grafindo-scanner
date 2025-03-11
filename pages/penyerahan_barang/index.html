@@ -100,7 +100,10 @@ style="font-weight: bold;font-size: 25px;"
 const pb = new PocketBase(pocketbaseUrl);
 
 $(document).ready(function() {
-$("#navbar-container").load("../../component/nav.html");
+$("#navbar-container").load("../../component/nav.html",function(){
+        setTimeout(loginUser, 500);
+    
+});
 $("#masukkan-qty-button").on("click", function() {
 Masukkan_stok_baru(); // Panggil fungsi dari file masukkan_qty.js
 });
