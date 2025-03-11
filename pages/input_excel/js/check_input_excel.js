@@ -95,7 +95,7 @@
             function convertToJSON(data) {
     const headers = data[0]; // Ambil header (nama kolom)
     const rows = data.slice(1); // Ambil baris data (mulai dari indeks 1)
-
+        console.log("Data",data)
     
 
     // Periksa apakah semua kolom yang diharapkan ada di header
@@ -142,6 +142,7 @@
                 // Konversi data ke JSON
                 finalJSON = convertToJSON(jsonData); // Simpan data ke variabel global
          // Periksa apakah data JSON valid
+                console.log(finalJSON)
                 if (finalJSON && finalJSON.length > 0) {
                     // Aktifkan tombol jika data JSON valid
                     document.getElementById('submitButton').disabled = false;
