@@ -75,16 +75,13 @@ function renderTable(data) {
           <td>${nomorUrut}</td>
             <td style="font-weight:bold">${item.no_dn.toUpperCase()}</td>
             <td style="background-color:yellow;font-weight:bold">${item.part_number}</td>
-                <td>
-                ${/^https?:\/\//.test(item.gambar) ? `<img src="${item.gambar}" style="width:100px"/>` : 'Tidak ada gambar'}
-            </td>
+                
 
             <td style="font-weight:bold">${item.nama_barang}</td>
             
             <td style="background-color:black;font-weight:bold;color:white">${item.lot}</td>
-            <td>${item.qty_minta}</td>
-            <td>${item.tgl_pb}</td>
             <td style="background-color: green; font-weight:bold;text-align:center; color:white">${item.qty_masuk}</td>
+            <td style=" font-weight:bold;text-align:center; color:black">${item.balance}</td>
             <td style="background-color: red; font-weight:bold;text-align:center; color:white">${item.qty_ambil}</td>
             <td style="${statusStyle}">${statusIcon} ${item.status}</td>
             <td><i>${formattedDate}</i></td>
@@ -132,3 +129,31 @@ async function changePage(page) {
     renderTable(data);
     renderPagination();
 })();
+
+
+
+document.getElementById("downloadexcel").addEventListener("click", async function () {
+    // Fetch the data (you can modify this to fetch the current page data)
+    const data = await fetchData(currentPage); // Fetch the current page data
+
+    // Prepare the data for Excel
+    const excelData = data.items.map((item, index) => ({
+        "No": (currentPage - 1) * 30 + index + 1,
+        "Qty Masuk": item.qty_masuk,
+        "Balance": item.balance,
+        "Qty Ambil": item.qty_ambil,
+        "No DN": item.no_dn,
+        "Part Number": item.part_number,
+        "Nama Barang": item.nama_barang,
+        "Lot": item.lot,
+        "Created": formatDate(item.created) // Format the date
+    }));
+
+    // Create a new workbook and add the data
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(excelData);
+    XLSX.utils.book_append_sheet(wb, ws, "Kartu Stok");
+
+    // Generate Excel file and trigger download
+    XLSX.writeFile(wb, "kartu_stok.xlsx");
+});
