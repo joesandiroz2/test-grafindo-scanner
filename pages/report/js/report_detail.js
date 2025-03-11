@@ -17,31 +17,7 @@ const date = new Date(dateString);
 return date.toLocaleString('id-ID', options);
 }
 
-async function fetchAndPopulateSelect() {
-    try {
-        const resultList = await pb.collection("kartu_stok").getList(1, perPage, {
-            sort: "-created",
-            filter: "status = 'keluar'"
-        });
 
-        const uniqueNoDn = [...new Set(resultList.items.map(item => item.no_dn))];
-
-        let selectElement = document.getElementById("select-no-dn");
-        selectElement.innerHTML = '<option value="">Pilih No DN</option>'; // Default option
-
-        uniqueNoDn.forEach(no_dn => {
-            let option = document.createElement("option");
-            option.value = no_dn;
-            option.textContent = no_dn;
-            selectElement.appendChild(option);
-        });
-
-        // Aktifkan Select2
-        $(selectElement).select2();
-    } catch (error) {
-        console.error("Error fetching data for select:", error);
-    }
-}
 
 async function fetchDataByNoDn(no_dn) {
     Swal.fire({
@@ -140,7 +116,7 @@ function renderTable(data) {
             <div style="border:1px solid black">
                 <div class="row">
                 <div class="col-sm-12 col-md-2 col-lg-2">
-                    <h6 class="mt-4" style="background-color:black;color:white;padding:3px;font-weight:bold;text-align:center">${no_dn}</h6>
+                    <h6 class="mt-4" id="no_dn_print" style="background-color:black;color:white;padding:3px;font-weight:bold;text-align:center">${no_dn}</h6>
                 </div>
                 <div class="col-sm-12 col-md-2 col-lg-2">
                     <h6>Tanggal DO : </h6>
@@ -228,19 +204,20 @@ window.changePage = function (newPage) {
 
 
 document.getElementById("search-btn").addEventListener("click", function () {
-    let selectedNoDn = document.getElementById("select-no-dn").value;
-    if (selectedNoDn) {
-        fetchDataByNoDn(selectedNoDn);
+    let inputNoDn = document.getElementById("input-no-dn").value;
+     inputNoDn = inputNoDn.toUpperCase().replace(/\s+/g, '');
+
+    if (inputNoDn) {
+        fetchDataByNoDn(inputNoDn);
     } else {
         Swal.fire({
             icon: "warning",
-            title: "Pilih No DN",
-            text: "Silakan pilih nomor DN terlebih dahulu."
+            title: "Input No Dn dahulu",
+            text: "Silakan input no dn  dahulu."
         });
     }
 });
 
-await fetchAndPopulateSelect();
 await authenticateUser();
 fetchData(currentPage);
 
