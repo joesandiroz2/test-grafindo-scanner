@@ -129,7 +129,7 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, lot, depo, su
     if (modalBody) {
         // Mengisi modal untuk menampilkan detail
         modalBody.innerHTML = `
-            <div style="background-color:white;height:30px;color:white"></div>
+            <div style="background-color:white;height:15px;color:white"></div>
             <div class="row" id="labelContainer"></div>`;
 
         const labelContainer = document.getElementById('labelContainer');
