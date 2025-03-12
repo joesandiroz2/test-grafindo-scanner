@@ -149,7 +149,7 @@ function restrictMenu() {
         Object.values(menuItems).forEach(item => {
             if (item) item.style.display = "block";
         });
-    } else if (userEmail === "pika@gmail.com") {
+    } else if (userEmail === "pika@gmail.com" || "sinta@gmail.com") {
         // Jika user pika@gmail.com, hanya tampilkan beberapa menu
         let allowedMenus = ["buatlabel-nav", "reportlabel-nav"];
         allowedMenus.forEach(menuId => {

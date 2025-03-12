@@ -23,7 +23,6 @@ const records = await pb.collection('data_barang').getFullList({
     sort: "-created",  // Urutkan berdasarkan terbaru
 });
 
-console.log(records)
 
 // Filter hanya yang memiliki `ikut_set`
 const filteredRecords = records.filter(item => item.ikut_set && item.ikut_set.trim() !== "");

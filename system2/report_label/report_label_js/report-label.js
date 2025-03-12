@@ -87,7 +87,7 @@ function displayDataInTable(items) {
                     <td>${item.lot}</td>
                     <td>${item.depo}</td>
                     <td>${item.supplier_id}</td>
-                    <td>${new Date(item.tgl_inspeksi).toLocaleDateString()}</td>
+                   <td>${new Date(item.tgl_inspeksi).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-')}</td>
                     <td>${createdDate}</td> <!-- Display the created date -->
                 </tr>
             `;

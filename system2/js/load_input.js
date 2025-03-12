@@ -1,13 +1,19 @@
 let currentLoadPage = 1; // Ganti nama variabel untuk halaman saat ini
 const itemsPerPageLoad = 50; // Ganti nama variabel untuk jumlah item per halaman
 
+
+
 async function loadInputData(page = 1) {
     // Tampilkan loading spinner
     document.getElementById('loadinput').innerHTML = '<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>';
 
+    const userGrafindo = localStorage.getItem('operator_label');
     try {
+
         // Mengambil data dari API dengan pagination
-        const response = await fetch(`${pocketbaseUrl}/api/collections/system2_scan_input/records?page=${page}&perPage=${itemsPerPageLoad}`);
+        const url = `${pocketbaseUrl}/api/collections/system2_scan_input/records?page=${page}&perPage=${itemsPerPageLoad}&filter=operator%20%3D%20%27${encodeURIComponent(userGrafindo)}%27`;
+
+        const response = await fetch(url);
         
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -41,7 +47,7 @@ function displayDataInTable(items) {
                     <th>Part Number</th>
                     <th>Nama Barang</th>
                     <th>qty</th>
-                    <th>Satuan</th>
+                    <th>Bikin Berapa Label</th>
                     <th>Lot</th>
                     <th>Depo</th>
                     <th>Suplier</th>
@@ -61,7 +67,7 @@ function displayDataInTable(items) {
             <button class="btn btn-warning" onclick="openPrintModal('${item.merk}', '${item.part_number}', '${item.nama_barang}', '${item.qty}', '${item.satuan}', '${item.lot}', '${item.depo}', '${item.supplier_id}', '${new Date(item.tgl_inspeksi).toLocaleDateString()}')">Cetak</button>
             ${showEditDeleteButtons ? `
                 <button class="btn btn-danger" onclick="openDeleteModal('${item.id}')">Hapus</button>
-                <button class="btn btn-success" onclick="openEditModal('${item.id}', '${item.merk}', '${item.part_number}', '${item.nama_barang}', '${item.qty}', '${item.satuan}')">Edit</button>
+                <button class="btn btn-success" onclick="openEditModal('${item.id}', '${item.merk}', '${item.part_number}', '${item.nama_barang}', '${item.qty}', '${item.satuan}','${item.depo}')">Edit</button>
             ` : ''}
                 </td>
                 <td>${item.operator}</td>
@@ -73,7 +79,8 @@ function displayDataInTable(items) {
                 <td>${item.lot}</td>
                 <td>${item.depo}</td>
                 <td>${item.supplier_id}</td>
-                <td>${new Date(item.tgl_inspeksi).toLocaleDateString()}</td>
+                <td>${new Date(item.tgl_inspeksi).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-')}</td>
+
             </tr>
         `;
     });
@@ -163,13 +170,13 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, lot, depo, su
 
             let labelHTML = `
             <div  style="color:black;padding: 3px  55px; width: calc(33.33% - 5px);">
-                <div class="label" style="width:300px;border-radius:10px; border: 2px solid black;  padding: 2px; position: relative;">
-                    <p style="font-size:10px;padding:0px;border-bottom:1px solid black;margin:0px;font-weight:bold;text-align:center; display:block;">PT. GRAFINDO MITRASEMESTA</p>
+                <div class="label" style="width:300px;border-radius:10px; border: 1px solid black;  padding: 2px; position: relative;margin-bottom:20px">
+                    <p style="font-size:10px;padding:0px;border-bottom:1px solid black;margin:0px;text-align:center; display:block;">PT. GRAFINDO MITRASEMESTA</p>
                      <p class="no-margin" style="font-size:12px;text-decoration:underline; display: block; width: 100%; margin: 1px 0; line-height: 1;">Part Name: &nbsp;${namaBarang}</p>
                     <div style="line-height:0.5;display:flex;justify-content:space-between">
                         <div style="line-height:0.2;margin-top:0px">
                             <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Part Number: &nbsp;${partNumber}</p>
-                            <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Penerima: &nbsp;${penerima}</p>
+                            <p class="no-margin" style="font-size:10px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Penerima: &nbsp;${penerima}</p>
                             
                            <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">No Lot : &nbsp;${lot}</p>
                             <span class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Qty : &nbsp;${qty} Pcs  <span style="border:1px solid black;font-weight:bold;padding:0.5px;">OK</span><span > NG</span></span>
@@ -206,13 +213,14 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, lot, depo, su
 
 
 // Buka Modal Edit
-function openEditModal(id, merk, partNumber, namaBarang, qty, satuan) {
+function openEditModal(id, merk, partNumber, namaBarang, qty, satuan,depo) {
     document.getElementById('editId').value = id;
     document.getElementById('editMerk').value = merk;
     document.getElementById('editPartNumber').value = partNumber;
     document.getElementById('editNamaBarang').value = namaBarang;
     document.getElementById('editQty').value = qty;
     document.getElementById('editSatuan').value = satuan; // Tambahkan ini
+    document.getElementById('editDepo').value = depo; // Tambahkan ini
 
     $('#editModal').modal('show');
 }
@@ -239,6 +247,7 @@ async function saveEdit() {
         nama_barang: document.getElementById('editNamaBarang').value,
         qty: document.getElementById('editQty').value,
         satuan:document.getElementById('editSatuan').value,
+        depo:document.getElementById('editDepo').value,
         supplier_id:supplierId
     };
 
@@ -252,9 +261,17 @@ async function saveEdit() {
         if (response.ok) {
             $('#editModal').modal('hide');
             loadInputData(currentLoadPage);
-            alert('Data berhasil diperbarui!');
+            Swal.fire({
+                icon:"success",
+                title:"Berhasil Update ",
+                timer:1200
+            })
         } else {
-            alert('Gagal memperbarui data!');
+           Swal.fire({
+                icon:"error",
+                title:"Gagal Update ada yg error ",
+                timer:1200
+            })
         }
     } catch (error) {
         console.error('Error:', error);
