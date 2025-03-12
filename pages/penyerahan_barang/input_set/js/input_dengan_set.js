@@ -5,14 +5,15 @@ const pb = new PocketBase(pocketbaseUrl);
 async function fetchDataBarang() {
 try {
 // Tampilkan loading SweetAlert2
-Swal.fire({
-    title: 'Sedang Memuat Data...',
-    html: 'Silakan tunggu sebentar',
-    allowOutsideClick: false,
-    didOpen: () => {
-        Swal.showLoading();
-    }
-});
+  const loader = document.createElement('div');
+        loader.className = 'text-center';
+        loader.innerHTML = `
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <p>Sedang Memuat Data... Silakan tunggu sebentar</p>
+        `;
+        document.getElementById("data-container").appendChild(loader);
 
 // Autentikasi pengguna
 await pb.collection('users').authWithPassword(username_pocket, user_pass_pocket);
@@ -22,11 +23,13 @@ const records = await pb.collection('data_barang').getFullList({
     sort: "-created",  // Urutkan berdasarkan terbaru
 });
 
+console.log(records)
+
 // Filter hanya yang memiliki `ikut_set`
 const filteredRecords = records.filter(item => item.ikut_set && item.ikut_set.trim() !== "");
 
 // Tutup loading setelah data diterima
-Swal.close();
+ loader.remove();
 
 if (filteredRecords.length === 0) {
     Swal.fire({
