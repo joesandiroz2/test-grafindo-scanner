@@ -30,21 +30,27 @@ async function authenticate() {
 }
 
 async function fetchData(page) {
-    Swal.fire({
-        title: 'Sedang memuat kartu stok...',
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
+      // Buat preloader secara dinamis
+    const loadingElement = document.createElement("div");
+    loadingElement.innerHTML = `
+        <div class="text-center my-3" id="loading">
+            <div class="spinner-border text-primary" role="status">
+            </div>
+        </div>
+        <p style="text-align:center">Sedang mengambil kartu stok...</p>
+    `;
+    document.body.appendChild(loadingElement); // Tambahkan ke body
+
+
     try {
         const resultList = await pb.collection('kartu_stok').getList(page, 30, {
             sort: '-created' // Mengurutkan berdasarkan field 'created' secara menurun
         });
-        Swal.close();
+         document.body.removeChild(loadingElement);
         return resultList;
     } catch (error) {
         console.error("Failed to fetch data:", error);
-        Swal.close();
+        document.body.removeChild(loadingElement);
     }
 }
 
