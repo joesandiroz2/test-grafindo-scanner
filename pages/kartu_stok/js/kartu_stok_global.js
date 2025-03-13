@@ -167,12 +167,41 @@ document.getElementById("downloadexcel").addEventListener("click", async functio
     // Fetch the data (you can modify this to fetch the current page data)
     const data = await fetchData(currentPage); // Fetch the current page data
 
+    // Mengelompokkan data berdasarkan part_number dan lot
+    const groupedData = {};
+
+    data.items.forEach(item => {
+        const key = `${item.part_number}-${item.lot}`;
+        
+        // Pastikan qty_ambil diubah menjadi Number
+        const qtyAmbil = Number(item.qty_ambil); // Mengonversi qty_ambil menjadi Number
+
+        if (!groupedData[key]) {
+            // Jika belum ada, simpan item dan inisialisasi qty_ambil
+            groupedData[key] = {
+                ...item,
+                qty_ambil: qtyAmbil, // Simpan qty_ambil sebagai Number
+                balance: item.balance, // Simpan balance dari item pertama
+                qty_masuk: item.qty_masuk,
+                count: 1 // Untuk menghitung jumlah item yang sama
+            };
+        } else {
+            // Menjumlahkan qty_ambil
+            groupedData[key].qty_ambil += qtyAmbil; // Menjumlahkan qty_ambil
+            // Tidak mengubah balance, tetap menggunakan balance dari item pertama
+            groupedData[key].count += 1; // Menambah hitungan
+        }
+    });
+
+    // Mengubah objek menjadi array untuk ditampilkan di Excel
+    const finalData = Object.values(groupedData);
+
     // Prepare the data for Excel
-    const excelData = data.items.map((item, index) => ({
+    const excelData = finalData.map((item, index) => ({
         "No": (currentPage - 1) * 30 + index + 1,
         "Qty Masuk": item.qty_masuk,
         "Balance": item.balance,
-        "Qty Ambil": item.qty_ambil,
+        "Qty Scan": item.qty_ambil,
         "No DN": item.no_dn,
         "Part Number": item.part_number,
         "Nama Barang": item.nama_barang,
@@ -184,7 +213,11 @@ document.getElementById("downloadexcel").addEventListener("click", async functio
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(excelData);
     XLSX.utils.book_append_sheet(wb, ws, "Kartu Stok");
+    
+    const today = new Date();
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const formattedDate = today.toLocaleDateString('id-ID', options).replace(/ /g, '_'); // Format date to replace spaces with underscores
 
     // Generate Excel file and trigger download
-    XLSX.writeFile(wb, "kartu_stok.xlsx");
+    XLSX.writeFile(wb, `kartu_stok_${formattedDate}.xlsx`);
 });
