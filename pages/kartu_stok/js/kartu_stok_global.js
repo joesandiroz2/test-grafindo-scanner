@@ -57,46 +57,70 @@ async function fetchData(page) {
 function renderTable(data) {
     const tableBody = document.getElementById('data-table-body');
     tableBody.innerHTML = '';
-    data.items.forEach((item, index) => {
-        const formattedDate = formatDate(item.created);
-         const nomorUrut = (currentPage - 1) * 60 + index + 1;
 
-        // Determine the status style and icon
+    // Mengelompokkan data berdasarkan part_number dan lot
+    const groupedData = {};
+
+    data.items.forEach(item => {
+        const key = `${item.part_number}-${item.lot}`;
+        
+        // Pastikan qty_ambil diubah menjadi Number
+        const qtyAmbil = Number(item.qty_ambil); // Mengonversi qty_ambil menjadi Number
+
+        if (!groupedData[key]) {
+            // Jika belum ada, simpan item dan inisialisasi qty_ambil
+            groupedData[key] = {
+                ...item,
+                qty_ambil: qtyAmbil, // Simpan qty_ambil sebagai Number
+                balance: item.balance, // Simpan balance dari item pertama
+                qty_masuk: item.qty_masuk,
+                count: 1 // Untuk menghitung jumlah item yang sama
+            };
+        } else {
+            // Menjumlahkan qty_ambil
+            groupedData[key].qty_ambil += qtyAmbil; // Menjumlahkan qty_ambil
+            // Tidak mengubah balance, tetap menggunakan balance dari item pertama
+            groupedData[key].count += 1; // Menambah hitungan
+        }
+    });
+
+    // Mengubah objek menjadi array untuk ditampilkan
+    const finalData = Object.values(groupedData);
+
+    finalData.forEach((item, index) => {
+        const formattedDate = formatDate(item.created);
+        const nomorUrut = (currentPage - 1) * 60 + index + 1;
+
+        // Menentukan gaya dan ikon status
         let statusStyle = '';
         let statusIcon = '';
         
-        if (item.status === 'keluar') { // Assuming 'keluar' means out
+        if (item.status === 'keluar') {
             statusStyle = 'color: red; font-weight: bold;';
-            statusIcon = '❌'; // Minus icon
-        } else if (item.status === 'masuk') { // Assuming 'masuk' means in
+            statusIcon = '❌';
+        } else if (item.status === 'masuk') {
             statusStyle = 'color: green; font-weight: bold;';
-            statusIcon = '✅'; // Plus icon
+            statusIcon = '✅';
         } else {
-            statusStyle = 'color: black;'; // Default style for other statuses
-            statusIcon = ''; // No icon for other statuses
+            statusStyle = 'color: black;';
+            statusIcon = '';
         }
 
-        
         const row = `<tr>
-          <td>${nomorUrut}</td>
+            <td>${nomorUrut}</td>
             <td style="background-color:yellow;font-weight:bold">${item.part_number}</td>
-                
-
             <td style="font-weight:bold">${item.nama_barang}</td>
-            
             <td style="background-color:black;font-weight:bold;color:white">${item.lot}</td>
             <td style="background-color: green; font-weight:bold;text-align:center; color:white">${item.qty_masuk}</td>
-            <td style=" font-weight:bold;text-align:center; color:black">${item.balance}</td>
+            <td style="font-weight:bold;text-align:center; color:black">${item.balance}</td>
             <td style="background-color: red; font-weight:bold;text-align:center; color:white">${item.qty_ambil}</td>
             <td style="${statusStyle}">${statusIcon} ${item.status}</td>
             <td style="font-weight:bold">${item.no_dn.toUpperCase()}</td>
-            
             <td><i>${formattedDate}</i></td>
         </tr>`;
         tableBody.innerHTML += row;
     });
 }
-
 function renderPagination() {
     const pagination = document.getElementById('pagination');
     pagination.innerHTML = '';
