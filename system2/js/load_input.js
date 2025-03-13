@@ -141,7 +141,7 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, lot, depo, su
         // Mengisi modal untuk menampilkan detail
         modalBody.innerHTML = `
             <div style="background-color:white;height:14px;color:white"></div>
-            <div class="row" id="labelContainer"></div>`;
+            <div class="row" style="margin-right:30px" id="labelContainer"></div>`;
 
         const labelContainer = document.getElementById('labelContainer');
 
@@ -173,8 +173,8 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, lot, depo, su
 
 
             let labelHTML = `
-            <div  style="color:black;padding: 3px  55px; width: calc(33.33% - 5px);">
-                <div class="label" style="width:300px;border-radius:10px; border: 1px solid black;  padding: 2px; position: relative;margin-bottom:20px">
+            <div  style="color:black;padding: 3px  55px; width: calc(33.33% - 10px);">
+                <div class="label" style="width:330px;border-radius:10px; border: 1px solid black;  padding: 2px; position: relative;margin-bottom:35px">
                     <p style="font-size:10px;padding:0px;border-bottom:1px solid black;margin:0px;text-align:center; display:block;">PT. GRAFINDO MITRASEMESTA</p>
                      <p class="no-margin" style="font-size:12px;text-decoration:underline; display: block; width: 100%; margin: 1px 0; line-height: 1;">Part Name: &nbsp;${namaBarang}</p>
                     <div style="line-height:0.5;display:flex;justify-content:space-between">
@@ -188,7 +188,7 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, lot, depo, su
                         <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Opr Packing: &nbsp;${depo}</p>
                             
                         </div>
-                        <div style="text-align: right;padding-top:3px;padding-left:3px;padding-bottom:3px;padding-right:10px">
+                        <div style="text-align: right;padding-top:3px;padding-left:3px;padding-bottom:10px;padding-right:10px">
                             <div id="qrcode-${i}"></div>
                         </div>
                     </div>
@@ -202,8 +202,11 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, lot, depo, su
             setTimeout(() => {
                 new QRCode(document.getElementById(`qrcode-${i}`), {
                     text: qrData,
-                    width: 70,
-                    height: 70
+                    width: 85,
+                    height: 85,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.L 
                 });
             }, 100);
         }
