@@ -176,11 +176,11 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, lot, depo, su
             <div  style="color:black;padding: 3px  35px; width: calc(33.33% - 10px);margin-left:10px;">
                 <div class="label" style="width:340px;border-radius:10px; border: 1px solid black;position: relative;margin-bottom:30px;">
                     <p style="font-size:10px;padding:0px;border-bottom:1px solid black;margin:0px;text-align:center; display:block;">PT. GRAFINDO MITRASEMESTA</p>
-                     <p class="no-margin" style="font-size:12px;text-decoration:underline; display: block; width: 100%; margin: 1px 0; line-height: 1;">Part Name &nbsp;: &nbsp;&nbsp;${namaBarang}</p>
+                     <p class="no-margin" style="font-size:12px;text-decoration:underline; display: block; width: 100%; margin: 1px 0; line-height: 1;">Part Name &nbsp;:&nbsp;${namaBarang}</p>
                     <div style="line-height:0.5;display:flex;justify-content:space-between">
                         <div style="line-height:0.2;margin-top:0px">
-                            <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Part Number &nbsp; : &nbsp;${partNumber}</p>
-                            <p class="no-margin" style="font-size:10px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Penerima: &nbsp;&nbsp;${penerima}</p>
+                            <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Part Number &nbsp;: &nbsp;${partNumber}</p>
+                            <p class="no-margin" style="font-size:10px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Penerima: &nbsp;${penerima}</p>
                             
                            <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">No Lot : &nbsp;&nbsp;${lot}</p>
                             <span class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Qty : &nbsp;&nbsp;&nbsp;&nbsp;${qty} Pcs  &nbsp;&nbsp;&nbsp;<span style="border:1px solid black;font-weight:bold;padding:0.5px;">OK</span> &nbsp;&nbsp;&nbsp;<span > NG</span></span>
