@@ -141,7 +141,7 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, lot, depo, su
         // Mengisi modal untuk menampilkan detail
         modalBody.innerHTML = `
             <div style="background-color:white;height:14px;color:white"></div>
-            <div class="row" style="margin-right:60px" id="labelContainer"></div>`;
+            <div class="row"  id="labelContainer"></div>`;
 
         const labelContainer = document.getElementById('labelContainer');
 
@@ -173,8 +173,8 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, lot, depo, su
 
 
             let labelHTML = `
-            <div  style="color:black;padding: 3px  20px; width: calc(33.33% - 10px);margin-left:10px;">
-                <div class="label" style="width:340px;border-radius:10px; border: 1px solid black;position: relative;margin-bottom:30px;">
+            <div  style="color:black;padding: 3px  20px; width: calc(33.33% - 10px);">
+                <div class="label" style="width:340px;border-radius:10px; border: 1px solid black;position: relative;margin-bottom:30px;margin-left:20px">
                     <p style="font-size:10px;padding:0px;border-bottom:1px solid black;margin:0px;text-align:center; display:block;">PT. GRAFINDO MITRASEMESTA</p>
                      <p class="no-margin" style="font-size:12px;text-decoration:underline; display: block; width: 100%; margin: 1px 0; line-height: 1;">Part Name &nbsp;:&nbsp;${namaBarang}</p>
                     <div style="line-height:0.5;display:flex;justify-content:space-between">
