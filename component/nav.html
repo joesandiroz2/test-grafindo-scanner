@@ -12,19 +12,19 @@
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
             <li class="nav-item" id="scan-do-nav">
-                <a class="nav-link" href="/scan.html">Scan Do</a>
+                <a class="nav-link" href="/scan.html">Scan </a>
             </li>
             <li class="nav-item" id="semua-do-nav">
                 <a class="nav-link" href="/pages/semua_do">Semua Do</a>
             </li>
             <li class="nav-item" id="penyerahan-barang-nav">
-                <a class="nav-link" href="/pages/penyerahan_barang/index.html">Penyerahan Barang</a>
+                <a class="nav-link" href="/pages/penyerahan_barang/index.html">Peny Barang</a>
             </li>
             <li class="nav-item" id="data-barang-nav">
                 <a class="nav-link" href="/pages/data_barang">Data Barang</a>
             </li>
             <li class="nav-item" id="input-excel-nav">
-                <a class="nav-link" href="/pages/input_excel/">Input Excel Do</a>
+                <a class="nav-link" href="/pages/input_excel/"> Excel Do</a>
             </li>
             <li class="nav-item" id="kesalahan-nav">
                 <a class="nav-link" style="background-color:red;color:white;border-radius: 30px;" href="/pages/kesalahan/">Kesalahan</a>
@@ -39,10 +39,14 @@
                 <a class="nav-link" href="/pages/report">Report Detail</a>
             </li>
             <li class="nav-item" id="buatlabel-nav" style="background-color:yellow;color:black;border-radius: 30px;">
-                <a style="color:black" class="nav-link" href="/system2/index.html">Buat Label</a>
+                <a style="color:black" class="nav-link" href="/system2/index.html">Bikin Label</a>
             </li>
+
             <li class="nav-item" id="reportlabel-nav" style="background-color:yellow;color:black;border-radius: 30px;">
                 <a style="color:black" class="nav-link" href="/system2/report_label/index.html">Report Label</a>
+            </li>
+        <li class="nav-item" id="gselabel-nav" style="background-color:yellow;color:white;border-radius: 30px;">
+                <a style="color:black" class="nav-link" href="/system2_gse/index.html">GSE Bikin Label</a>
             </li>
         </ul>
     </div>
@@ -136,6 +140,7 @@ function restrictMenu() {
         "kartu-stok-perbarang-nav": document.getElementById("kartu-stok-perbarang-nav"),
         "report-detail-nav": document.getElementById("report-detail-nav"),
         "buatlabel-nav": document.getElementById("buatlabel-nav"),
+        "gselabel-nav": document.getElementById("gselabel-nav"),
         "reportlabel-nav": document.getElementById("reportlabel-nav"),
     };
 
@@ -143,13 +148,19 @@ function restrictMenu() {
     Object.values(menuItems).forEach(item => {
         if (item) item.style.display = "none";
     });
-
-    if (userEmail === "sopian@gmail.com" || userEmail === "daren.rasyidx@gmail.com") {
-        // Jika user sopian@gmail.com, tampilkan semua menu
-        Object.values(menuItems).forEach(item => {
-            if (item) item.style.display = "block";
-        });
-    } else if (userEmail === "pika@gmail.com") {
+if (userEmail === "sopian@gmail.com") {
+    // Tampilkan semua menu kecuali "gselabel-nav"
+    Object.keys(menuItems).forEach(menuId => {
+        if (menuId !== "gselabel-nav") {
+            menuItems[menuId].style.display = "block";
+        }
+    });
+} else if (userEmail === "daren.rasyidx@gmail.com") {
+    // User daren melihat semua menu
+    Object.values(menuItems).forEach(item => {
+        if (item) item.style.display = "block";
+    });
+} else if (userEmail === "pika@gmail.com") {
         // Jika user pika@gmail.com, hanya tampilkan beberapa menu
         let allowedMenus = ["buatlabel-nav", "reportlabel-nav"];
         allowedMenus.forEach(menuId => {
@@ -157,7 +168,7 @@ function restrictMenu() {
         });
     }else if (userEmail === "sinta@gmail.com") {
         // Jika user pika@gmail.com, hanya tampilkan beberapa menu
-        let allowedMenus = ["buatlabel-nav", "reportlabel-nav"];
+        let allowedMenus = ["gselabel-nav", "reportlabel-nav"];
         allowedMenus.forEach(menuId => {
             if (menuItems[menuId]) menuItems[menuId].style.display = "block";
         });
