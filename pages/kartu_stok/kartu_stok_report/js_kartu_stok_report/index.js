@@ -32,6 +32,7 @@ async function loadReport(page) {
             const qtyMasuk = parseInt(record.qty_masuk) || 0; // Pastikan qty_masuk adalah angka
             const lot = record.lot; // Ambil lot dari record
             const createdDate = new Date(record.created); // Ambil tanggal created
+            const balance = parseInt(record.balance) || 0; // Ambil balance dari record
 
             if (!reportData[partNumber]) {
                 reportData[partNumber] = {
@@ -42,10 +43,14 @@ async function loadReport(page) {
                     total_qty_masuk: 0,
                     rincian: {}, // Objek untuk menyimpan rincian qty_ambil dan qty_masuk berdasarkan no_dn
                     lots: new Set(), // Gunakan Set untuk menyimpan lot yang unik
-                    createdDates: [] // Array untuk menyimpan tanggal created
+                    createdDates: [], // Array untuk menyimpan tanggal created
+                    last_balance:balance
                 };
             }
-
+            if (createdDate > reportData[partNumber].last_updated) {
+                reportData[partNumber].last_balance = balance;
+                reportData[partNumber].last_updated = createdDate;
+            }
             // Tambahkan lot ke Set
             reportData[partNumber].lots.add(lot);
             reportData[partNumber].createdDates.push(createdDate); // Simpan tanggal created
@@ -110,6 +115,8 @@ async function loadReport(page) {
                     <td>${item.nama_barang}</td>
                     <td>${totalKeterangan}</td>
                     <td><ul>${rincianList}</ul></td>
+                   <td>${item.last_balance}</td> <!-- Tambahkan balance terakhir -->
+                    
                     <td>${lotList}</td> <!-- Tampilkan lot -->
                     <td style="font-size:12px"><i>${periode}</i></td> <!-- Tampilkan periode -->
                 </tr>
