@@ -165,7 +165,7 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, berapa_lembar
 
         // Loop untuk jumlah lembar
     for (let l = 0; l < berapa_lembar; l++) {
-        let lembarHTML = `<div class="lembar" style="margin-top:18px;margin-left:10px;page-break-after: always;">`;
+        let lembarHTML = `<div class="lembar" style="margin-top:18px;margin-left:6px;page-break-after: always;">`;
         
             // Loop untuk jumlah label per lembar
             for (let i = 0; i < satuan; i++) {
