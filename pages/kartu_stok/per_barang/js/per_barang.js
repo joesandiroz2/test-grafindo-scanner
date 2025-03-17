@@ -60,7 +60,7 @@ async function fetchData(query, startDate, endDate) {
     });
     try {
         const resultList = await pb.collection('kartu_stok').getFullList({
-            filter: `(part_number ~ "${query}" || nama_barang ~ "${query}") && created >= "${startDate}" && created <= "${endDate}"`,
+            filter: `(part_number ~ "${query}" ) && created >= "${startDate}" && created <= "${endDate}"`,
         });
         Swal.close();
         return resultList;
@@ -107,12 +107,12 @@ function renderTable(data) {
     const tableBody = document.getElementById('data-table-body');
     tableBody.innerHTML = ''; // Hapus data sebelumnya
 
-    if (data.items.length === 0) {
+    if (data.length === 0) {
         tableBody.innerHTML = '<tr><td colspan="9" class="text-center">Tidak ada data ditemukan</td></tr>';
         return;
     }
 
-    data.items.forEach((item,index) => {
+    data.forEach((item,index) => {
         // Menentukan warna background berdasarkan status
         const bgColor = item.status.toLowerCase() === "keluar" ? "red" : "green";
         
