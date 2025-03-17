@@ -181,7 +181,7 @@ lembarHTML += `
         <div style="line-height:0.5;display:flex;justify-content:space-between">
             <div style="line-height:0.2;margin-top:0px">
                 <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Part Number  &nbsp;:&nbsp;${partNumber}</p>
-                <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Penerima &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;${penerima}</p>
+                <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Penerima &nbsp;&nbsp;&nbsp;: &nbsp;${penerima}</p>
                 
                <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">No Lot &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;${lot}</p>
                 <span class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Qty &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;${qty} Pcs  &nbsp;&nbsp;<span style="border:1px solid black;font-weight:bold;padding:0.5px;">OK</span> &nbsp;&nbsp;&nbsp;<span > NG</span></span>
