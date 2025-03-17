@@ -59,7 +59,7 @@ async function fetchData(query, startDate, endDate) {
         }
     });
     try {
-        const resultList = await pb.collection('kartu_stok').getList(1, 100, {
+        const resultList = await pb.collection('kartu_stok').getFullList({
             filter: `(part_number ~ "${query}" || nama_barang ~ "${query}") && created >= "${startDate}" && created <= "${endDate}"`,
         });
         Swal.close();

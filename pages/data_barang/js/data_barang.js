@@ -1,7 +1,7 @@
 const pb = new PocketBase(pocketbaseUrl);
 
 let currentPage = 1; // Halaman saat ini
-const pageSize = 5; // Jumlah item per halaman
+const pageSize = 50; // Jumlah item per halaman
 
 async function authenticate() {
     try {
@@ -15,13 +15,7 @@ async function authenticate() {
 }
 
 async function loadData(pageini) {
-    Swal.fire({
-        title: 'Sedang memuat data barang...',
-        allowOutsideClick: false,
-        onBeforeOpen: () => {
-            Swal.showLoading()
-        }
-    });
+   
     await loadIkutSetOptions('ikut_set'); // Pastikan opsi diisi sebelum menampilkan modal
 
     try {
@@ -63,8 +57,14 @@ async function loadData(pageini) {
         updatePagination(currentPage, totalPages);
     } catch (error) {
         console.error('Error loading data:', error);
-    } finally {
-        Swal.close();
+        Swal.fire({
+            icon:"error",
+            title:"tidak dapat ambil data barang coba refresh",
+            timer:1500
+        })
+    }finally {
+        // Sembunyikan preloader setelah data selesai dimuat
+        document.getElementById('loadingSpinner').style.display = 'none';
     }
 }
 
@@ -111,6 +111,7 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
 
 async function editData(id) {
     try {
+
         const record = await pb.collection('data_barang').getOne(id);
         
         // Isi modal dengan data yang ada
@@ -195,6 +196,10 @@ authenticate();
 
 document.getElementById('editForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+    const submitButton = document.getElementById('submitButton'); // Ambil tombol submit
+    submitButton.disabled = true; // Nonaktifkan tombol
+    submitButton.textContent = "Sedang mengupdate..."; // Ubah teks tombol
+
 
     const id = document.getElementById('edit_record_id').value; // Ambil ID record
     const nama_barang = document.getElementById('edit_nama_barang').value;
@@ -212,13 +217,82 @@ document.getElementById('editForm').addEventListener('submit', async (e) => {
 
     try {
         await pb.collection('data_barang').update(id, formData);
-        Swal.fire('Success', 'Data barang berhasil diperbarui!', 'success');
+         Swal.fire({
+            title: 'Success',
+            text: 'Data barang berhasil diperbarui!',
+            icon: 'success',
+            timer: 1200, // Swal akan otomatis tertutup setelah 1.2 detik
+            showConfirmButton: false // Hilangkan tombol OK agar otomatis tertutup
+        });
         loadData(currentPage); // Muat ulang data setelah pembaruan
         $('#editModal').modal('hide'); // Sembunyikan modal setelah berhasil
     } catch (error) {
         console.error('Error updating data:', error);
         Swal.fire('Error', 'Gagal memperbarui data barang!', 'error');
+    }finally {
+        submitButton.disabled = false; // Aktifkan kembali tombol
+        submitButton.textContent = "Update Data"; // Kembalikan teks tombol
     }
 });
+
+
+// cari barang
+document.getElementById('cari_part').addEventListener('click', async () => {
+    let partNumberInput = document.getElementById('input_cari_part').value.trim();
+    
+    if (!partNumberInput) {
+        Swal.fire('Error', 'Masukkan nomor part terlebih dahulu!', 'error');
+        return;
+    }
+
+    partNumberInput = partNumberInput.replace(/\s+/g, '').toUpperCase();
+
+    await searchPart(partNumberInput);
+});
+
+
+async function searchPart(partNumber) {
+    try {
+        document.getElementById('loadingSpinner').style.display = 'block';
+       
+
+        const result = await pb.collection('data_barang').getList(1, 50, {
+            filter: `part_number = "${partNumber}"`
+        });
+
+        if (result.items.length === 0) {
+            Swal.fire('Hasil Tidak Ditemukan', `Tidak ada barang dengan nomor part "${partNumber}"`, 'warning');
+            return;
+        }
+
+        const dataBody = document.getElementById('dataBody');
+        dataBody.innerHTML = '';
+
+        result.items.forEach(record => {
+            const imageUrl = `${pocketbaseUrl}/api/files/data_barang/${record.id}/${record.gambar}`;
+            const imageCell = record.gambar ? `<img src="${imageUrl}" alt="${record.nama_barang}" style="width:350px;height:250px">` : 'Tidak ada gambar';
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${imageCell}</td>
+                <td>${record.nama_barang}</td>
+                <td>${record.part_number}</td>
+                <td>${record.ikut_set}</td>
+                <td>
+                    <button class="btn btn-warning" onclick="editData('${record.id}')">Edit</button>
+                    <button class="btn btn-danger" onclick="deleteData('${record.id}')">Delete</button>
+                </td>
+            `;
+            dataBody.appendChild(row);
+        });
+
+    } catch (error) {
+        console.error('Error searching data:', error);
+        Swal.fire('Error', 'Gagal mencari data barang!', 'error');
+    } finally {
+    document.getElementById('loadingSpinner').style.display = 'none';
+
+    }
+}
 
 
