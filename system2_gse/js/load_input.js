@@ -165,7 +165,7 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, berapa_lembar
 
         // Loop untuk jumlah lembar
     for (let l = 0; l < berapa_lembar; l++) {
-        let lembarHTML = `<div class="lembar" style="margin-top:18px;margin-left:8px;page-break-after: always;">`;
+        let lembarHTML = `<div class="lembar" style="margin-top:18px;margin-left:10px;page-break-after: always;">`;
         
             // Loop untuk jumlah label per lembar
             for (let i = 0; i < satuan; i++) {
@@ -174,7 +174,7 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, berapa_lembar
                     : `${partNumber}|${supplierId}|${qty}|${lot}`;
 
 lembarHTML += `
-<div  style="color:black;padding: 3px  14px; width: calc(33.33% - 10px);display:inline-block">
+<div  style="color:black;padding: 3px  10px; width: calc(33.33% - 10px);display:inline-block">
     <div class="label" style=" page-break-inside: avoid; width:320px;border-radius:10px; border: 1px solid black;position: relative;margin-bottom:35px;margin-left:7px">
         <p style="font-size:10px;padding:0px;border-bottom:1px solid black;margin:0px;text-align:center; display:block;">PT. GRAFINDO MITRASEMESTA</p>
          <p class="no-margin" style="font-size:12px;text-decoration:underline; display: block; width: 100%; margin: 1px 0; line-height: 1;">Part Name &nbsp;&nbsp;&nbsp;:&nbsp;${namaBarang}</p>
