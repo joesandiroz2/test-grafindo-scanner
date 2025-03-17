@@ -75,7 +75,7 @@ function displayDataInTable(items) {
             <button class="btn btn-warning" onclick="openPrintModal('${item.merk}', '${item.part_number}', '${item.nama_barang}', '${item.qty}', '${item.satuan}', '${item.berapa_lembar}','${item.lot}', '${item.depo}', '${item.supplier_id}', '${item.tgl_inspeksi}')">Cetak</button>
             ${showEditDeleteButtons ? `
                 <button class="btn btn-danger" onclick="openDeleteModal('${item.id}')">Hapus</button>
-                <button class="btn btn-success" onclick="openEditModal('${item.id}', '${item.merk}', '${item.part_number}', '${item.nama_barang}', '${item.qty}', '${item.satuan}','${item.berapa_lembar}','${item.depo}','${item.tgl_inspeksi}')">Edit</button>
+                <button class="btn btn-success" onclick="openEditModal('${item.id}', '${item.merk}', '${item.part_number}', '${item.nama_barang}', '${item.qty}', '${item.satuan}','${item.berapa_lembar}','${item.depo}','${item.tgl_inspeksi}','${item.lot}')">Edit</button>
             ` : ''}
                 </td>
                 <td>${item.operator}</td>
@@ -230,7 +230,7 @@ lembarHTML += `
 
 
 // Buka Modal Edit
-function openEditModal(id, merk, partNumber, namaBarang, qty, satuan,berapa_lembar,depo,tglInspeksi) {
+function openEditModal(id, merk, partNumber, namaBarang, qty, satuan,berapa_lembar,depo,tglInspeksi,lot) {
     document.getElementById('editId').value = id;
     document.getElementById('editMerk').value = merk;
     document.getElementById('editPartNumber').value = partNumber;
@@ -240,6 +240,7 @@ function openEditModal(id, merk, partNumber, namaBarang, qty, satuan,berapa_lemb
     document.getElementById('editBerapaLembar').value = berapa_lembar; // Tambahkan ini
     document.getElementById('editDepo').value = depo; // Tambahkan ini
     document.getElementById('editTglInspeksi').value = tglInspeksi; // Tambahkan ini
+    document.getElementById('editLot').value = lot; // Tambahkan ini
 
     $('#editModal').modal('show');
 }
@@ -269,6 +270,7 @@ async function saveEdit() {
         berapa_lembar:document.getElementById('editBerapaLembar').value,
         depo:document.getElementById('editDepo').value,
         tgl_inspeksi:document.getElementById('editTglInspeksi').value,
+        lot:document.getElementById('editLot').value,
         supplier_id:supplierId
     };
 
