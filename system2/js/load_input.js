@@ -210,8 +210,11 @@ function openBarenganPrint(merk, partNumber, namaBarang, qty, satuan, berapa_lem
         let jumlahLabelPerLembar = parseInt(satuan); // Jumlah label tergantung satuan
 
         // **Perbaikan: Hapus `page-break-after: always;` agar tetap dalam satu lembar**
-        let lembarHTML = `<div class="lembar" style="margin-top:28px;">`;
-       
+        let lembarHTML = '';
+        if (document.getElementById('modalBody').children.length === 0) {
+            lembarHTML += `<div style="height:28px;"></div>`; 
+        }
+
         // **Loop berdasarkan jumlah label tanpa memisahkan lembar**
         for (let i = 0; i < jumlahLabelPerLembar; i++) {
             let qrData = (merk.toLowerCase() === 'yamaha') 
@@ -220,8 +223,8 @@ function openBarenganPrint(merk, partNumber, namaBarang, qty, satuan, berapa_lem
             let qrId = `qrcode-${partNumber.replace(/\s+/g, '')}-${i}`;
 
         lembarHTML += `
-            <div style="color:black;padding: 3px 6px; width: calc(33.33% - 10px);display:inline-block;">
-                <div class="label" style="page-break-inside: avoid; width:340px;border-radius:10px; border: 1px solid black;position: relative;margin-bottom:25px;margin-left:7px">
+            <div style="color:black;padding: 0px 6px; width: calc(33.33% - 10px);display:inline-block;">
+                <div class="label" style="page-break-inside: avoid; width:340px;border-radius:10px; border: 1px solid black;position: relative;margin-bottom:35px;margin-left:7px">
                     <p style="font-size:10px;padding:0px;border-bottom:1px solid black;margin:0px;text-align:center; display:block;">PT. GRAFINDO MITRASEMESTA</p>
                     <p class="no-margin" style="font-size:12px;text-decoration:underline; display: block; width: 100%; margin: 1px 0; line-height: 1;">Part Name &nbsp;&nbsp;&nbsp;:&nbsp;${namaBarang}</p>
                     <div style="line-height:0.5;display:flex;justify-content:space-between">
