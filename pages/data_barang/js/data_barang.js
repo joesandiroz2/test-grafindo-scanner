@@ -36,7 +36,7 @@ async function loadData(pageini) {
         records.forEach(record => {
             const imageUrl = `${pocketbaseUrl}/api/files/data_barang/${record.id}/${record.gambar}`;
             const imageCell = record.gambar ? 
-                `<img src="${imageUrl}" alt="${record.nama_barang}" width="50">` : 
+                `<img src="${imageUrl}" alt="${record.nama_barang}" style="width:150px;height:80px">` : 
                 'Tidak ada gambar'; // Teks jika tidak ada gambar
 
             const row = document.createElement('tr');
