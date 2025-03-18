@@ -11,7 +11,7 @@ async function loadInputData(page = 1) {
     try {
 
         // Mengambil data dari API dengan pagination
-          let url = `${pocketbaseUrl}/api/collections/system2_scan_input/records?page=${page}&perPage=${itemsPerPageLoad}`;
+          let url = `${pocketbaseUrl}/api/collections/system2_scan_input/records?page=${page}&perPage=${itemsPerPageLoad}&sort=-created`;
 
         // Tambahkan filter jika user bukan "sopian@gmail.com"
         if (userGrafindo !== "sopian@gmail.com") {
