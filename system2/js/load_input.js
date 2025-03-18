@@ -43,11 +43,17 @@ async function loadInputData(page = 1) {
 
 
 
+let selectedItems = {};
+
 function displayDataInTable(items) {
     let tableHTML = `
         <table class="table table-bordered table-responsive">
             <thead>
                 <tr>
+              <th>
+                Pilih 
+                <button class="btn btn-primary btn-sm" onclick="printSelectedItems()">Cetak</button>
+            </th>
                     <th>Aksi</th>
                     <th>OP</th>
                     <th>Merk</th>
@@ -67,10 +73,25 @@ function displayDataInTable(items) {
     const currentOperator = localStorage.getItem('operator_label'); // Get the current operator from localStorage
 
     items.forEach(item => {
-         const showEditDeleteButtons = item.operator === currentOperator;
+        const showEditDeleteButtons = item.operator === currentOperator;
 
         tableHTML += `
             <tr>
+        <td>
+       <input type="checkbox" class="item-checkbox" 
+            data-id="${item.id}" 
+            data-merk="${item.merk}" 
+            data-part_number="${item.part_number}" 
+            data-nama_barang="${item.nama_barang}" 
+            data-qty="${item.qty}" 
+            data-satuan="${item.satuan}" 
+            data-berapa_lembar="${item.berapa_lembar}" 
+            data-lot="${item.lot}" 
+            data-depo="${item.depo}" 
+            data-supplier_id="${item.supplier_id}" 
+            data-tgl_inspeksi="${item.tgl_inspeksi}"
+        />
+        </td>
                  <td>
             <button class="btn btn-warning" onclick="openPrintModal('${item.merk}', '${item.part_number}', '${item.nama_barang}', '${item.qty}', '${item.satuan}', '${item.berapa_lembar}','${item.lot}', '${item.depo}', '${item.supplier_id}', '${item.tgl_inspeksi}')">Cetak</button>
             ${showEditDeleteButtons ? `
@@ -101,7 +122,165 @@ function displayDataInTable(items) {
 
     // Update elemen loadinput dengan tabel
     document.getElementById('loadinput').innerHTML = tableHTML;
+
 }
+
+
+document.addEventListener('change', function(event) {
+    if (event.target.classList.contains('item-checkbox')) {
+        const checkbox = event.target;
+        const itemId = checkbox.dataset.id;
+
+        if (checkbox.checked) {
+            selectedItems[itemId] = {
+                merk: checkbox.dataset.merk,
+                partNumber: checkbox.dataset.part_number,
+                namaBarang: checkbox.dataset.nama_barang,
+                qty: checkbox.dataset.qty,
+                satuan: parseInt(checkbox.dataset.satuan) || 0,
+                berapa_lembar: checkbox.dataset.berapa_lembar,
+                lot: checkbox.dataset.lot,
+                depo: checkbox.dataset.depo,
+                supplierId: checkbox.dataset.supplier_id,
+                tglInspeksi: checkbox.dataset.tgl_inspeksi
+            };
+        } else {
+            delete selectedItems[itemId]; // Hapus jika tidak dicentang
+        }
+
+        // Hitung total satuan dari semua item yang dipilih
+        let totalSatuan = Object.values(selectedItems).reduce((sum, item) => sum + item.satuan, 0);
+
+        if (totalSatuan > 18) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Total cuman 18 label yg bagus untuk di cetak ',
+                text: 'Total label maksimal hanya 18 yang bisa dipilih.',
+            });
+
+            // Batalkan centang terakhir
+            checkbox.checked = false;
+            delete selectedItems[itemId];
+        }
+    }
+});
+
+function printSelectedItems() {
+    if (Object.keys(selectedItems).length === 0) {
+        Swal.fire({
+            title:"Centang dulu label yg mau di cetak",
+            icon:"warning"
+        })
+        return;
+    }
+
+    // Bersihkan modal sebelum menampilkan data baru
+    const modalBody = document.getElementById('modalBody');
+    modalBody.innerHTML = '';
+
+    for (const itemId in selectedItems) {
+        const item = selectedItems[itemId];
+
+        openBarenganPrint(
+            item.merk,
+            item.partNumber,
+            item.namaBarang,
+            parseInt(item.qty),  
+            parseInt(item.satuan), 
+            parseInt(item.berapa_lembar),  
+            item.lot,
+            item.depo,
+            item.supplierId,
+            item.tglInspeksi
+        );
+    }
+
+    // Tampilkan modal setelah semua data dimasukkan
+    $('#printModal').modal('show');
+}
+
+function openBarenganPrint(merk, partNumber, namaBarang, qty, satuan, berapa_lembar, lot, depo, supplierId, tglInspeksi) {
+    const modalBody = document.getElementById('modalBody');
+    const formattedPartNumber = partNumber.replace(/\s+/g, '').toUpperCase();
+    
+    if (modalBody) {
+        let supplierId = (merk.toLowerCase() === 'yamaha') ? '7603' : (merk.toLowerCase() === 'honda') ? '1201591' : '';
+        let penerima = (merk.toLowerCase() === 'yamaha') ? 'PT YAMAHA INDONESIA' : (merk.toLowerCase() === 'honda') ? 'PT ASTRA HONDA MOTOR' : '';
+
+        let jumlahLabelPerLembar = parseInt(satuan); // Jumlah label tergantung satuan
+
+        // **Perbaikan: Hapus `page-break-after: always;` agar tetap dalam satu lembar**
+        let lembarHTML = `<div class="lembar" style="margin-top:28px;">`;
+       
+        // **Loop berdasarkan jumlah label tanpa memisahkan lembar**
+        for (let i = 0; i < jumlahLabelPerLembar; i++) {
+            let qrData = (merk.toLowerCase() === 'yamaha') 
+                ? `${partNumber}|${supplierId}|${qty}` 
+                : `${partNumber}|${supplierId}|${qty}|${lot}`;
+            let qrId = `qrcode-${partNumber.replace(/\s+/g, '')}-${i}`;
+
+        lembarHTML += `
+            <div style="color:black;padding: 3px 6px; width: calc(33.33% - 10px);display:inline-block;">
+                <div class="label" style="page-break-inside: avoid; width:340px;border-radius:10px; border: 1px solid black;position: relative;margin-bottom:25px;margin-left:7px">
+                    <p style="font-size:10px;padding:0px;border-bottom:1px solid black;margin:0px;text-align:center; display:block;">PT. GRAFINDO MITRASEMESTA</p>
+                    <p class="no-margin" style="font-size:12px;text-decoration:underline; display: block; width: 100%; margin: 1px 0; line-height: 1;">Part Name &nbsp;&nbsp;&nbsp;:&nbsp;${namaBarang}</p>
+                    <div style="line-height:0.5;display:flex;justify-content:space-between">
+                        <div style="line-height:0.2;margin-top:0px">
+                            <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Part Number  &nbsp;:&nbsp;${formattedPartNumber}</p>
+                            <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Penerima &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;${penerima}</p>
+                            <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">No Lot &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;${lot}</p>
+                            <span class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">
+                                Qty &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;${qty} Pcs  
+                                &nbsp;&nbsp;<span style="border:1px solid black;font-weight:bold;padding:0.5px;">OK</span> &nbsp;&nbsp;&nbsp;<span > NG</span>
+                            </span>
+                            <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Tgl Packing &nbsp;&nbsp;:&nbsp;&nbsp;${tglInspeksi}</p>
+                            <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Opr Packing &nbsp;:&nbsp;${depo}</p>
+                        </div>
+                        <div style="text-align: right;padding-top:3px;padding-left:3px;padding-bottom:10px;padding-right:10px">
+                            <div id="${qrId}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        lembarHTML += `</div>`; // **Tutup div container agar semua dalam satu lembar**
+        modalBody.innerHTML += lembarHTML;
+
+        // **Generate QR Code setelah HTML selesai dibuat**
+        setTimeout(() => {
+            for (let i = 0; i < jumlahLabelPerLembar; i++) {
+                let qrId = `qrcode-${partNumber.replace(/\s+/g, '')}-${i}`;
+                let qrElement = document.getElementById(qrId);
+
+                if (qrElement) {
+                    let qrText = (merk.toLowerCase() === 'yamaha') 
+                        ? `${partNumber}|${supplierId}|${qty}`
+                        : `${partNumber}|${supplierId}|${qty}|${lot}`;
+
+                    new QRCode(qrElement, {
+                        text: qrText,
+                        width: 85,
+                        height: 85,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.L 
+                    });
+                } else {
+                    console.error("QR Code container not found:", qrId);
+                }
+            }
+        }, 100);
+    } else {
+        console.error('Modal body not found');
+    }
+}
+
+
+
+
+
+
 
 function displayPagination(totalItems, currentLoadPage) {
     const totalPages = Math.ceil(totalItems / itemsPerPageLoad);
