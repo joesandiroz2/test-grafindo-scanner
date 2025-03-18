@@ -142,6 +142,8 @@ document.addEventListener('DOMContentLoaded', () => loadInputData(currentLoadPag
 
 function openPrintModal(merk, partNumber, namaBarang, qty, satuan, berapa_lembar, lot, depo, supplierId, tglInspeksi) {
     const modalBody = document.getElementById('modalBody');
+    const formattedPartNumber = partNumber.replace(/\s+/g, '').toUpperCase();
+
     if (modalBody) {
         modalBody.innerHTML = `
             <div id="lembarContainer"></div>`;
@@ -180,7 +182,7 @@ lembarHTML += `
          <p class="no-margin" style="font-size:12px;text-decoration:underline; display: block; width: 100%; margin: 1px 0; line-height: 1;">Part Name &nbsp;&nbsp;&nbsp;:&nbsp;${namaBarang}</p>
         <div style="line-height:0.5;display:flex;justify-content:space-between">
             <div style="line-height:0.2;margin-top:0px">
-                <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Part Number  &nbsp;:&nbsp;${partNumber}</p>
+                <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Part Number  &nbsp;:&nbsp;${formattedPartNumber}</p>
                 <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Penerima &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;${penerima}</p>
                 
                <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">No Lot &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;${lot}</p>
