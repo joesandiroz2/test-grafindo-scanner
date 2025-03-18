@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+
 <title>Grafindo Scanner</title>
 <!-- Link ke CSS Bootstrap -->
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -101,9 +103,14 @@
 <h4 style="font-weight: bold;">Buat Label Partnumber</h4>
 <form id="inputForm" class="card shadow" style="padding: 3px;">
 
-
 <div class="row">
-    <div class="col-md-4 col-lg-4">
+    <div class="col-md-12 col-lg-12">
+    <label for="search-part">Cari Part:</label>
+    <select id="search-part" class="form-control"></select>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-2 col-lg-2">
         <div class="form-group">
             <label for="merk">Merk</label>
             <div>
@@ -118,6 +125,7 @@
             </div>
         </div>
     </div>
+
     <div class="col-md-4 col-lg-4">
         <div class="form-group">
             <label for="part_number">Part Number</label>
@@ -347,6 +355,9 @@
 
 <!-- Link ke jQuery dan JS Bootstrap -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+    
+
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
@@ -359,6 +370,80 @@
 <script src="./js/check_akun/akun.js"></script>
 <script>
 
+let search_part = [
+    {
+        "nama_part":"MARK,HONDA 90 MM TYPE 1 CBS",
+        "part_no":"86103K0WNA000001"
+    },
+    {
+        "nama_part":"MARK,HONDA 90 MM TYPE 2 ABS",
+        "part_no":"86103K0WNA000002"
+    },
+    {
+        "nama_part":"EMBLEM,ADV 160 TYPE 1",
+        "part_no":"86835K0WNA000001"
+    },
+    {
+        "nama_part":"EMBLEM,ADV 160 TYPE 2",
+        "part_no":"86835K0WNA000002"
+    },
+    {
+        "nama_part":"MARK,SCOOPY & LINNER SET  TYPE 1",
+        "part_no":"8683AK2FND00DL01"
+    },
+    {
+        "nama_part":"MARK,SCOOPY & LINNER SET  TYPE 2",
+        "part_no":"8683AK2FND00DL02"
+    },
+    {
+        "nama_part":"EMBLEM,BODY COVER TYPE 1",
+        "part_no":"86833K3VN1000001"
+    },
+    {
+        "nama_part":"EMBLEM,,BEAT TYPE 1",
+        "part_no":"86834K1AN9010001"
+    },
+    {
+        "nama_part":"EMBLEM,PCX 160 TYPE 3",
+        "part_no":"86830-K1Z-NA00-00-03"
+    },
+    {
+        "nama_part":"GESIT TEXT EMBLEM R",
+        "part_no":"G1.20-D01-0110R"
+    },
+    {
+        "nama_part":"SOFT EMBLEM FOX S",
+        "part_no":"SN89A834"
+    },
+
+]
+
+$(document).ready(function () {
+// Inisialisasi Select2
+$("#search-part").select2({
+    placeholder: "Cari Nama Part atau Part No",
+    allowClear: true,
+    data: search_part.map(item => ({
+        id: item.part_no,
+        text: `${item.nama_part} (${item.part_no})`,
+        nama_part: item.nama_part,  // Simpan nama_part di data
+        part_no: item.part_no       // Simpan part_no di data
+    }))
+});
+
+// Event saat memilih part
+$("#search-part").on("change", function () {
+    let selectedData = $("#search-part").select2("data")[0]; // Ambil data terpilih
+
+    if (selectedData) {
+        $("#part_number").val(selectedData.part_no);  // Isi Part Number
+        $("#nama_barang").val(selectedData.nama_part); // Isi Nama Barang
+    } else {
+        $("#part_number").val("");  // Kosongkan jika tidak ada yang dipilih
+        $("#nama_barang").val("");
+    }
+});
+});
 
 const pb = new PocketBase(pocketbaseUrl);
 
