@@ -189,7 +189,7 @@ lembarHTML += `
             <p class="no-margin" style="font-size:9px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Opr Packing &nbsp;:&nbsp;${depo}</p>
                 
             </div>
-            <div style="text-align: right;padding-top:3px;padding-left:3px;padding-bottom:10px;padding-right:10px">
+            <div style="text-align: right;padding-top:3px;padding-left:3px;padding-bottom:5px;padding-right:5px">
                  <div id="qrcode-${l}-${i}"></div>
             </div>
         </div>
