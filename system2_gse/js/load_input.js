@@ -210,8 +210,8 @@ lembarHTML += `
                         text: (merk.toLowerCase() === 'yamaha') 
                             ? `${partNumber}|${supplierId}|${qty}`
                             : `${partNumber}|${supplierId}|${qty}|${lot}`,
-                        width: 85,
-                        height: 85,
+                        width: 80,
+                        height: 80,
                         colorDark: "#000000",
                         colorLight: "#ffffff",
                         correctLevel: QRCode.CorrectLevel.L 
