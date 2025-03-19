@@ -87,7 +87,7 @@ for (const [setName, items] of Object.entries(groupedData)) {
                 ${items.map((item, index) => `
                     <tr>
                         <td>${index + 1}</td>
-                        <td><img src="${pocketbaseUrl}/api/files/data_barang/${item.id}/${item.gambar}" width="50"></td>
+                        <td><img src="${pocketbaseUrl}/api/files/data_barang/${item.id}/${item.gambar}" style="width:160px;height:80px"></td>
                         <td>${item.nama_barang}</td>
                         <td>${item.part_number}</td>
                     </tr>

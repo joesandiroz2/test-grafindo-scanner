@@ -150,9 +150,9 @@
     </div>
     <div class="col-md-2 col-lg-2">
         <div class="form-group">
-            <label for="satuan">Bikin berapa label  *18 = 1 lembar  </label>
+            <label for="satuan">Bikin berapa label  *33 = 1 lembar  </label>
             <input type="text" class="form-control" id="satuan" required>
-            <small id="error-message" class="text-danger" style="display: none;">Maksimalnya 18 aja</small>
+            <small id="error-message" class="text-danger" style="display: none;">Maksimalnya 33 aja</small>
  
         </div>
     </div>
@@ -451,9 +451,9 @@ document.getElementById('satuan').addEventListener('input', function () {
     const inputField = this;
     const errorMessage = document.getElementById('error-message');
     
-    if (inputField.value > 18) {
+    if (inputField.value > 33) {
         errorMessage.style.display = 'block';  // Tampilkan pesan error
-        inputField.value = 18; // Paksa nilai maksimal jadi 33
+        inputField.value = 33; // Paksa nilai maksimal jadi 33
     } else {
         errorMessage.style.display = 'none'; // Sembunyikan pesan jika valid
     }

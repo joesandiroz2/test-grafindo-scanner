@@ -36,7 +36,7 @@ async function loadData(pageini) {
         records.forEach(record => {
             const imageUrl = `${pocketbaseUrl}/api/files/data_barang/${record.id}/${record.gambar}`;
             const imageCell = record.gambar ? 
-                `<img src="${imageUrl}" alt="${record.nama_barang}" style="width:150px;height:80px">` : 
+                `<img src="${imageUrl}" alt="${record.nama_barang}" style="width:240px;height:180px">` : 
                 'Tidak ada gambar'; // Teks jika tidak ada gambar
 
             const row = document.createElement('tr');
@@ -114,15 +114,27 @@ async function editData(id) {
 
         const record = await pb.collection('data_barang').getOne(id);
         
-        // Isi modal dengan data yang ada
-        document.getElementById('edit_nama_barang').value = record.nama_barang;
-        document.getElementById('edit_part_number').value = record.part_number;
-        document.getElementById('edit_ikut_set').value = record.ikut_set;
-        document.getElementById('edit_record_id').value = record.id; // Simpan ID record
-         await loadIkutSetOptions('edit_ikut_set'); // Pastikan opsi diisi sebelum menampilkan modal
 
-        // Tampilkan modal
-        $('#editModal').modal('show');
+        // Isi modal dengan data yang ada
+        // document.getElementById('edit_nama_barang').value = record.nama_barang;
+        // document.getElementById('edit_part_number').value = record.part_number;
+        // document.getElementById('edit_ikut_set').value = record.ikut_set;
+        // document.getElementById('edit_record_id').value = record.id; // Simpan ID record
+
+        // // Tampilkan modal
+        // $('#editModal').modal('show');
+          await loadIkutSetOptions('edit_ikut_set');
+
+        // Gunakan setTimeout agar eksekusi menunggu dropdown terisi
+        setTimeout(() => {
+            document.getElementById('edit_nama_barang').value = record.nama_barang;
+            document.getElementById('edit_part_number').value = record.part_number;
+            document.getElementById('edit_ikut_set').value = record.ikut_set;
+            document.getElementById('edit_record_id').value = record.id;
+
+            // Tampilkan modal setelah semua data siap
+            $('#editModal').modal('show');
+        }, 300); // Delay 300ms agar opsi dropdown terisi lebih dulu
     } catch (error) {
         console.error('Error fetching record for edit:', error);
     }

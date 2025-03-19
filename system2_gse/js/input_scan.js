@@ -50,7 +50,7 @@ $(document).ready(function() {
             });
             // Reset form setelah sukses
             $("#inputForm")[0].reset();
-            window.location.href = "/system2/index.html";
+            window.location.href = "/system2_gse/index.html";
         })
         .catch((error) => {
             // Menampilkan notifikasi gagal
