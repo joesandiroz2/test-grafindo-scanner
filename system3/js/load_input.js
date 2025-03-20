@@ -239,7 +239,7 @@ function openBarenganPrint(merk, partNumber, namaBarang, qty, satuan, berapa_lem
                             <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Tgl Packing &nbsp;&nbsp;:&nbsp;&nbsp;${tglInspeksi}</p>
                             <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Opr Packing &nbsp;:&nbsp;${depo}</p>
                         </div>
-                        <div style="text-align: right;padding-top:3px;padding-left:3px;padding-bottom:10px;padding-right:10px">
+                        <div style="text-align: right;padding-top:3px;padding-left:2px;padding-bottom:10px;padding-right:5px">
                             <div id="${qrId}"></div>
                         </div>
                     </div>
@@ -263,8 +263,8 @@ function openBarenganPrint(merk, partNumber, namaBarang, qty, satuan, berapa_lem
 
                     new QRCode(qrElement, {
                         text: qrText,
-                        width: 85,
-                        height: 85,
+                        width: 80,
+                        height: 80,
                         colorDark: "#000000",
                         colorLight: "#ffffff",
                         correctLevel: QRCode.CorrectLevel.L 
@@ -359,7 +359,7 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, berapa_lembar
 
 lembarHTML += `
 <div  style="color:black;padding: 3px  6px; width: calc(33.33% - 10px);display:inline-block">
-    <div class="label" style=" page-break-inside: avoid; width:340px;border-radius:10px; border: 1px solid black;position: relative;margin-bottom:35px;margin-left:7px">
+    <div class="label" style=" page-break-inside: avoid; width:310px;border-radius:10px; border: 1px solid black;position: relative;margin-bottom:35px;margin-left:40px">
         <p style="font-size:10px;padding:0px;border-bottom:1px solid black;margin:0px;text-align:center; display:block;">PT. GRAFINDO MITRASEMESTA</p>
          <p class="no-margin" style="font-size:12px;text-decoration:underline; display: block; width: 100%; margin: 1px 0; line-height: 1;">Part Name &nbsp;&nbsp;&nbsp;:&nbsp;${namaBarang}</p>
         <div style="line-height:0.5;display:flex;justify-content:space-between">
@@ -373,7 +373,7 @@ lembarHTML += `
             <p class="no-margin" style="font-size:12px;border-bottom: 1px solid black; display: block; width: 100%; margin: 2px 0; line-height: 1;">Opr Packing &nbsp;:&nbsp;${depo}</p>
                 
             </div>
-            <div style="text-align: right;padding-top:3px;padding-left:3px;padding-bottom:10px;padding-right:10px">
+            <div style="text-align: center;padding-top:3px;padding-left:3px;padding-bottom:3px;padding-right:3px">
                  <div id="qrcode-${l}-${i}"></div>
             </div>
         </div>
@@ -394,8 +394,8 @@ lembarHTML += `
                         text: (merk.toLowerCase() === 'yamaha') 
                             ? `${partNumber}|${supplierId}|${qty}`
                             : `${partNumber}|${supplierId}|${qty}|${lot}`,
-                        width: 85,
-                        height: 85,
+                        width: 70,
+                        height: 70,
                         colorDark: "#000000",
                         colorLight: "#ffffff",
                         correctLevel: QRCode.CorrectLevel.L 
