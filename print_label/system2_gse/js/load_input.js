@@ -240,7 +240,7 @@ function openEditModal(id, merk, partNumber, namaBarang, qty, satuan,berapa_lemb
     document.getElementById('editBerapaLembar').value = berapa_lembar; // Tambahkan ini
     document.getElementById('editDepo').value = depo; // Tambahkan ini
     document.getElementById('editTglInspeksi').value = tglInspeksi; // Tambahkan ini
-    document.getElementById('editLot').value = tglInspeksi; // Tambahkan ini
+    document.getElementById('editLot').value = lot; // Tambahkan ini
 
     $('#editModal').modal('show');
 }
