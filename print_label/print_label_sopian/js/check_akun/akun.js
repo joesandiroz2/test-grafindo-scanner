@@ -25,7 +25,7 @@ if (formValues) {
         const authData = await pb.collection('users').authWithPassword(formValues.email, formValues.password);
         localStorage.setItem('operator_label', authData.record.email); // Store email in localStorage
         Swal.fire('Login Berhasil!', 'Anda berhasil masuk.', 'success');
-        window.location.href = "/system2/"
+        window.location.href = "/print_label/print_label_sopian/index.html"
         displayOperatorLabel()
         // Show the main content
         document.getElementById('inputlabelmain').style.display = 'block'; // Show the div after successful login

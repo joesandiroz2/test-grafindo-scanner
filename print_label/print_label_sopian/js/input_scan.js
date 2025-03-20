@@ -50,7 +50,7 @@ $(document).ready(function() {
             });
             // Reset form setelah sukses
             $("#inputForm")[0].reset();
-            window.location.href = "/system3/index.html";
+            window.location.href = "/print_label/print_label_sopian/index.html";
         })
         .catch((error) => {
             // Menampilkan notifikasi gagal

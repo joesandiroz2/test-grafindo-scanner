@@ -82,6 +82,7 @@
      id="operator_label">
     </div>
       <button id="logoutButton" class="btn btn-danger mt-2">Keluar Akun</button>
+<h5 style="background-color:black;color: white;font-weight: bold;padding: 3px;margin-top: 5px;">Printer KHUSUS Ruangan Pa SOPIAN</h5>
 
 
     <h5 style="font-weight:bold">Scan Input Disini</h5>
@@ -350,8 +351,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-<script src="../js/sdk/pocketbase.umd.js"></script>
-<script src="../js/pocket_config.js"></script>
+<script src="../../js/sdk/pocketbase.umd.js"></script>
+<script src="../../js/pocket_config.js"></script>
 <script src="./js/input_scan.js"></script>
 <script src="./js/load_scan.js"></script>
 <script src="./js/check_barang.js"></script>
@@ -429,7 +430,7 @@ document.getElementById("printButton").addEventListener("click", function () {
 
 
 $(document).ready(function() {
-$("#navbar-container").load("../component/nav.html",function(){
+$("#navbar-container").load("../../component/nav.html",function(){
         setTimeout(loginUser, 500);
     
 });
