@@ -34,6 +34,9 @@ async function fetchData(partNumber, noLot) {
 
         // Tampilkan data di tabel
         displayResults(resultList.items, partNumber, noLot);
+        // Memutar suara
+        const audio = new Audio('../../suara/suara_ok.mp3');
+        audio.play();
     } catch (error) {
         console.error(error);
         Swal.fire('Error', 'Terjadi kesalahan saat mengambil data.', 'error');

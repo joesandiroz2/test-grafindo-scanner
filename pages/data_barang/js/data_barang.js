@@ -21,7 +21,7 @@ async function loadData(pageini) {
     try {
         // Ambil data dengan pagination
         const result = await pb.collection('data_barang').getList(pageini, pageSize, {
-            sort: "-created"
+            sort: "-updated"
         });
         console.log(result)
         console.log(pageini, pageSize)
@@ -52,7 +52,7 @@ async function loadData(pageini) {
             `;
             dataBody.appendChild(row);
         });
-
+         currentPage = pageini;
         // Update pagination
         updatePagination(currentPage, totalPages);
     } catch (error) {
@@ -169,7 +169,7 @@ function updatePagination(currentPage, totalPages) {
 
     // Previous button
     const prevButton = document.createElement('button');
-    prevButton.innerText = 'Previous';
+    prevButton.innerText = 'Sebelumnya';
     prevButton.className = 'btn btn-secondary';
     prevButton.disabled = currentPage <= 1; // Disable jika di halaman pertama
     prevButton.onclick = () => {
@@ -188,12 +188,13 @@ function updatePagination(currentPage, totalPages) {
 
     // Next button
     const nextButton = document.createElement('button');
-    nextButton.innerText = 'Next';
+    nextButton.innerText = 'Selanjutnya';
     nextButton.className = 'btn btn-secondary';
-    nextButton.disabled = currentPage >= totalPages; // Disable jika di halaman terakhir
+    nextButton.disabled = currentPage == totalPages; // Disable jika di halaman terakhir
     nextButton.onclick = () => {
         if (currentPage < totalPages) {
-            loadData(currentPage + 1);
+            currentPage++
+            loadData(currentPage);
         }
     };
 
