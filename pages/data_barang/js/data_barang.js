@@ -1,7 +1,7 @@
 const pb = new PocketBase(pocketbaseUrl);
 
 let currentPage = 1; // Halaman saat ini
-const pageSize = 50; // Jumlah item per halaman
+const pageSize = 100; // Jumlah item per halaman
 
 async function authenticate() {
     try {
@@ -36,7 +36,7 @@ async function loadData(pageini) {
         records.forEach(record => {
             const imageUrl = `${pocketbaseUrl}/api/files/data_barang/${record.id}/${record.gambar}`;
             const imageCell = record.gambar ? 
-                `<img src="${imageUrl}" alt="${record.nama_barang}" style="width:240px;height:180px">` : 
+                `<img src="${imageUrl}" alt="${record.nama_barang}" style="width:300px;height:180px">` : 
                 'Tidak ada gambar'; // Teks jika tidak ada gambar
 
             const row = document.createElement('tr');
