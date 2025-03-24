@@ -214,12 +214,11 @@ document.getElementById('pdfDownload').addEventListener('click', function() {
 authUser ();
 
 $(document).on("click", ".dari-stok-awal", async function () {
-      const $button = $(this); // Simpan referensi ke tombol
-    const originalText = $button.text(); // Simpan teks asli tombol
-    $button.addClass("disabled").text("Sedang Mengambil..."); // Ubah ke mode loading
+    const $button = $(this);
+    const originalText = $button.text();
+    $button.addClass("disabled").text("Sedang Mengambil...");
 
-
-    const partNumber = $(this).data("partnumber"); // Ambil part_number dari tombol
+    const partNumber = $(this).data("partnumber");
     const pb = new PocketBase(pocketbaseUrl);
 
     try {
@@ -236,45 +235,36 @@ $(document).on("click", ".dari-stok-awal", async function () {
         // **Urutkan berdasarkan tanggal transaksi (`tgl_pb`)**
         response.sort((a, b) => new Date(a.tgl_pb) - new Date(b.tgl_pb));
 
-        // **Menghitung balance berdasarkan transaksi**
-        let currentBalance = 0;
-        const groupedData = response.reduce((acc, record) => {
+        // **Mengelompokkan berdasarkan no_dn dan menjumlahkan qty_ambil**
+        let groupedData = {};
+        response.forEach(record => {
             const key = record.no_dn;
 
-            if (!acc[key]) {
-                acc[key] = {
+            if (!groupedData[key]) {
+                // Buat entri baru jika belum ada
+                groupedData[key] = {
                     no_dn: record.no_dn,
                     qty_minta: parseInt(record.qty_minta) || 0,
-                    qty_ambil: 0,
-                    qty_masuk: 0,
-                    balance: 0,
+                    qty_ambil: parseInt(record.qty_ambil) || 0, // Set jumlah awal
+                    qty_masuk: parseInt(record.qty_masuk) || 0,
+                    balance: parseInt(record.balance) || 0,
                     tgl_pb: record.tgl_pb,
-                    status: record.status, // Tambahkan status
-                    lot: record.lot || "-", // Tambahkan lot
-                    created: record.created, // Ambil created
+                    status: record.status,
+                    lot: record.lot || "-",
+                    created: record.created, // Ambil tanggal terbaru
                 };
+            } else {
+                // **Tambah qty_ambil jika ada no_dn yang sama**
+                groupedData[key].qty_ambil += parseInt(record.qty_ambil) || 0;
+                groupedData[key].qty_masuk += parseInt(record.qty_masuk) || 0;
+
+                // **Pastikan balance terbaru yang diambil adalah dari record terbaru**
+                if (new Date(record.created) > new Date(groupedData[key].created)) {
+                    groupedData[key].balance = parseInt(record.balance) || 0;
+                    groupedData[key].created = record.created; // Update waktu terbaru
+                }
             }
-
-            // **Ambil created terbaru**
-            if (new Date(record.created) > new Date(acc[key].created)) {
-                acc[key].created = record.created;
-            }
-
-            // **Mengupdate qty masuk dan keluar**
-            if (record.status === "keluar") {
-                acc[key].qty_ambil += parseInt(record.qty_ambil) || 0;
-                currentBalance -= parseInt(record.qty_ambil) || 0;
-            } else if (record.status === "masuk") {
-                acc[key].qty_masuk += parseInt(record.qty_masuk) || 0;
-                currentBalance += parseInt(record.qty_masuk) || 0;
-            }
-
-            // **Simpan balance terbaru**
-            acc[key].balance = currentBalance;
-            acc[key].tgl_pb = record.tgl_pb;
-
-            return acc;
-        }, {});
+        });
 
         // **Fungsi format tanggal (contoh: "22 Mei 2025")**
         function formatTanggal(dateStr) {
@@ -295,13 +285,15 @@ $(document).on("click", ".dari-stok-awal", async function () {
             let formattedDate = formatTanggal(record.created);
 
             // **Style balance merah jika negatif**
-            let balanceStyle = record.balance < 0 ? 'style="color:red; background-color:white;padding:3px;font-weight:bold;"' : 'style="font-weight:bold;"';
+            let balanceStyle = record.balance < 0 ? 
+                'style="color:red; background-color:white;padding:3px;font-weight:bold;"' : 
+                'style="font-weight:bold;"';
 
             return `
                 <tr>
                     <td>
-                        <p> Dari <b>${record.no_dn}</b> 
-                        ${record.status} <b>${qty_display} Pcs </b> tgl
+                        <p>Dari <b>${record.no_dn}</b> 
+                        ${record.status} <b>${qty_display} Pcs</b> tgl
                         <i>${formattedDate}</i>
                         </p>
                     </td>
@@ -331,13 +323,11 @@ $(document).on("click", ".dari-stok-awal", async function () {
     } catch (error) {
         console.error("Error fetching data:", error);
         Swal.fire("Error", "Gagal mengambil data", "error");
-    }finally {
+    } finally {
         // Kembalikan tombol ke kondisi semula setelah proses selesai
         $button.removeClass("disabled").text(originalText);
     }
 });
-
-
 
 // berdasarkan tgl kartu stok rincian
 $(document).ready(function () {
