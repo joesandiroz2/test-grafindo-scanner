@@ -1,9 +1,11 @@
 async function Kurangi_stok_part() {
     const partNumber = $("#part-number").val().trim().replace(/\s+/g, '').toUpperCase();
     const alasan_kurangi = $("#alasan_kurangi").val();
+    const lot = $("#no-lot").val();
+    const nama_barang = $("#namabarang").val();
     const qty_kurangi = parseInt($("#qtykurangi").val(), 10);
 
-    if (!partNumber || !alasan_kurangi ||  isNaN(qty_kurangi)) {
+    if (!partNumber || !lot ||!alasan_kurangi || !nama_barang || isNaN(qty_kurangi)) {
         Swal.fire('Ada Inputan yg Kosong , lengkapi dulu', 'Semua field harus diisi dengan benar.', 'error');
         return;
     }
@@ -57,6 +59,8 @@ async function Kurangi_stok_part() {
             part_number: partNumber,
             qty_ambil: qty_kurangi,
             status: 'keluar',
+            lot:lot,
+            nama_barang:nama_barang,
             balance: balance,
         };
 

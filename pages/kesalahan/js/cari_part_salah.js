@@ -53,6 +53,8 @@ async function displayResults(items, partNumber, noLot) {
     errorContainer.hide(); // Sembunyikan pesan kesalahan
 
     if (items.length > 0) {
+       document.getElementById("namabarang").value = items[0].nama_barang;
+
         // Tampilkan hasil pencarian
         let tableRows = items.map(item => {
             const lastDate = formatDate(item.created); // Format tanggal terakhir

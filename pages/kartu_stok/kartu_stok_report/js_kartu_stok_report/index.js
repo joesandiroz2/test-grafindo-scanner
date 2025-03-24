@@ -25,7 +25,7 @@ async function loadReport(page) {
         const reportData = {};
 
         // Kelompokkan data berdasarkan part_number dan no_dn
-        records.forEach(record => {
+        for (const record of records) {
             const partNumber = record.part_number;
             const noDn = record.no_dn;
             const qtyAmbil = parseInt(record.qty_ambil) || 0; // Pastikan qty_ambil adalah angka
@@ -35,6 +35,8 @@ async function loadReport(page) {
             const balance = parseInt(record.balance) || 0; // Ambil balance dari record
 
             if (!reportData[partNumber]) {
+                
+
                 reportData[partNumber] = {
                     part_number: partNumber,
                     nama_barang: record.nama_barang, // Simpan nama_barang
@@ -44,7 +46,7 @@ async function loadReport(page) {
                     rincian: {}, // Objek untuk menyimpan rincian qty_ambil dan qty_masuk berdasarkan no_dn
                     lots: new Set(), // Gunakan Set untuk menyimpan lot yang unik
                     createdDates: [], // Array untuk menyimpan tanggal created
-                    last_balance:balance
+                    last_balance:balance,
                 };
             }
             if (createdDate > reportData[partNumber].last_updated) {
@@ -71,7 +73,7 @@ async function loadReport(page) {
                 }
                 reportData[partNumber].rincian[noDn].qtyMasuk += qtyMasuk; // Tambahkan qty_masuk ke rincian
             }
-        });
+        };
 
         // Tampilkan data di tabel
         const tbody = $('#reportTable tbody');
@@ -92,7 +94,6 @@ async function loadReport(page) {
                 .filter(item => item !== '')
                 .join('');
 
-            const totalKeterangan = `${item.total_qty_ambil} total keluar <br/> ${item.total_qty_masuk} total masuk`;
 
             // Gabungkan lot menjadi string
             const lotList = Array.from(item.lots).join('<br/>'); // Mengubah Set menjadi array dan menggabungkannya dengan <br/>
@@ -111,14 +112,17 @@ async function loadReport(page) {
             tbody.append(`
                 <tr>
                     <td>${nomorUrut++}</td> <!-- Tampilkan nomor urut -->
-                    <td>${item.part_number}</td>
-                    <td>${item.nama_barang}</td>
-                    <td>${totalKeterangan}</td>
+                    <td style="font-weight:bold">${item.part_number}</td>
+                    <td style="font-weight:bold">${item.nama_barang}</td>
                     <td><ul>${rincianList}</ul></td>
-                   <td>${item.last_balance}</td> <!-- Tambahkan balance terakhir -->
-                    
+                   <td style="font-weight: bold; color: ${item.last_balance < 0 ? 'red' : 'inherit'};">
+                        ${item.last_balance}
+                    </td>
                     <td>${lotList}</td> <!-- Tampilkan lot -->
                     <td style="font-size:12px"><i>${periode}</i></td> <!-- Tampilkan periode -->
+                    <td>
+                        <button class="btn btn-info dari-stok-awal" data-partnumber="${item.part_number}">Dari Stok Awal</button>
+                    </td>
                 </tr>
             `);
         });
@@ -208,3 +212,140 @@ document.getElementById('pdfDownload').addEventListener('click', function() {
     });
 });
 authUser ();
+
+$(document).on("click", ".dari-stok-awal", async function () {
+      const $button = $(this); // Simpan referensi ke tombol
+    const originalText = $button.text(); // Simpan teks asli tombol
+    $button.addClass("disabled").text("Sedang Mengambil..."); // Ubah ke mode loading
+
+
+    const partNumber = $(this).data("partnumber"); // Ambil part_number dari tombol
+    const pb = new PocketBase(pocketbaseUrl);
+
+    try {
+        // Ambil semua data berdasarkan part_number
+        const response = await pb.collection('kartu_stok').getFullList({
+            filter: `part_number="${partNumber}"`,
+        });
+
+        if (response.length === 0) {
+            Swal.fire("Info", "Data tidak ditemukan!", "warning");
+            return;
+        }
+
+        // **Urutkan berdasarkan tanggal transaksi (`tgl_pb`)**
+        response.sort((a, b) => new Date(a.tgl_pb) - new Date(b.tgl_pb));
+
+        // **Menghitung balance berdasarkan transaksi**
+        let currentBalance = 0;
+        const groupedData = response.reduce((acc, record) => {
+            const key = record.no_dn;
+
+            if (!acc[key]) {
+                acc[key] = {
+                    no_dn: record.no_dn,
+                    qty_minta: parseInt(record.qty_minta) || 0,
+                    qty_ambil: 0,
+                    qty_masuk: 0,
+                    balance: 0,
+                    tgl_pb: record.tgl_pb,
+                    status: record.status, // Tambahkan status
+                    lot: record.lot || "-", // Tambahkan lot
+                    created: record.created, // Ambil created
+                };
+            }
+
+            // **Ambil created terbaru**
+            if (new Date(record.created) > new Date(acc[key].created)) {
+                acc[key].created = record.created;
+            }
+
+            // **Mengupdate qty masuk dan keluar**
+            if (record.status === "keluar") {
+                acc[key].qty_ambil += parseInt(record.qty_ambil) || 0;
+                currentBalance -= parseInt(record.qty_ambil) || 0;
+            } else if (record.status === "masuk") {
+                acc[key].qty_masuk += parseInt(record.qty_masuk) || 0;
+                currentBalance += parseInt(record.qty_masuk) || 0;
+            }
+
+            // **Simpan balance terbaru**
+            acc[key].balance = currentBalance;
+            acc[key].tgl_pb = record.tgl_pb;
+
+            return acc;
+        }, {});
+
+        // **Fungsi format tanggal (contoh: "22 Mei 2025")**
+        function formatTanggal(dateStr) {
+            const bulanIndo = [
+                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+            ];
+            let date = new Date(dateStr);
+            let day = date.getDate();
+            let month = bulanIndo[date.getMonth()];
+            let year = date.getFullYear();
+            return `${day} ${month} ${year}`;
+        }
+
+        // **Format data untuk ditampilkan sesuai status**
+        let stokDetails = Object.values(groupedData).map(record => {
+            let qty_display = record.status === "keluar" ? record.qty_ambil : record.qty_masuk;
+            let formattedDate = formatTanggal(record.created);
+
+            // **Style balance merah jika negatif**
+            let balanceStyle = record.balance < 0 ? 'style="color:red; background-color:white;padding:3px;font-weight:bold;"' : 'style="font-weight:bold;"';
+
+            return `
+                <tr>
+                    <td>
+                        <p> Dari <b>${record.no_dn}</b> 
+                        ${record.status} <b>${qty_display} Pcs </b> tgl
+                        <i>${formattedDate}</i>
+                        </p>
+                    </td>
+                    <td><i>${record.lot}</i></td>
+                    <td ${balanceStyle}>${record.balance}</td>
+                </tr>
+            `;
+        }).join("");
+
+        // **Tambahkan hasil ke baris setelah tombol diklik**
+        $(this).closest("tr").after(`
+            <tr style="background-color:#bdbdbd">
+                <td colspan="9">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Rincian Awal ${partNumber}</th>
+                                <th>Lot</th>
+                                <th>Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody>${stokDetails}</tbody>
+                    </table>
+                </td>
+            </tr>
+        `);
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        Swal.fire("Error", "Gagal mengambil data", "error");
+    }finally {
+        // Kembalikan tombol ke kondisi semula setelah proses selesai
+        $button.removeClass("disabled").text(originalText);
+    }
+});
+
+
+
+// berdasarkan tgl kartu stok rincian
+$(document).ready(function () {
+    $(document).on("click", ".btn-primary", function () {
+        $("#modalFilterTanggal").modal("show");
+    });
+
+
+});
+
+
