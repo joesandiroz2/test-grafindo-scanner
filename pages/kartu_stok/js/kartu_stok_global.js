@@ -99,7 +99,7 @@ function renderTable(data) {
         if (item.status === 'keluar') {
             statusStyle = 'color: red; font-weight: bold;';
             statusIcon = '❌';
-             statusText = 'Proses Scan'; 
+             statusText = 'Barang Keluar'; 
         } else if (item.status === 'masuk') {
             statusStyle = 'color: green; font-weight: bold;';
             statusIcon = '✅';
@@ -109,13 +109,18 @@ function renderTable(data) {
             statusIcon = '';
         }
 
+        let balanceStyle = 'font-weight: bold; text-align: center; color: black;';
+
+        if (item.balance < 0) {
+            balanceStyle = 'font-weight: bold; text-align: center; color: red;';
+        }
         const row = `<tr>
             <td>${nomorUrut}</td>
             <td style="background-color:yellow;font-weight:bold">${item.part_number}</td>
             <td style="font-weight:bold">${item.nama_barang}</td>
             <td style="background-color:black;font-weight:bold;color:white">${item.lot}</td>
             <td style="background-color: green; font-weight:bold;text-align:center; color:white">${item.qty_masuk}</td>
-            <td style="font-weight:bold;text-align:center; color:black">${item.balance}</td>
+            <td style="${balanceStyle}">${item.balance}</td>
             <td style="background-color: red; font-weight:bold;text-align:center; color:white">${item.qty_ambil}</td>
             <td style="${statusStyle}"> ${statusText}</td>
             <td style="font-weight:bold">${item.no_dn.toUpperCase()}</td>
