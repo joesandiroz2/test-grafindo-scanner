@@ -94,13 +94,16 @@ function renderTable(data) {
         // Menentukan gaya dan ikon status
         let statusStyle = '';
         let statusIcon = '';
+        let statusText = '';
         
         if (item.status === 'keluar') {
             statusStyle = 'color: red; font-weight: bold;';
             statusIcon = '❌';
+             statusText = 'Proses Scan'; 
         } else if (item.status === 'masuk') {
             statusStyle = 'color: green; font-weight: bold;';
             statusIcon = '✅';
+             statusText = item.status;
         } else {
             statusStyle = 'color: black;';
             statusIcon = '';
@@ -114,7 +117,7 @@ function renderTable(data) {
             <td style="background-color: green; font-weight:bold;text-align:center; color:white">${item.qty_masuk}</td>
             <td style="font-weight:bold;text-align:center; color:black">${item.balance}</td>
             <td style="background-color: red; font-weight:bold;text-align:center; color:white">${item.qty_ambil}</td>
-            <td style="${statusStyle}">${statusIcon} ${item.status}</td>
+            <td style="${statusStyle}"> ${statusText}</td>
             <td style="font-weight:bold">${item.no_dn.toUpperCase()}</td>
             <td><i>${formattedDate}</i></td>
         </tr>`;
