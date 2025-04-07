@@ -14,9 +14,9 @@ async function loadInputData(page = 1) {
           let url = `${pocketbaseUrl}/api/collections/system2_scan_input/records?page=${page}&perPage=${itemsPerPageLoad}&sort=-created`;
 
         // Tambahkan filter jika user bukan "sopian@gmail.com"
-        if (userGrafindo !== "sopian@gmail.com") {
-            url += `&filter=operator%20%3D%20%27${encodeURIComponent(userGrafindo)}%27`;
-        }
+        // if (userGrafindo !== "sopian@gmail.com") {
+        //     url += `&filter=operator%20%3D%20%27${encodeURIComponent(userGrafindo)}%27`;
+        // }
         const response = await fetch(url);
         
         if (!response.ok) {
