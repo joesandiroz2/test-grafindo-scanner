@@ -21,7 +21,7 @@ return date.toLocaleString('id-ID', options);
 
 async function fetchDataByNoDn(no_dn) {
     Swal.fire({
-        title: "Memuat data...",
+        title: "Mengambil data report...",
         didOpen: () => Swal.showLoading(),
     });
 
@@ -32,6 +32,8 @@ async function fetchDataByNoDn(no_dn) {
         });
 
         renderTable(resultList.items);
+        
+
     } catch (error) {
         console.error("Error fetching data:", error);
     } finally {
@@ -55,25 +57,20 @@ async function authenticateUser() {
 }
 
 async function fetchData(page) {
-    Swal.fire({
-        title: "Sedang memuat Report Do...",
-        didOpen: () => {
-            Swal.showLoading();
-        },
-    });
-
+   
     try {
         const resultList = await pb.collection("kartu_stok").getList(page, perPage, {
             sort: "-created",
             filter:"status  = 'keluar' "
         });
         renderTable(resultList.items);
+        const filteredItems = resultList.items.filter(item => item.no_dn === "DO-A-2504000032");
+
         updatePagination(resultList.page, resultList.totalPages);
     } catch (error) {
         console.error("Error fetching data:", error);
     } finally {
           document.getElementById("loading_report").style.display = "none"; // Sembunyikan spinner
-        Swal.close();
     }
 }
 
@@ -107,6 +104,7 @@ function renderTable(data) {
 
 
     Object.keys(noDnGroups).forEach(no_dn => {
+
         let rowIndex = 1;
         const dataHead = noDnGroups[no_dn][0];
         const totalItemsOk = noDnGroups[no_dn].filter(item => item.qty_minta == item.qty_ambil).length;
@@ -199,6 +197,7 @@ function updatePagination(page, totalPages) {
 window.changePage = function (newPage) {
     if (newPage < 1) return;
     currentPage = newPage;
+    document.getElementById("loading_report").style.display = "block"; // Sembunyikan spinner
     fetchData(currentPage);
 };
 

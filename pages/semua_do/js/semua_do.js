@@ -103,7 +103,7 @@ function setupPagination(totalItems, currentPage) {
 
 // Event listener untuk tombol cari
 $("#search-button").on("click", function() {
-    const searchValue = $("#search-input").val().trim();
+ const searchValue = $("#search-input").val().replace(/\s+/g, '').toUpperCase();
     const filter = searchValue ? `Delivery_Note_No = "${searchValue}"` : ''; // Filter pencarian
     fetchData(1, filter); // Panggil fetchData dengan filter
 });
