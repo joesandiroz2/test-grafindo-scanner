@@ -220,8 +220,8 @@ function openBarenganPrint(merk, partNumber, namaBarang, qty, satuan, berapa_lem
             let qrData = (merk.toLowerCase() === 'yamaha') 
                 ? `${partNumber}|${supplierId}|${qty}` 
                 : `${partNumber}|${supplierId}|${qty}|${lot}`;
-            let qrId = `qrcode-${partNumber.replace(/\s+/g, '')}-${i}`;
-
+                let qrId = `qrcode-${partNumber.replace(/\s+/g, '')}-${lot}-${qty}-${i}`;
+            
         lembarHTML += `
             <div  style="color:black;padding: 3px  6px; width: calc(33.33% - 20px);display:inline-block">
             <div class="label" style=" page-break-inside: avoid; width:310px;border-radius:10px; border: 1px solid black;position: relative;margin-bottom:30px;margin-left:40px">
@@ -253,7 +253,8 @@ function openBarenganPrint(merk, partNumber, namaBarang, qty, satuan, berapa_lem
         // **Generate QR Code setelah HTML selesai dibuat**
         setTimeout(() => {
             for (let i = 0; i < jumlahLabelPerLembar; i++) {
-                let qrId = `qrcode-${partNumber.replace(/\s+/g, '')}-${i}`;
+                let qrId = `qrcode-${partNumber.replace(/\s+/g, '')}-${lot}-${qty}-${i}`;
+
                 let qrElement = document.getElementById(qrId);
 
                 if (qrElement) {
