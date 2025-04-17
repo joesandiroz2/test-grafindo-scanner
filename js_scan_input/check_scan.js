@@ -61,7 +61,7 @@ $("#do-input").on("input", function() {
                 // Format: DO-A-2502000048
                 await searchDO(inputValue);
             }
-        }, 1300); // 1.3 detik
+        }, 200); // 0.9 detik
     } else {
         $("#result-container").empty(); // Kosongkan hasil jika input kosong
     }

@@ -115,18 +115,19 @@ function renderTable(data) {
     data.forEach((item,index) => {
         // Menentukan warna background berdasarkan status
         const bgColor = item.status.toLowerCase() === "keluar" ? "red" : "green";
-        
-        const row = `<tr style="background-color: ${bgColor}; color: white;font-weight:bold; text-align: center;">
-            <td>${index + 1}</td> 
-            <td>${item.qty_masuk}</td>
-            <td>${item.balance}</td>
-            <td>${item.qty_ambil}</td>
+        const balanceColor = Number(item.balance) < 0 ? 'red' : 'black';
+    
+        const row = `<tr >
+            <td style="background-color: ${bgColor}; color: white;font-weight:bold; text-align: center;">${index + 1}</td> 
+            <td style="font-weight:bold;text-align:center;color:blue">${item.qty_masuk}</td>
+            <td style="font-weight:bold;text-align:center;color:${balanceColor}">${item.balance}</td>
+            <td style="font-weight:bold;text-align:center;color:red">${item.qty_ambil}</td>
             <td>${item.lot}</td>
-            <td>${item.no_dn.toUpperCase()}</td>
+            <td style="font-weight:bold;text-align:center">${item.no_dn.toUpperCase()}</td>
             <td>${item.dn_date}</td>
-            <td>${item.nama_barang}</td>
+            <td style="font-weight:bold;text-align:center">${item.nama_barang}</td>
             <td>${item.tgl_pb}</td>
-            <td>${item.status}</td>
+            <td style="background-color: ${bgColor}; color: white;font-weight:bold; text-align: center;">${item.status}</td>
             <td><i>${formatDate(item.created)}</i></td>
         </tr>`;
         
@@ -148,6 +149,8 @@ function formatDate(dateString) {
 }
 
 async function loadPartNumbers() {
+    document.getElementById('loadpart').style.display = 'block';
+
     try {
         await authenticate(); // Pastikan user sudah login
         const result = await pb.collection('kartu_stok').getFullList({
@@ -178,6 +181,9 @@ async function loadPartNumbers() {
 
     } catch (error) {
         console.error("Error loading part numbers:", error);
+    }finally {
+        // Sembunyikan elemen loading
+        document.getElementById('loadpart').style.display = 'none';
     }
 }
 
