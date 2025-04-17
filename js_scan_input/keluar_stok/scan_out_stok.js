@@ -113,8 +113,14 @@ export async function ScanOutStok(pb, input, dataItems) {
             title: 'OKEH !!!!',
             text: 'Data berhasil disimpan ke kartu stok.',
             icon: 'success',
-            timer: 1300,
-            showConfirmButton: false
+            timer: 1000,
+            showConfirmButton: false,
+             showClass: {
+                popup: ''
+            },
+            hideClass: {
+                popup: ''
+            }
         });
         const audio = new Audio('./suara/suara_ok.mp3');
         audio.play();
