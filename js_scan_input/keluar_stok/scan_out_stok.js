@@ -36,14 +36,13 @@ export async function ScanOutStok(pb, input, dataItems) {
 
     // Cari item yang sesuai dari dataItems
     const item = dataItems.find(record => record.Supplier_Part_Number === partNumber);
-
+    console.log("itemm nya ",item)
     if (item) {
 
         // Ambil semua data kartu_stok berdasarkan part_number dan no_dn
         const records = await pb.collection('kartu_stok').getFullList({
             filter: `part_number="${partNumber}" && no_dn="${item.Delivery_Note_No}"`
         });
-
         // Hitung total qty_ambil
         const totalQtyAmbil = records.reduce((total, record) => total + parseInt(record.qty_ambil || 0), 0);
 
@@ -69,16 +68,18 @@ export async function ScanOutStok(pb, input, dataItems) {
         }
 
 
-          // Ambil semua data kartu_stok berdasarkan part_number
-        const recordsbalance = await pb.collection('kartu_stok').getFullList({
+          // Ambil balance data kartu_stok berdasarkan part_number
+        
+        const recordsbalance = await pb.collection('kartu_stok').getList(1,1,{
             filter: `part_number="${partNumber}"`,
             sort: '-created' // Mengurutkan dari yang terbaru
         });
 
         // Ambil data terakhir (terbaru)
-        const lastRecord = recordsbalance.length > 0 ? recordsbalance[0] : null;
+        const lastRecord = recordsbalance.items.length > 0 ? recordsbalance.items[0] : null;
         const lastBalance = lastRecord ? parseInt(lastRecord.balance) || 0 : 0;
-
+    
+        console.log("lastRecord lastBalance",lastRecord,lastBalance)
         // Hitung balance baru berdasarkan data terakhir
         let newBalance = lastBalance - parseInt(qty);
 
