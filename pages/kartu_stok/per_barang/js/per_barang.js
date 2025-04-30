@@ -3,12 +3,12 @@ const pb = new PocketBase(pocketbaseUrl);
 document.addEventListener("DOMContentLoaded", function () {
 
     const today = new Date();
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(today.getMonth() - 1);
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(today.getDate() - 14); // 14 hari ke belakang
 
     const formatDate = (date) => date.toISOString().split("T")[0];
 
-    document.getElementById("start-date").value = formatDate(oneMonthAgo);
+    document.getElementById("start-date").value = formatDate(twoWeeksAgo);
     document.getElementById("end-date").value = formatDate(today);
       const startDateInput = document.getElementById("start-date");
     const endDateInput = document.getElementById("end-date");
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
             tglsampaiSpan.textContent = formatDateIndo(endDateInput.value);
         }
     }
-        startDateInput.value = oneMonthAgo.toISOString().split("T")[0];
+        startDateInput.value = twoWeeksAgo.toISOString().split("T")[0];
     endDateInput.value = today.toISOString().split("T")[0];
 
     updateDateDisplay(); // Perbarui tampilan span saat halaman dimuat
