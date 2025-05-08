@@ -140,6 +140,33 @@ try {
             filter: `Delivery_Note_No="${deliveryNoteNo}"`
         });
     
+    // hapus data jika duplicat
+    const seen = new Set();
+    const duplicates = [];
+
+    for (const record of globalRecords) {
+        const partNumber = record.Supplier_Part_Number;
+        if (seen.has(partNumber)) {
+            // Jika sudah pernah dilihat, tandai untuk dihapus
+            duplicates.push(record.id);
+        } else {
+            seen.add(partNumber);
+        }
+    }
+    
+     if (duplicates.length > 0) {
+        const audio = new Audio('../suara/duplicat_gw_hapus.mp3');
+        audio.play();
+    }
+
+        for (const id of duplicates) {
+        await pb.collection('data_do').delete(id);
+    }
+
+    // Hapus juga dari globalRecords agar tidak ditampilkan
+    globalRecords = globalRecords.filter(item => !duplicates.includes(item.id));
+
+
     // Kosongkan input dan set fokus kembali
     $("#do-input").val(''); // Mengosongkan input
     $("#do-input").focus(); // Mengatur fokus kembali ke input
