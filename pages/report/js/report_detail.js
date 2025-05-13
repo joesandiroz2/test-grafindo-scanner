@@ -63,9 +63,21 @@ async function fetchData(page) {
             sort: "-created",
             filter:"status  = 'keluar' "
         });
-        renderTable(resultList.items);
-        const filteredItems = resultList.items.filter(item => item.no_dn === "DO-A-2504000032");
+        console.log(resultList)
+        // renderTable(resultList.items);
+          // Step 1: Ambil semua no_dn unik dari resultList
+        const uniqueNoDns = [...new Set(resultList.items.map(item => item.no_dn))];
 
+        // Step 2: Ambil data lengkap untuk setiap no_dn
+        const allData = [];
+        for (const no_dn of uniqueNoDns) {
+            const records = await pb.collection("kartu_stok").getFullList({
+                sort: "-created",
+                filter: `no_dn = '${no_dn}' && status = 'keluar'`
+            });
+            allData.push(...records);
+        }
+        renderTable(allData);
         updatePagination(resultList.page, resultList.totalPages);
     } catch (error) {
         console.error("Error fetching data:", error);
