@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async function () {
 const pb = new PocketBase(pocketbaseUrl);
 let currentPage = 1;
-const perPage = 500;
+const perPage = 15;
 
 function formatDate(dateString) {
 const options = {
@@ -62,13 +62,11 @@ async function fetchData(page) {
     const loadingText = document.getElementById("loading_text");
 
     try {
-        const resultList = await pb.collection("kartu_stok").getList(page, perPage, {
-            sort: "-created",
-            filter:"status  = 'keluar' "
-        });
-        // renderTable(resultList.items);
-          // Step 1: Ambil semua no_dn unik dari resultList
-        const uniqueNoDns = [...new Set(resultList.items.map(item => item.no_dn))];
+        const response = await fetch(`${pocketbaseUrl}/api/collections/unik_no_dn_kartu_stok/records?page=${page}&perPage=${perPage}&sort=-created`);
+        const resultList = await response.json();
+
+        const uniqueNoDns = resultList.items.map(item => item.no_dn); // ambil field no_dn
+
         const total = uniqueNoDns.length;
         let completed = 0;
         // Step 2: Ambil data lengkap untuk setiap no_dn
