@@ -51,19 +51,32 @@ async function authenticate() {
     }
 }
 
-async function fetchData(query, startDate, endDate) {
+async function fetchData(query, startDate, endDate,fetchsemua) {
     Swal.fire({
-        title: 'Sedang memuat data...',
+        title: 'Sedang mengecek Stok...',
         didOpen: () => {
             Swal.showLoading();
         }
     });
+    let resultList = [];
     try {
-        const resultList = await pb.collection('kartu_stok').getFullList({
-            filter: `(part_number ~ "${query}" ) && created >= "${startDate}" && created <= "${endDate}"`,
-        });
-        Swal.close();
-        return resultList;
+        if (fetchsemua) {
+            const resultList = await pb.collection('kartu_stok').getFullList({
+                filter: `(part_number ~ "${query}" ) && created >= "${startDate}" && created <= "${endDate}"`,
+            });
+             document.getElementById("keteranganstok").textContent = "Semua Stok detail";
+            Swal.close();
+            return resultList
+        }else {
+            // Fetch only the last entry
+            resultList = await pb.collection('kartu_stok').getList(1, 1, {
+                filter: `(part_number ~ "${query}" )`,
+                sort: '-created', // Sort by most recent
+            });
+            document.getElementById("keteranganstok").textContent = "Stok terakhir Saja Barang itu";
+             Swal.close();
+            return resultList.items
+        }
     } catch (error) {
         console.error("Failed to fetch data:", error);
         Swal.close();
@@ -95,13 +108,23 @@ document.getElementById('filter-form').addEventListener('submit', async function
     const endDate = convertToTimestamp(document.getElementById('end-date').value, true);
 
     await authenticate(); // Authenticate user
-    const data = await fetchData(query, startDate, endDate); // Fetch data berdasarkan query
+    const data = await fetchData(query, startDate, endDate,true); // Fetch data berdasarkan query
 
     renderTable(data); // Render hasil ke tabel
        renderDetailBarang(query); // Render detail barang
 });
 
 
+document.getElementById('tampilkan-stok-terakhir').addEventListener('click', async function(event) {
+    const query = document.getElementById('part-number').value; // Bisa Part Number atau Nama Barang
+    const startDate = convertToTimestamp(document.getElementById('start-date').value);
+    const endDate = convertToTimestamp(document.getElementById('end-date').value, true);
+
+    // Tampilkan Stok Terakhir saja (fetch satu data terakhir)
+    const data = await fetchData(query, startDate, endDate, false);
+    renderTable(data); // Render hasil ke tabel
+    renderDetailBarang(query); // Render detail barang
+});
 
 function renderTable(data) {
     const tableBody = document.getElementById('data-table-body');
@@ -152,33 +175,21 @@ async function loadPartNumbers() {
     document.getElementById('loadpart').style.display = 'block';
 
     try {
-        await authenticate(); // Pastikan user sudah login
-        const result = await pb.collection('kartu_stok').getFullList({
-            fields: 'part_number, nama_barang'
-        });
+         const res = await fetch(pocketbaseUrl + '/api/collections/unik_partnumber_kartu_stok/records?page=1&perPage=1000&sort=-created');
+        const data = await res.json();
 
-        // Buat array unik dari part_number dan nama_barang
-        const uniqueData = [];
-        const seenItems = new Set();
+        // Mapping data dari response API ke format Select2
+        const uniqueData = data.items.map(item => ({
+            id: item.part_number,
+             text: `${item.part_number} - ${item.nama_barang}` 
+        }));
 
-        result.forEach(item => {
-            const key = `${item.part_number}-${item.nama_barang}`;
-            if (!seenItems.has(key)) {
-                seenItems.add(key);
-                uniqueData.push({
-                    id: item.part_number, // Gunakan part_number sebagai ID
-                    text: `${item.part_number} - ${item.nama_barang}` // Tampilkan kedua-duanya
-                });
-            }
-        });
-
-        // Inisialisasi Select2 dengan fitur pencarian bebas
+        // Inisialisasi Select2 dengan data yang sudah diformat
         $('#part-number').select2({
             data: uniqueData,
-            placeholder: 'Cari Part Number atau Nama Barang...',
+            placeholder: 'Cari Part Number...',
             allowClear: true
-        });
-
+        })
     } catch (error) {
         console.error("Error loading part numbers:", error);
     }finally {
