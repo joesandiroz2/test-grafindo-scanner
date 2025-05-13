@@ -57,17 +57,20 @@ async function authenticateUser() {
 }
 
 async function fetchData(page) {
-   
+    document.getElementById("loading_report").style.display = "block";
+    const progressBar = document.getElementById("progressBar");
+    const loadingText = document.getElementById("loading_text");
+
     try {
         const resultList = await pb.collection("kartu_stok").getList(page, perPage, {
             sort: "-created",
             filter:"status  = 'keluar' "
         });
-        console.log(resultList)
         // renderTable(resultList.items);
           // Step 1: Ambil semua no_dn unik dari resultList
         const uniqueNoDns = [...new Set(resultList.items.map(item => item.no_dn))];
-
+        const total = uniqueNoDns.length;
+        let completed = 0;
         // Step 2: Ambil data lengkap untuk setiap no_dn
         const allData = [];
         for (const no_dn of uniqueNoDns) {
@@ -76,7 +79,14 @@ async function fetchData(page) {
                 filter: `no_dn = '${no_dn}' && status = 'keluar'`
             });
             allData.push(...records);
+            completed++;
+            const percent = Math.round((completed / total) * 100);
+            progressBar.style.width = percent + "%";
+            progressBar.setAttribute("aria-valuenow", percent);
+            progressBar.innerText = percent + "%";
+            loadingText.textContent = "Report detail berhasil didapat, tunggu sedang menampilkan...";
         }
+
         renderTable(allData);
         updatePagination(resultList.page, resultList.totalPages);
     } catch (error) {
