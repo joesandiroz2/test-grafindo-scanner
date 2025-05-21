@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aplikasi Yamaha</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+</head>
+<body>
+
+<div id="navbar-container"></div>
+
+<div class="container mt-2">
+  
+<div class="row">
+  <div class="card mt-2 p-3">
+    <div class="row align-items-center">
+      <!-- Kolom Gambar -->
+      <div class="col-12 col-md-4 text-center text-md-start mb-2 mb-md-0">
+        <img style="width: 130px;" src="../../logo/yamaha_logo.png" alt="Yamaha Logo">
+      </div>
+
+      <!-- Kolom Judul -->
+      <div class="col-12 col-md-4 text-center mb-2 mb-md-0">
+        <h5 class="mb-0">Yamaha Semua DO</h5>
+      </div>
+
+      <!-- Kolom Tombol -->
+      <div class="col-12 col-md-4 text-center text-md-end">
+        <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#uploadModal">
+          <i class="bi bi-upload"></i> Upload DO Baru
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- MODAL Upload DO -->
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" style="font-weight:bold" id="uploadModalLabel">YAMAHA Upload Excel DO</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Upload Button -->
+        <div class="container">
+          <div class="card" style="background-color: #ef5350;color: white;">
+            <h5>Standar Kolom Excel</h5>
+            <p>kode_depan, no_do, tgl_do,  part_number, nama_barang, qty, remarks</p>
+          </div>
+        </div>
+        <div class="mb-3">
+          <input type="file" id="excelFile" accept=".xlsx, .xls" class="form-control" />
+        </div>
+
+        <!-- Table Preview -->
+        <div class="table-responsive">
+          <table class="table table-bordered" id="excelTable">
+            <thead class="table-dark" id="excelHead"></thead>
+            <tbody id="excelBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div id="progress-upload"></div>
+        <button class="btn btn-success" id="uploadDataBtn">Upload Excel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- kotak pencarian -->
+<!-- kotak pencarian -->
+<div class="row">
+  <div class="col-12 col-sm-4 col-md-4 mt-2">
+    <div class="container">
+      <div class="card p-3">
+        <h6 style="font-weight:bold">Cari DO saja misal: 2500232</h6>
+        <input id="searchDoInput" type="text" class="form-control mb-2" placeholder="cari no_do jangan ada G atau X di depan">
+        <button id="searchDoBtn" class="btn btn-success">Cari DO</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- table do -->
+<!-- Loading Spinner -->
+<div id="loadingSpinner" class="text-center my-4" style="display: none;">
+  <div class="spinner-border text-primary" role="status"></div>
+  <div class="mt-2">Sedang mencari data DO Yamaha...</div>
+</div>
+
+<!-- Tabel DO -->
+<div class="table-responsive">
+  <table class="table table-bordered" id="doTable">
+    <thead id="doTableHead"></thead>
+    <tbody id="doTableBody"></tbody>
+  </table>
+</div>
+
+<!-- Tombol Pagination -->
+<div class="d-flex justify-content-between my-3">
+  <button class="btn btn-secondary" id="prevBtn">Previous</button>
+  <button class="btn btn-secondary" id="nextBtn">Next</button>
+</div>
+
+
+<!-- Bootstrap & jQuery -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<!-- External JS -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="../../js/sdk/pocketbase.umd.js"></script>
+<script src="../../js/pocket_config.js"></script>
+<script src="./js/yamaha_semua_do.js"></script>
+<script src="./js/yamaha_cari_do.js"></script>
+<script src="./js/yamaha_do_upload.js"></script>
+
+<script>
+  $(document).ready(function () {
+    $("#navbar-container").load("../../component/nav.html", function () {
+      setTimeout(loginUser, 500);
+    });
+  });
+</script>
+
+</body>
+</html>

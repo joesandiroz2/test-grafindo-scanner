@@ -45,6 +45,14 @@
             <li class="nav-item" id="reportlabel-nav" style="background-color:yellow;color:black;border-radius: 30px;">
                 <a style="color:black" class="nav-link" href="/print_label/print_label_sopian/report_label/index.html">Report Label</a>
             </li>
+            <li class="nav-item" id="report-detail-nav" style="background-color:white; border:2px solid red; padding: 5px 10px; margin: 5px;">
+
+            <li class="nav-item" id="yamaha-nav" style="background-color:white; border:2px solid red; padding: 5px 10px; margin: 5px;">
+            <a 
+             href="/yamaha/yamaha_index.html" style="color:red; font-weight:bold;">YAMAHA</a>
+             </li>
+        </li>
+
         <li class="nav-item" id="gselabel-nav" style="background-color:yellow;color:white;border-radius: 30px;">
                 <a style="color:black" class="nav-link" href="/print_label/system2_gse/index.html">GSE Bikin Label</a>
             </li>
@@ -142,6 +150,7 @@ function restrictMenu() {
         "buatlabel-nav": document.getElementById("buatlabel-nav"),
         "gselabel-nav": document.getElementById("gselabel-nav"),
         "reportlabel-nav": document.getElementById("reportlabel-nav"),
+        "yamaha-nav": document.getElementById("yamaha-nav"),
     };
 
     // Semua menu disembunyikan dulu
@@ -162,7 +171,7 @@ if (userEmail === "sopian@gmail.com") {
     });
 } else if (userEmail === "pika@gmail.com") {
         // Jika user pika@gmail.com, hanya tampilkan beberapa menu
-        let allowedMenus = ["buatlabel-nav", "reportlabel-nav"];
+        let allowedMenus = ["buatlabel-nav", "reportlabel-nav","yamaha-nav"];
         allowedMenus.forEach(menuId => {
             if (menuItems[menuId]) menuItems[menuId].style.display = "block";
         });

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aplikasi Yamaha</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    .custom-card {
+      transition: transform 0.3s, box-shadow 0.3s;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .custom-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px red;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .icon-circle {
+      font-size: 2.5rem;
+      color: white;
+      background-color: red;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    a.custom-card {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="navbar-container"></div>
+
+  <div class="container mt-5">
+    <div class="row justify-content-center g-4">
+
+      <!-- Card 1 -->
+      <div class="col-12 col-sm-6 col-md-3">
+        <a href="/yamaha/scan_yamaha" class="card text-center custom-card p-3">
+          <div class="icon-circle mx-auto">
+            <i class="bi bi-upc-scan"></i>
+          </div>
+          <h5 class="card-title">Scan Yamaha</h5>
+        </a>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="col-12 col-sm-6 col-md-3">
+        <a href="/yamaha/yamaha_semua_do/yamaha_semua_do.html" class="card text-center custom-card p-3">
+          <div class="icon-circle mx-auto">
+            <i class="bi bi-upload"></i>
+          </div>
+          <h5 class="card-title">Yamaha Upload DO</h5>
+        </a>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="col-12 col-sm-6 col-md-3">
+        <a href="/yamaha/kartu_stok" class="card text-center custom-card p-3">
+          <div class="icon-circle mx-auto">
+            <i class="bi bi-credit-card"></i>
+          </div>
+          <h5 class="card-title">Yamaha Kartu Stok</h5>
+        </a>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="col-12 col-sm-6 col-md-3">
+        <a href="/yamaha/report" class="card text-center custom-card p-3">
+          <div class="icon-circle mx-auto">
+            <i class="bi bi-bar-chart-line"></i>
+          </div>
+          <h5 class="card-title">Yamaha Report</h5>
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+  <!-- Load Navbar -->
+  <script>
+    $(document).ready(function () {
+      $("#navbar-container").load("../component/nav.html", function () {
+        setTimeout(loginUser, 500);
+      });
+    });
+  </script>
+
+</body>
+</html>
