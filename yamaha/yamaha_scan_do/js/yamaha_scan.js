@@ -1,5 +1,12 @@
+
+
+
+
 let pb = new PocketBase(pocketbaseUrl);
 let timeout = null;
+
+let doData = []; // akan menyimpan hasil search DO
+
 
 const inputPartNo = document.getElementById('input-partno');
 const inputQty = document.getElementById('input-qty');
@@ -29,7 +36,7 @@ function playSound(filePath) {
 // Tampilkan pesan status
 function showStatus(text) {
   statusMessage.innerHTML = text;
-  statusMessage.className = `mt-3 text-center fw-bold`;
+  statusMessage.className = `mt-3 bg-warning text-center fw-bold`;
 }
 
 // Tampilkan loading
@@ -56,156 +63,62 @@ function renderTable(data) {
   statusMessage.innerHTML = ''; // Hapus pesan status kalau ada data
 
   data.forEach((item, index) => {
+     const totalScanned = scanData
+  .filter(scan => scan.part_number === item.part_number && scan.no_do === item.no_do)
+  .reduce((sum, s) => sum + parseInt(s.qty_scan || 0), 0);
+
+
+     const isFull = parseInt(item.qty) === totalScanned;
+    const checkIcon = isFull ? "✅" : "";
+
     tableBody.innerHTML += `
-      <tr>
-        <td>${index + 1}</td>
+       <tr >
+       <td>${index + 1}</td>
         <td>${item.kode_depan + item.no_do}</td>
         <td>${item.part_number}</td>
         <td>${item.nama_barang}</td>
-        <td>${item.qty}</td>
+          <td 
+        ${
+          totalScanned === 0
+            ? ''
+            : totalScanned === parseInt(item.qty)
+              ? 'style="background-color: green; font-weight: bold; color: white;"'
+              : 'style="background-color: orange; font-weight: bold; color: black;"'
+        }
+      >
+        ${item.qty} (scan: ${totalScanned}) ${checkIcon}
+      </td>
+
       </tr>
     `;
   });
 }
 
-// Ambil data dari PocketBase dan filter
-async function searchDO(partNoValue) {
-  showLoading();
-  try {
-    await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
 
-    const records = await pb.collection('yamaha_do').getFullList({
-      sort: '-created',
-    });
-
-    // Filter berdasarkan no_do
-    const filtered = records.filter(record =>
-      record.no_do.toLowerCase().includes(partNoValue.toLowerCase())
-    );
-
-    // Cari duplikat part_number
-    const partNumberCount = {};
-    filtered.forEach(record => {
-      partNumberCount[record.part_number] = (partNumberCount[record.part_number] || 0) + 1;
-    });
-
-    // Map untuk simpan satu record per part_number yang akan dipertahankan
-    const uniquePartMap = new Map();
-
-    for (const record of filtered) {
-      if (!uniquePartMap.has(record.part_number)) {
-        uniquePartMap.set(record.part_number, record);
-      } else {
-        // Ini duplikat, hapus dari PocketBase
-        try {
-          await pb.collection('yamaha_do').delete(record.id);
-          console.log(`Deleted duplicate part_number ${record.part_number} with id ${record.id}`);
-          playSound('../../../suara/yamaha_part_number_sama_dihapus.mp3');
-          
-        } catch (delErr) {
-          console.error(`Gagal hapus duplikat ${record.part_number} dengan id ${record.id}:`, delErr);
-        }
-      }
-    }
-
-    const uniqueFiltered = Array.from(uniquePartMap.values());
-
-    hideLoading();
-    renderTable(uniqueFiltered);
-
-    inputPartNo.value = "";  
-    document.getElementById("input-qty").value = "";
-    inputPartNo.focus();
-
-  } catch (err) {
-    hideLoading();
-    showStatus("Terjadi error koneksi ke database, coba lagi atau hubungi Edi");
-    console.error("Database error:", err);
-  }
-}
-
-// Input listener dengan delay 2 detik
-let lastPartNo = "";
-let searchDone = false;
-
-const handleInput = () => {
-  clearTimeout(timeout);
-
-  const val = inputPartNo.value.trim();
-  const qty = inputQty.value.trim();
-
-  if (val === "") return; // Jangan lanjut kalau partno kosong
-
-  timeout = setTimeout(async () => {
-    // === CEK: Kalau dua-duanya terisi dan DO sudah dicari sebelumnya, langsung proses simpan ===
-    if (val !== "" && qty !== "" && searchDone && lastPartNo === val) {
-      const match = window.cachedDOList.find(item => item.part_number === val);
-      if (match) {
-        alert(`Part No: ${val}\nQty: ${qty}`);
-
-        try {
-          const existing = await pb.collection("yamaha_kartu_stok").getFullList({
-            filter: `part_number = '${val}'`,
-            sort: '-created',
-            limit: 1
-          });
-
-          const lastBalance = existing.length > 0 ? parseInt(existing[0].balance) || 0 : 0;
-          const newBalance = lastBalance - parseInt(qty);
-
-          const data = {
-            kode_depan: match.kode_depan,
-            no_do: match.no_do,
-            part_number: val,
-            nama_barang: match.nama_barang,
-            qty_scan: qty,
-            qty_do: match.qty,
-            status: "keluar",
-            remarks: match.remarks,
-            balance: newBalance
-          };
-
-          await pb.collection("yamaha_kartu_stok").create(data);
-
-          Swal.fire({
-            toast: true,
-            position: 'top-end',
-            icon: 'success',
-            title: 'Data berhasil ditambahkan',
-            showConfirmButton: false,
-            timer: 1500
-          });
-
-          inputQty.value = "";
-          inputPartNo.value = "";
-          inputPartNo.focus();
-          searchDone = false;
-        } catch (error) {
-          console.error("Gagal simpan:", error);
-          Swal.fire({
-            icon: 'error',
-            title: 'Gagal menyimpan',
-            text: 'Terjadi kesalahan saat menyimpan data!'
-          });
-        }
-      }
-
-      return; // Jangan lanjut cari DO
-    }
-
-    // === CASE 1: Hanya partno terisi => cari DO
-    if (qty === "") {
-      searchDone = false;
-      window.cachedDOList = await searchDO(val);
-      lastPartNo = val;
-      searchDone = true;
+// proses cek scan
+let timer = null;
+document.getElementById('input-partno').addEventListener('input', function () {
+  if (this.value.trim() !== '' && !timer) {
+    timer = setTimeout(() => {
+      const partno = document.getElementById('input-partno').value.trim();
+      const qty = document.getElementById('input-qty').value.trim();
       playSound('../../../suara/yamaha_scan_do.mp3');
-    }
-  }, 3000);
-};
 
-// Pasang ke dua input
-inputPartNo.addEventListener('input', handleInput);
-inputQty.addEventListener('input', handleInput);
+      if (qty === '') {
+        searchDO(partno);
+
+      } else {
+        // Kalau qty ada isinya, tampilkan alert
+    proses_cek_scan(partno, qty, doData);
+    
+        }
+
+      timer = null; // Reset timer
+    }, 3000);
+  }
+});
+
+
+
 
 // document.addEventListener("DOMContentLoaded", keepAutofocus);
