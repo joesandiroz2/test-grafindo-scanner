@@ -6,12 +6,15 @@ async function searchDO(partNoValue) {
 
     const records = await pb.collection('yamaha_do').getFullList({
       sort: '-created',
+       filter: `no_do ~ "${partNoValue}"`,
     });
 
     // Filter berdasarkan no_do
-    const filtered = records.filter(record =>
-      record.no_do.toLowerCase().includes(partNoValue.toLowerCase())
-    );
+    // const filtered = records.filter(record =>
+    //   record.no_do.toLowerCase().includes(partNoValue.toLowerCase())
+    // );
+
+    const filtered = records
 
     // Cari duplikat part_number
     const partNumberCount = {};

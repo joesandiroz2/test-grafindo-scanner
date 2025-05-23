@@ -15,7 +15,6 @@ async function tabel_barang_sudah_scan(doData) {
     });
 
     scanData = res; // ⬅️ Tambahkan baris ini
-    console.log("ss",scanData)
     if (!res || res.length === 0) {
       document.getElementById("tbl_udah_scan").innerHTML = "<p class='text-center'>Belum ada barang yang di-scan.</p>";
       return;
