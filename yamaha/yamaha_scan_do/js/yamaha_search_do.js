@@ -9,10 +9,7 @@ async function searchDO(partNoValue) {
        filter: `no_do ~ "${partNoValue}"`,
     });
 
-    // Filter berdasarkan no_do
-    // const filtered = records.filter(record =>
-    //   record.no_do.toLowerCase().includes(partNoValue.toLowerCase())
-    // );
+    
 
     const filtered = records
 
