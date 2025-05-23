@@ -130,33 +130,19 @@ let searchDone = false;
 
 const handleInput = () => {
   clearTimeout(timeout);
+
   const val = inputPartNo.value.trim();
   const qty = inputQty.value.trim();
 
-  if (val === "") return; // Tidak lanjut jika kosong
+  if (val === "") return; // Jangan lanjut kalau partno kosong
 
   timeout = setTimeout(async () => {
-    // CASE 1: Hanya partno terisi
-    if (qty === "") {
-      window.cachedDOList = await searchDO(val);
-      lastPartNo = val;
-      searchDone = true;
-      playSound('../../../suara/yamaha_scan_do.mp3');
-      return;
-    }
-
-    // CASE 2: Partno dan qty terisi
-    if (qty !== "" && !isNaN(qty)) {
-      // Jika searchDO belum dilakukan sebelumnya
-      if (!searchDone || lastPartNo !== val) {
-        window.cachedDOList = await searchDO(val);
-        playSound('../../../suara/yamaha_scan_do.mp3');
-        lastPartNo = val;
-        searchDone = true;
-      }
-
+    // === CEK: Kalau dua-duanya terisi dan DO sudah dicari sebelumnya, langsung proses simpan ===
+    if (val !== "" && qty !== "" && searchDone && lastPartNo === val) {
       const match = window.cachedDOList.find(item => item.part_number === val);
       if (match) {
+        alert(`Part No: ${val}\nQty: ${qty}`);
+
         try {
           const existing = await pb.collection("yamaha_kartu_stok").getFullList({
             filter: `part_number = '${val}'`,
@@ -203,6 +189,17 @@ const handleInput = () => {
           });
         }
       }
+
+      return; // Jangan lanjut cari DO
+    }
+
+    // === CASE 1: Hanya partno terisi => cari DO
+    if (qty === "") {
+      searchDone = false;
+      window.cachedDOList = await searchDO(val);
+      lastPartNo = val;
+      searchDone = true;
+      playSound('../../../suara/yamaha_scan_do.mp3');
     }
   }, 3000);
 };
