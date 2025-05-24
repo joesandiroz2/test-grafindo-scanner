@@ -146,7 +146,7 @@ function renderTable(data) {
             <td style="font-weight:bold;text-align:center;color:${balanceColor}">${item.balance}</td>
             <td style="font-weight:bold;text-align:center;color:red">${item.qty_scan}</td>
             <td>${item.lot}</td>
-            <td style="font-weight:bold;text-align:center">${item.no_do.toUpperCase()}</td>
+            <td style="font-weight:bold;text-align:center">${item.kode_depan} ${item.no_do.toUpperCase()}</td>
             <td>${item.tgl_do}</td>
             <td style="font-weight:bold;text-align:center">${item.nama_barang}</td>
             <td>${item.tgl_pb}</td>
@@ -175,7 +175,7 @@ async function loadPartNumbers() {
     document.getElementById('loadpart').style.display = 'block';
 
     try {
-         const res = await fetch(pocketbaseUrl + '/api/collections/yamaha_unik_part_number/records?page=1&perPage=1000&sort=-created');
+         const res = await fetch(pocketbaseUrl + '/api/collections/yamaha_unik_part_number/records?page=1&perPage=2000&sort=-created');
         const data = await res.json();
 
         // Mapping data dari response API ke format Select2
