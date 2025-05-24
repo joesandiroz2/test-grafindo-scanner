@@ -32,7 +32,13 @@ function renderTable(items) {
   const keluarMap = {};
   const otherItems = [];
 
+   const partCount = {};
+
+
   items.forEach(item => {
+      // Hitung part_number frequency
+    partCount[item.part_number] = (partCount[item.part_number] || 0) + 1;
+
     if (item.status === "keluar") {
       const part = item.part_number;
       const qty = parseInt(item.qty_scan) || 0;
@@ -80,10 +86,17 @@ function renderTable(items) {
           <tr>
             <td>${index + 1}</td>
             <td>${item.kode_depan + item.no_do}</td>
-            <td>${item.part_number}</td>
+            <td style="
+              background-color: ${partCount[item.part_number] > 1 ? 'orange' : 'inherit'};
+              color: ${partCount[item.part_number] > 1 ? 'black' : 'inherit'};
+            ">
+              ${item.part_number}
+            </td>
             <td>${item.nama_barang}</td>
             <td class="td_masuk">${item.qty_masuk || ""}</td>
-            <td class="balance">${item.balance}</td>
+           <td class="balance" style="color: ${item.balance < 0 ? 'red' : 'inherit'};">
+            ${item.balance}
+          </td>
             <td class="td_keluar">${item.status === "keluar" ? item.qty_keluar_total : ""}</td>
            <td style="font-weight: bold; color: ${item.status === "keluar" ? "red" : "green"};">
             ${item.status === "keluar" ? "barang keluar" : "masuk"}
@@ -102,6 +115,8 @@ function updatePagination(page, totalPages) {
   $("#prevPage").prop("disabled", page <= 1);
   $("#nextPage").prop("disabled", page >= totalPages);
 
+  $("#pageInfo").text(`Halaman ${page} dari ${totalPages}`);
+
   $("#prevPage").off("click").on("click", () => {
     if (page > 1) {
       currentPage--;
@@ -110,10 +125,13 @@ function updatePagination(page, totalPages) {
   });
 
   $("#nextPage").off("click").on("click", () => {
-    currentPage++;
-    fetchKartuStok(currentPage);
+    if (page < totalPages) {
+      currentPage++;
+      fetchKartuStok(currentPage);
+    }
   });
 }
+
 
 // Panggil saat halaman dimuat
 $(document).ready(() => {

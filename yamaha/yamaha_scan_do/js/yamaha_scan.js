@@ -1,7 +1,4 @@
 
-
-
-
 let pb = new PocketBase(pocketbaseUrl);
 let timeout = null;
 

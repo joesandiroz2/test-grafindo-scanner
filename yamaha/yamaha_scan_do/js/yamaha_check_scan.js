@@ -1,6 +1,22 @@
 
 async function proses_cek_scan(partno, qty, dataDo) {
 
+  partno = partno.replace(/\s+/g, "").toUpperCase();
+
+
+  
+
+  // qty harus angka positif (integer), cek dengan regex atau Number.isInteger + parseInt
+  const qtyInt = parseInt(qty);
+  if (isNaN(qtyInt) || qtyInt <= 0) {
+    showStatus("❌ Scan Input Tidak sesuai: Qty bukan angka valid!");
+    resetInputan();
+    return;
+  }
+
+  // lanjut proses semula dengan qtyInt (integer) yang sudah valid
+  qty = qtyInt;
+
   if (!Array.isArray(dataDo) || dataDo.length === 0) {
     showStatus("Scan Do Dulu !!");
     
@@ -67,6 +83,8 @@ async function proses_cek_scan(partno, qty, dataDo) {
       showStatus("Gagal ambil saldo terakhir!");
       return;
     }
+    // ambil tgl do
+    const found_tgl_do = dataDo.find(item => item.part_number === partno);
 
      // Siapkan data baru
     const newData = {
@@ -80,7 +98,9 @@ async function proses_cek_scan(partno, qty, dataDo) {
       remarks,
       balance,
       qty_masuk: "",
-      tgl_pb: ""
+      tgl_pb: "",
+      tgl_do:found_tgl_do.tgl_do || "",
+      jumlah_barang: dataDo.length.toString()
     };
 
     // Buat record baru
