@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafindo Scanner</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+
+    <style>
+        @media print{
+            body { print-color-adjust: exact; }
+            table td {
+                font-weight: bold;
+                color: black;
+            }
+        }
+        .loadingpart{
+            background-color: green;
+            color: white;
+            font-weight: bold;
+            padding: 3px;
+        }
+
+    </style>
+
+
+</head>
+<body>
+
+    <div id="navbar-container"></div>
+
+    <div class="container mt-4">
+        <div style="display: flex;justify-content: space-between;">
+        <img 
+        style="width:120px" 
+        src="../../../logo/yamaha_logo.png" alt="">
+        <h4 style="font-weight: bold;">Kartu Stok Yamaha PerBarang</h4>
+        <button id="excel-btn" class="btn btn-success">Download Excel</button>
+
+            <button id="print-btn" class="btn btn-primary">Print</button>
+
+        </div>
+        <form id="filter-form">
+            <div class="row">
+                <div class="col-12">
+            <div class="form-group">
+            <label for="part-number">Part Number:</label>
+            <p class="loadingpart" id="loadpart">Sedang Loading Part number....</p>
+            <select class="form-control" id="part-number" required></select>
+        </div>
+
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="start-date">Tanggal Dari: 
+                        <span id="tgldari"></span>
+                        </label>
+                        <input type="date" class="form-control" id="start-date" required>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="end-date">Tanggal Sampai:  <span id="tglsampai"></span></label>
+                        <input type="date" class="form-control" id="end-date" required>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                    <button type="submit" class="btn btn-info btn-block">Tampilkan Stok Detailnya</button>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                <button type="button" class="btn btn-warning btn-block" 
+                style="font-weight: bold;"
+                id="tampilkan-stok-terakhir">Tampilkan Stok Terakhir saja</button>
+            </div>
+            </div>
+        </form>
+
+    <div class="container">
+        <h4 style="font-weight:bold" id="keteranganstok"></h4>
+    </div>
+
+        <div style="border:1px solid black">
+            <div id="detail_barang"></div>
+        </div>
+
+
+    </div>
+    
+        <table class="table table-bordered mt-4 table-responsive">
+            <thead>
+                <tr class="text-center">
+                    <th>No</th>
+                    <th>In</th>
+                    <th>Balance</th>
+                    <th>Out</th>
+                    <th>Lot</th>
+                    <th>No DN/PB</th>
+                    <th>Tanggal DO</th>
+                    <th>Nama Barang</th>
+                    <th>tgl pb</th>
+                    <th>status</th>
+                    <th>tgl in/out</th>
+                </tr>
+            </thead>
+            <tbody id="data-table-body">
+                <!-- Data akan ditambahkan di sini -->
+            </tbody>
+        </table>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $("#navbar-container").load("../../../component/nav.html",function(){
+        setTimeout(loginUser, 500);
+                
+            });
+        });
+    </script>
+
+    <script src="../../../js/sdk/pocketbase.umd.js"></script>
+    <script src="../../../js/pocket_config.js"></script>
+    <script src="./js_per_barang/yamaha_kartu_stok_per_barang.js"></script>
+
+</body>
+<script>
+    $(document).ready(function() {
+    loadPartNumbers();
+});
+
+</script>
+
+<script>
+    document.querySelector("#print-btn").addEventListener("click", function() {
+        let printContents = document.querySelector("#detail_barang").outerHTML + 
+            document.querySelector("table").outerHTML;
+        let originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        location.reload(); // Refresh halaman agar tidak rusak setelah print
+    });
+</script>
+
+</html>
