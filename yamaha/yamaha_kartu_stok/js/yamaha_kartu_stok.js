@@ -1,149 +1,231 @@
 const pb = new PocketBase(pocketbaseUrl);
 let currentPage = 1;
-const perPage = 100;
+let totalPages = 0;
 
-async function fetchKartuStok(page = 1) {
-  $("#loading").show();
-  $("#table-container").empty();
+// Function to format the date
+function formatDate(dateString) {
+const date = new Date(dateString);
 
-  try {
-    await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
+// Ambil bagian tanggal
+const day = date.getDate().toString().padStart(2, '0'); // Pastikan selalu 2 digit
+const month = date.toLocaleString('id-ID', { month: 'long' }); // Nama bulan dalam bahasa Indonesia
+const year = date.getFullYear();
 
-    const resultList = await pb.collection("yamaha_kartu_stok").getList(page, perPage, {
-      sort: "-created"
+// Ambil bagian jam & menit
+const hours = date.getHours().toString().padStart(2, '0'); // Pastikan selalu 2 digit
+const minutes = date.getMinutes().toString().padStart(2, '0');
+
+// Gabungkan tanpa "pukul"
+return `${day} ${month} ${year} ${hours}:${minutes}`;
+}
+
+
+async function authenticate() {
+try {
+    const authData = await pb.collection('users').authWithPassword(username_pocket, user_pass_pocket);
+    return authData;
+} catch (error) {
+    console.error("Authentication failed:", error);
+}
+}
+
+async function fetchData(page) {
+  // Buat preloader secara dinamis
+const loadingElement = document.createElement("div");
+loadingElement.innerHTML = `
+    <div class="text-center my-3" id="loading">
+        <div class="spinner-border text-primary" role="status">
+        </div>
+    </div>
+    <p style="text-align:center">Sedang mengambil kartu stok...</p>
+`;
+document.body.appendChild(loadingElement); // Tambahkan ke body
+
+
+try {
+    const resultList = await pb.collection('yamaha_kartu_stok').getList(page, 500, {
+        sort: '-created' // Mengurutkan berdasarkan field 'created' secara menurun
     });
-
-    renderTable(resultList.items);
-    updatePagination(resultList.page, resultList.totalPages);
-  } catch (error) {
-    console.error("Gagal ambil data kartu stok:", error);
-    Swal.fire("Error", "Gagal mengambil data kartu stok!", "error");
-  } finally {
-    $("#loading").hide();
-  }
+     document.body.removeChild(loadingElement);
+    return resultList;
+} catch (error) {
+    console.error("Failed to fetch data:", error);
+    document.body.removeChild(loadingElement);
+}
 }
 
-function renderTable(items) {
-  if (items.length === 0) {
-    $("#table-container").html("<p class='text-center'>Tidak ada data.</p>");
-    return;
-  }
+function renderTable(data) {
+const tableBody = document.getElementById('data-table-body');
+tableBody.innerHTML = '';
 
-  const keluarMap = {};
-  const otherItems = [];
+// Mengelompokkan data berdasarkan part_number dan lot
+const groupedData = {};
 
-   const partCount = {};
+data.items.forEach(item => {
+    const key = `${item.part_number}-${item.lot}`;
+    
+    // Pastikan qty_scan diubah menjadi Number
+    const qtyAmbil = Number(item.qty_scan); // Mengonversi qty_scan menjadi Number
 
-
-  items.forEach(item => {
-      // Hitung part_number frequency
-    partCount[item.part_number] = (partCount[item.part_number] || 0) + 1;
-
-    if (item.status === "keluar") {
-      const part = item.part_number;
-      const qty = parseInt(item.qty_scan) || 0;
-
-      if (!keluarMap[part]) {
-        keluarMap[part] = {
-          ...item,
-          qty_keluar_total: qty,
-          created: item.created // simpan created untuk ambil balance terbaru
+    if (!groupedData[key]) {
+        // Jika belum ada, simpan item dan inisialisasi qty_scan
+        groupedData[key] = {
+            ...item,
+            qty_scan: qtyAmbil, // Simpan qty_scan sebagai Number
+            balance: item.balance, // Simpan balance dari item pertama
+            qty_masuk: item.qty_masuk,
+            count: 1 // Untuk menghitung jumlah item yang sama
         };
-      } else {
-        keluarMap[part].qty_keluar_total += qty;
-
-        // Ambil balance dari created terbaru
-        if (new Date(item.created) > new Date(keluarMap[part].created)) {
-          keluarMap[part].created = item.created;
-          keluarMap[part].balance = item.balance;
-        }
-      }
     } else {
-      otherItems.push(item);
+        // Menjumlahkan qty_scan
+        groupedData[key].qty_scan += qtyAmbil; // Menjumlahkan qty_scan
+        // Tidak mengubah balance, tetap menggunakan balance dari item pertama
+        groupedData[key].count += 1; // Menambah hitungan
     }
-  });
-
-  const combinedItems = otherItems.concat(Object.values(keluarMap));
-  combinedItems.sort((a, b) => new Date(b.created) - new Date(a.created));
-
-  const table = `
-    <table class="table table-bordered table-striped">
-      <thead class="table-dark">
-        <tr>
-          <th>No</th>
-          <th>No DO</th>
-          <th>Part Number</th>
-          <th>Nama Barang</th>
-          <th>Qty Masuk</th>
-          <th>Balance Terakhir</th>
-          <th>Qty Keluar</th>
-          <th>Status</th>
-          <th>Tgl System</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${combinedItems.map((item, index) => `
-          <tr>
-            <td>${index + 1}</td>
-            <td>${item.kode_depan + item.no_do}</td>
-            <td style="
-              background-color: ${partCount[item.part_number] > 1 ? 'orange' : 'inherit'};
-              color: ${partCount[item.part_number] > 1 ? 'black' : 'inherit'};
-            ">
-              ${item.part_number}
-            </td>
-            <td>${item.nama_barang}</td>
-            <td class="td_masuk">${item.qty_masuk || ""}</td>
-           <td class="balance" style="color: ${item.balance < 0 ? 'red' : 'inherit'};">
-            ${item.balance}
-          </td>
-            <td class="td_keluar">${item.status === "keluar" ? item.qty_keluar_total : ""}</td>
-           <td style="font-weight: bold; color: ${item.status === "keluar" ? "red" : "green"};">
-            ${item.status === "keluar" ? "barang keluar" : "masuk"}
-          </td>
-            <td><i>${formatTanggal(item.created)}</i></td>
-          </tr>
-        `).join("")}
-      </tbody>
-    </table>
-  `;
-
-  $("#table-container").html(table);
-}
-
-function updatePagination(page, totalPages) {
-  $("#prevPage").prop("disabled", page <= 1);
-  $("#nextPage").prop("disabled", page >= totalPages);
-
-  $("#pageInfo").text(`Halaman ${page} dari ${totalPages}`);
-
-  $("#prevPage").off("click").on("click", () => {
-    if (page > 1) {
-      currentPage--;
-      fetchKartuStok(currentPage);
-    }
-  });
-
-  $("#nextPage").off("click").on("click", () => {
-    if (page < totalPages) {
-      currentPage++;
-      fetchKartuStok(currentPage);
-    }
-  });
-}
-
-
-// Panggil saat halaman dimuat
-$(document).ready(() => {
-  fetchKartuStok(currentPage);
 });
 
+// Mengubah objek menjadi array untuk ditampilkan
+const finalData = Object.values(groupedData);
 
-function formatTanggal(isoDate) {
-  const date = new Date(isoDate);
-  const options = { day: '2-digit', month: 'long', year: 'numeric' };
-  const tanggal = date.toLocaleDateString('id-ID', options);
-  const jam = date.getHours().toString().padStart(2, '0');
-  const menit = date.getMinutes().toString().padStart(2, '0');
-  return `${tanggal} ${jam}:${menit}`;
+finalData.forEach((item, index) => {
+    const formattedDate = formatDate(item.created);
+    const nomorUrut = (currentPage - 1) * 60 + index + 1;
+
+    // Menentukan gaya dan ikon status
+    let statusStyle = '';
+    let statusIcon = '';
+    let statusText = '';
+    
+    if (item.status === 'keluar') {
+        statusStyle = 'color: red; font-weight: bold;';
+        statusIcon = '❌';
+         statusText = 'Barang Keluar'; 
+    } else if (item.status === 'masuk') {
+        statusStyle = 'color: green; font-weight: bold;';
+        statusIcon = '✅';
+         statusText = item.status;
+    } else {
+        statusStyle = 'color: black;';
+        statusIcon = '';
+    }
+
+    let balanceStyle = 'font-weight: bold; text-align: center; color: black;';
+
+    if (item.balance < 0) {
+        balanceStyle = 'font-weight: bold; text-align: center; color: red;';
+    }
+    const row = `<tr>
+        <td>${nomorUrut}</td>
+        <td style="font-weight:bold">${item.kode_depan + item.no_do.toUpperCase()}</td>
+        <td >${item.part_number}</td>
+        <td style="font-weight:bold">${item.nama_barang}</td>
+        <td >${item.lot}</td>
+        <td style="color:purple;font-weight:bold">${item.qty_masuk}</td>
+        <td style="${balanceStyle}">${item.balance}</td>
+        <td style="color:red;font-weight:bold">${item.qty_scan}</td>
+        <td style="${statusStyle}"> ${statusText}</td>
+        <td><i>${formattedDate}</i></td>
+    </tr>`;
+    tableBody.innerHTML += row;
+});
 }
+function renderPagination() {
+const pagination = document.getElementById('pagination');
+pagination.innerHTML = '';
+
+// Previous button
+const prevButton = `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+    <a class="page-link" href="#" onclick="changePage(currentPage - 1)">Sebelumnya</a>
+</li>`;
+pagination.innerHTML += prevButton;
+
+// Current page indicator
+const pageInfo = `<li class="page-item disabled">
+    <span class="page-link">Halaman ${currentPage} dari ${totalPages}</span>
+</li>`;
+pagination.innerHTML += pageInfo;
+
+// Next button
+const nextButton = `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+    <a class="page-link" href="#" onclick="changePage(currentPage + 1)">Halaman Selanjutnya</a>
+</li>`;
+pagination.innerHTML += nextButton;
+}
+
+async function changePage(page) {
+if (page < 1 || page > totalPages) return;
+currentPage = page;
+const data = await fetchData(currentPage);
+totalPages = data.totalPages; // Update total pages based on fetched data
+renderTable(data);
+renderPagination();
+}
+
+(async () => {
+await authenticate();
+const data = await fetchData(currentPage);
+totalPages = data.totalPages; // Set total pages from fetched data
+renderTable(data);
+renderPagination();
+})();
+
+
+
+document.getElementById("downloadexcel").addEventListener("click", async function () {
+// Fetch the data (you can modify this to fetch the current page data)
+const data = await fetchData(currentPage); // Fetch the current page data
+
+// Mengelompokkan data berdasarkan part_number dan lot
+const groupedData = {};
+
+data.items.forEach(item => {
+    const key = `${item.part_number}-${item.lot}`;
+    
+    // Pastikan qty_scan diubah menjadi Number
+    const qtyAmbil = Number(item.qty_scan); // Mengonversi qty_scan menjadi Number
+
+    if (!groupedData[key]) {
+        // Jika belum ada, simpan item dan inisialisasi qty_scan
+        groupedData[key] = {
+            ...item,
+            qty_scan: qtyAmbil, // Simpan qty_scan sebagai Number
+            balance: item.balance, // Simpan balance dari item pertama
+            qty_masuk: item.qty_masuk,
+            count: 1 // Untuk menghitung jumlah item yang sama
+        };
+    } else {
+        // Menjumlahkan qty_scan
+        groupedData[key].qty_scan += qtyAmbil; // Menjumlahkan qty_scan
+        // Tidak mengubah balance, tetap menggunakan balance dari item pertama
+        groupedData[key].count += 1; // Menambah hitungan
+    }
+});
+
+// Mengubah objek menjadi array untuk ditampilkan di Excel
+const finalData = Object.values(groupedData);
+
+// Prepare the data for Excel
+const excelData = finalData.map((item, index) => ({
+    "No": (currentPage - 1) * 30 + index + 1,
+    "Qty Masuk": item.qty_masuk,
+    "Balance": item.balance,
+    "Qty Scan": item.qty_scan,
+    "No DN": item.no_do,
+    "Part Number": item.part_number,
+    "Nama Barang": item.nama_barang,
+    "Lot": item.lot,
+    "Created": formatDate(item.created) // Format the date
+}));
+
+// Create a new workbook and add the data
+const wb = XLSX.utils.book_new();
+const ws = XLSX.utils.json_to_sheet(excelData);
+XLSX.utils.book_append_sheet(wb, ws, "Kartu Stok");
+
+const today = new Date();
+const options = { year: 'numeric', month: 'long', day: 'numeric' };
+const formattedDate = today.toLocaleDateString('id-ID', options).replace(/ /g, '_'); // Format date to replace spaces with underscores
+
+// Generate Excel file and trigger download
+XLSX.writeFile(wb, `kartu_stok_${formattedDate}.xlsx`);
+});

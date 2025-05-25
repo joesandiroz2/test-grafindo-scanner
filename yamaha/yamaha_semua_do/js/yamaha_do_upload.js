@@ -69,7 +69,16 @@ document.addEventListener("DOMContentLoaded", function () {
           const td = document.createElement("td");
           td.textContent = cellValue;
           row.appendChild(td);
-          rowObj[key.toString().trim().toLowerCase()] = cellValue;
+           const cleanKey = key.toString().trim().toLowerCase();
+          let cleanValue = cellValue;
+          // Hapus semua spasi untuk kolom tertentu
+          if (cleanKey === 'no_do') {
+            cleanValue = cellValue.replace(/\s+/g, '');
+          } else if (cleanKey === 'part_number') {
+            cleanValue = cellValue.replace(/\s+/g, '').toUpperCase();
+          }
+
+          rowObj[cleanKey] = cleanValue;
         });
         tableBody.appendChild(row);
         jsonData.push(rowObj);

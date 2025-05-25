@@ -46,7 +46,7 @@ async function searchDo(no_do) {
 
 // Tombol cari
 $(document).on("click", "#btn-cari-do", () => {
-  const doValue = $("#do-input").val().trim();
+   let doValue = $("#do-input").val().trim().replace(/\s+/g, ""); // hapus semua spasi
   if (doValue === "") {
     Swal.fire("Peringatan", "Masukkan nomor DO untuk dicari!", "warning");
     return;

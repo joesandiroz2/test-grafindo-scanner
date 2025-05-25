@@ -8,7 +8,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const tableBody = document.getElementById("doTableBody");
 
   searchBtn.addEventListener("click", async function () {
-    const searchTerm = searchInput.value.trim();
+    const searchTerm = searchInput.value.replace(/\s+/g, '');
+ 
     if (!searchTerm) {
       Swal.fire("Belum input nomor DO", "Masukkan nomor DO dulu!", "warning");
       return;

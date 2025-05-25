@@ -5,6 +5,9 @@ const perPage = 500;
 
 async function fetchReportData() {
   $("#loading").show();
+  $("#progress-bar").css("width", "0%").attr("aria-valuenow", 0).text("0%");
+  $(".progress").show();
+  $("#loading-text").text("Sedang Mengambil Report data...");
   $("#report-container").empty();
   $("#current-page").text(`Halaman: ${currentPage}`);
 
@@ -16,9 +19,10 @@ async function fetchReportData() {
     });
 
     const grouped = {};
+    const totalItems = unikNoDoResult.items.length;
 
-    // Loop untuk tiap item no_do di unik_no_do
-    for (const unikItem of unikNoDoResult.items) {
+    for (let i = 0; i < totalItems; i++) {
+      const unikItem = unikNoDoResult.items[i];
       const no_do = unikItem.no_do;
 
       // Ambil data dari kartu stok dengan filter status=keluar dan no_do = item.no_do
@@ -43,6 +47,10 @@ async function fetchReportData() {
           grouped[no_do][part_number].qty_scan += parseInt(stok.qty_scan) || 0;
         }
       }
+
+      // Update progress bar
+      const progressPercent = Math.round(((i + 1) / totalItems) * 100);
+      $("#progress-bar").css("width", progressPercent + "%").attr("aria-valuenow", progressPercent).text(progressPercent + "%");
     }
 
     renderReport(grouped);
@@ -52,11 +60,14 @@ async function fetchReportData() {
 
   } catch (error) {
     console.error("Gagal mengambil data:", error);
-    Swal.fire("Gagal", "Gagal mengambil data laporan!", "error");
+    Swal.fire("Gagal", "Gagal mengambil data laporan! coba refresh dan coba lagi", "error");
   } finally {
+    // Sembunyikan loading dan progress bar saat selesai
     $("#loading").hide();
+    $(".progress").hide();
   }
 }
+
 
 
 function renderReport(data) {

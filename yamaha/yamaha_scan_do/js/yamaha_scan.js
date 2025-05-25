@@ -14,13 +14,51 @@ const tableBody = document.querySelector("#table-do-list tbody");
 
 function keepAutofocus() {
   inputPartNo.focus();
+
+  // Jika blur dari inputPartNo dan kosong, langsung kembalikan fokus
   inputPartNo.addEventListener('blur', () => {
-    setTimeout(() => {
-      inputPartNo.focus()
-    },100);
+    if (inputPartNo.value.trim() === '') {
+      setTimeout(() => {
+        inputPartNo.focus();
+      }, 10);
+    }
   });
 
+  // Cegah fokus ke inputQty kalau inputPartNo kosong
+  inputQty.addEventListener('focus', () => {
+    if (inputPartNo.value.trim() === '') {
+      setTimeout(() => {
+        inputPartNo.focus();
+      }, 10);
+    }
+  });
+
+  // Jika user klik/fokus ke mana pun, cek dan kembalikan fokus jika perlu
+  document.addEventListener('focusin', (e) => {
+    if (
+      inputPartNo.value.trim() === '' &&
+      e.target !== inputPartNo &&
+      e.target !== inputQty
+    ) {
+      setTimeout(() => {
+        inputPartNo.focus();
+      }, 10);
+    }
+  });
+
+  // Jaga juga saat klik mouse — jika partno kosong, selalu paksa balik ke sana
+  document.addEventListener('mousedown', (e) => {
+    if (
+      inputPartNo.value.trim() === '' &&
+      e.target !== inputPartNo &&
+      e.target !== inputQty
+    ) {
+      e.preventDefault(); // Cegah fokus pindah ke elemen lain
+      inputPartNo.focus();
+    }
+  });
 }
+
 
 
 function playSound(filePath) {
@@ -89,6 +127,7 @@ function renderTable(data) {
       </tr>
     `;
   });
+  cekSemuaBarangSudahSelesai(data)
 }
 
 
@@ -111,11 +150,24 @@ document.getElementById('input-partno').addEventListener('input', function () {
         }
 
       timer = null; // Reset timer
-    }, 3000);
+    }, 500);
   }
 });
 
+// check sudah beres semua scan nya
+function cekSemuaBarangSudahSelesai(data) {
+  const semuaSelesai = data.every(item => {
+    const totalScanned = scanData
+      .filter(scan => scan.part_number === item.part_number && scan.no_do === item.no_do)
+      .reduce((sum, s) => sum + parseInt(s.qty_scan || 0), 0);
+    return totalScanned >= parseInt(item.qty);
+  });
+
+  if (semuaSelesai && data.length > 0) {
+    
+    playSound('../../../suara/yamaha_udah_di_scan_semua.mp3'); // (opsional: tambahkan file audio ini)
+  }
+}
 
 
-
-// document.addEventListener("DOMContentLoaded", keepAutofocus);
+document.addEventListener("DOMContentLoaded", keepAutofocus);
