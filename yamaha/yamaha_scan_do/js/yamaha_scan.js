@@ -1,5 +1,4 @@
 
-let pb = new PocketBase(pocketbaseUrl);
 let timeout = null;
 
 let doData = []; // akan menyimpan hasil search DO

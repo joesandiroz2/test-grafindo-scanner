@@ -1,8 +1,18 @@
+const cacheByNoDo = {};
+
 // Ambil data dari PocketBase dan filter
 async function searchDO(partNoValue) {
   showLoading();
   try {
-    await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
+    
+     if (cacheByNoDo[partNoValue]) {
+      // Pakai cache jika sudah ada
+      console.log(`Menggunakan cache untuk no_do = ${partNoValue}`);
+      const cachedData = cacheByNoDo[partNoValue];
+      await prosesSetelahData(cachedData);
+      hideLoading();
+      return;
+    }
 
     const records = await pb.collection('yamaha_do').getFullList({
       sort: '-created',
@@ -39,6 +49,10 @@ async function searchDO(partNoValue) {
     }
 
     const uniqueFiltered = Array.from(uniquePartMap.values());
+
+    // simpan data biar ga panggil nodo lagi
+    cacheByNoDo[partNoValue] = uniqueFiltered;
+
     doData = uniqueFiltered; // simpan untuk pengecekan nanti
     await tabel_barang_sudah_scan(doData)
     hideLoading();
@@ -53,4 +67,15 @@ async function searchDO(partNoValue) {
     showStatus("Terjadi error koneksi ke database, coba lagi atau hubungi Edi");
     console.error("Database error:", err);
   }
+}
+
+// ga perlu manggil lagi kalo nodo udah di panggil
+async function prosesSetelahData(filtered) {
+  doData = filtered; // simpan untuk pengecekan nanti
+  await tabel_barang_sudah_scan(doData);
+  renderTable(filtered);
+
+  inputPartNo.value = "";
+  document.getElementById("input-qty").value = "";
+  inputPartNo.focus();
 }

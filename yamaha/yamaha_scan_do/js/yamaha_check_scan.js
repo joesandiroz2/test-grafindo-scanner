@@ -3,7 +3,13 @@ async function proses_cek_scan(partno, qty, dataDo) {
 
   partno = partno.replace(/\s+/g, "").toUpperCase();
 
-
+   // Cek qty: harus angka positif integer
+  // Gunakan regex untuk deteksi jika ada karakter selain digit
+  if (!/^\d+$/.test(qty)) {
+    showStatus("❌ Input qty jangan huruf atau bukan angka!");
+    resetInputan();
+    return; // jangan lanjutkan proses
+  }
   
 
   // qty harus angka positif (integer), cek dengan regex atau Number.isInteger + parseInt
@@ -44,11 +50,10 @@ async function proses_cek_scan(partno, qty, dataDo) {
     // Step 1: Hitung total qty yang sudah discan
     let totalQtyScanned = 0;
     try {
-      await pb.collection('users').authWithPassword(username_pocket, user_pass_pocket);
+     
       const scannedItems = await pb.collection("yamaha_kartu_stok").getFullList({
         filter: `part_number = "${partno}" && no_do = "${no_do}"`
       });
-
       totalQtyScanned = scannedItems.reduce((sum, item) => sum + parseInt(item.qty_scan || 0), 0);
     } catch (err) {
       console.error("Gagal mengambil data scan sebelumnya:", err);
@@ -66,8 +71,7 @@ async function proses_cek_scan(partno, qty, dataDo) {
 
 
     try {
-      await pb.collection('users').authWithPassword(username_pocket, user_pass_pocket);
-
+     
       const result = await pb.collection('yamaha_kartu_stok').getList(1, 1, {
         filter: `part_number = "${partno}"`,
         sort: "-created"
