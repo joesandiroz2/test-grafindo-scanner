@@ -64,7 +64,10 @@ async function searchDO(partNoValue) {
 
   } catch (err) {
     hideLoading();
-    showStatus("Terjadi error koneksi ke database, coba lagi atau hubungi Edi");
+    showStatus("Terjadi error koneksi ke database, coba lagi");
+    inputPartNo.value = "";  
+    document.getElementById("input-qty").value = "";
+    inputPartNo.focus();
     console.error("Database error:", err);
   }
 }

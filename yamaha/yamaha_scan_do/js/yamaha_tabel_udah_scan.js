@@ -14,13 +14,13 @@ async function tabel_barang_sudah_scan(doData) {
 
     scanData = res; // ⬅️ Tambahkan baris ini
     if (!res || res.length === 0) {
-      document.getElementById("tbl_udah_scan").innerHTML = "<p class='text-center'>Belum ada barang yang di-scan.</p>";
+      document.getElementById("belum_ada_scan").innerHTML = "<p class='text-center'>Belum ada barang yang di-scan.</p>";
       return;
     }
 
    
   } catch (error) {
     console.error("Gagal menampilkan barang yang sudah di scan:", error);
-    document.getElementById("tbl_udah_scan").innerHTML = `<p class='text-danger text-center'>Gagal memuat data scan.</p>`;
+    document.getElementById("belum_ada_scan").innerHTML = `<p class='text-danger text-center'>Gagal memuat data scan.</p>`;
   }
 }
