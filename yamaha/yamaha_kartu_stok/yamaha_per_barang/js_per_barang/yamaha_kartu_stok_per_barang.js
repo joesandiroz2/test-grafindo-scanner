@@ -221,7 +221,7 @@ async function fetchLastBalance(partNumber) {
 async function renderDetailBarang(query) {
     try {
         await authenticate(); // Pastikan user sudah login
-        const result = await pb.collection('data_barang').getList(1, 1, {
+        const result = await pb.collection('yamaha_data_barang').getList(1, 1, {
             filter: `part_number = "${query}"`,
         });
 
@@ -234,7 +234,7 @@ async function renderDetailBarang(query) {
 
         const item = result.items[0];
         const imageHtml = item.gambar 
-        ? `<img src="${pocketbaseUrl}/api/files/data_barang/${item.id}/${item.gambar}" 
+        ? `<img src="${pocketbaseUrl}/api/files/yamaha_data_barang/${item.id}/${item.gambar}" 
                alt="${item.nama_barang}" 
                class="img-fluid rounded mb-3" 
                style="max-width: 150px;">` 
