@@ -149,7 +149,7 @@ document.getElementById('input-partno').addEventListener('input', function () {
         }
 
       timer = null; // Reset timer
-    }, 2500);
+    }, 500);
   }
 });
 
