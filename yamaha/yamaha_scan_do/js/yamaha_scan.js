@@ -144,12 +144,12 @@ document.getElementById('input-partno').addEventListener('input', function () {
 
       } else {
         // Kalau qty ada isinya, tampilkan alert
-    proses_cek_scan(partno, qty, doData);
-    
+    // proses_cek_scan(partno, qty, doData);
+     simpanKeKartuDO(partno, qty);
         }
 
       timer = null; // Reset timer
-    }, 500);
+    }, 2500);
   }
 });
 
