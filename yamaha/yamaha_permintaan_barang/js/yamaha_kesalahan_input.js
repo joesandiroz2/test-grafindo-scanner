@@ -14,23 +14,9 @@ async function Kurangi_stok_part() {
     loadingButton.prop("disabled", true).text("Sedang Mengurangi Stok...");
 
     try {
-
-      // Konfirmasi password
-    const { value: password } = await Swal.fire({
-        title: 'Konfirmasi Password',
-        input: 'password',
-        inputLabel: 'Masukkan password admin',
-        inputPlaceholder: 'Password',
-        showCancelButton: true,
-        confirmButtonText: 'Lanjutkan',
-        cancelButtonText: 'Batal',
-        allowOutsideClick: false
-    });
-
-    if (password === 'sp102103') {
     
-        Swal.fire({
-            title: 'Sedang Mengurangi...',
+    Swal.fire({
+            title: 'Sedang Mengurangi Stok...',
             text: 'Sedang Mengurangi Stok, harap tunggu...',
             allowOutsideClick: false,
              showConfirmButton: false,
@@ -39,9 +25,6 @@ async function Kurangi_stok_part() {
             }
         });
 
-        
-
-      
         // Ambil balance terakhir
         const latestItem = await getBalanceTerakhir(partNumber);
         let balance = 0;
@@ -77,9 +60,6 @@ async function Kurangi_stok_part() {
 
         // Reset inputan
         resetInputs();
-     } else {
-            Swal.fire('Password Salah', 'Password admin salah, hubungi Admin untuk mengurangi stok.', 'error');
-    }
 
     } catch (error) {
         console.error(error);

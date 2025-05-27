@@ -14,8 +14,8 @@ document.getElementById('pbForm').addEventListener('submit', async function (e) 
     const rawPartNumber = document.getElementById("part_number").value;
     const part_number = rawPartNumber.replace(/\s+/g, '').toUpperCase();
 
-    const lotRaw = document.getElementById("lot").value.trim();
-    const lot = parseInt(lotRaw, 10).toString();  // Buang leading zero
+   const lotRaw = document.getElementById("lot").value.trim();
+    const lot = lotRaw.replace(/\s+/g, "").toUpperCase();
 
    const nama_barang = document.getElementById("nama_barang").value.trim().toUpperCase();
    const rawDate = document.getElementById("tgl_pb").value;
@@ -76,6 +76,7 @@ document.getElementById('pbForm').addEventListener('submit', async function (e) 
       part_number,
       nama_barang,
       qty_scan: "",
+      lot:lot,
       qty_do: "",
       status: "masuk",
       remarks: "",

@@ -30,22 +30,34 @@
       <form id="pbForm">
         <div class="row g-3">
           <div class="col-12 col-md-6 col-xl-10">
-            <input type="text" class="form-control" id="part_number" placeholder="Part Number" required>
+            <input type="text" class="form-control" id="part_number" placeholder="Part Number" list="partNumberList" 
+            style="font-weight:bold" 
+             required>
+            <datalist 
+             
+            id="partNumberList"></datalist>
           </div>
           <div class="col-12 col-md-6 col-xl-5">
-            <input type="text" class="form-control" id="lot" placeholder="Lot" required>
+            <input type="text" class="form-control" 
+            style="font-weight:bold" 
+             id="nama_barang" placeholder="Nama Barang" required>
           </div>
-          <div class="col-12 col-md-6 col-xl-10">
-            <input type="text" class="form-control" id="nama_barang" placeholder="Nama Barang" required>
+          <div class="col-12 col-md-6 col-xl-10" style="font-weight:bold">
+            LOT: 
+            <input type="text" class="form-control" id="lot" placeholder="Lot" required>
+            
           </div>
          
-          <div class="col-12 col-md-6 col-xl-5">
+          <div class="col-12 col-md-6 col-xl-5" style="font-weight:bold">
+            No PB:
             <input type="text" class="form-control" id="no_pb" placeholder="No PB" required>
           </div>
-           <div class="col-12 col-md-6 col-xl-5">
+           <div class="col-12 col-md-6 col-xl-5" style="font-weight:bold">
+            TGL PB:
             <input type="date" class="form-control" id="tgl_pb" required>
           </div>
-          <div class="col-12 col-md-6 col-xl-5">
+          <div class="col-12 col-md-6 col-xl-5" style="font-weight:bold">
+            Qty Masuk:
             <input type="number" class="form-control" id="qty_masuk" placeholder="Qty Masuk" required>
           </div>
         </div>
@@ -101,7 +113,9 @@
 <!-- External JS -->
 <script src="../../js/sdk/pocketbase.umd.js"></script>
 <script src="../../js/pocket_config.js"></script>
+
 <script src="./js/yamaha_penyerahan_barang.js"></script>
+<script src="./js/yamaha_auto_complete_part_number.js"></script>
 <script src="./js/yamaha_load_penyerahan.js"></script>
 
 <script>
