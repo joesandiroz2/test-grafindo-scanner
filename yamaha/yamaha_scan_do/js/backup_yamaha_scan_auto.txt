@@ -1,0 +1,172 @@
+
+let timeout = null;
+
+let doData = []; // akan menyimpan hasil search DO
+
+
+const inputPartNo = document.getElementById('input-partno');
+const inputQty = document.getElementById('input-qty');
+
+const spinner = document.getElementById('loading-spinner');
+const statusMessage = document.getElementById('status-message');
+const tableBody = document.querySelector("#table-do-list tbody");
+
+function keepAutofocus() {
+  inputPartNo.focus();
+
+  // Jika blur dari inputPartNo dan kosong, langsung kembalikan fokus
+  inputPartNo.addEventListener('blur', () => {
+    if (inputPartNo.value.trim() === '') {
+      setTimeout(() => {
+        inputPartNo.focus();
+      }, 10);
+    }
+  });
+
+  // Cegah fokus ke inputQty kalau inputPartNo kosong
+  inputQty.addEventListener('focus', () => {
+    if (inputPartNo.value.trim() === '') {
+      setTimeout(() => {
+        inputPartNo.focus();
+      }, 10);
+    }
+  });
+
+  // Jika user klik/fokus ke mana pun, cek dan kembalikan fokus jika perlu
+  document.addEventListener('focusin', (e) => {
+    if (
+      inputPartNo.value.trim() === '' &&
+      e.target !== inputPartNo &&
+      e.target !== inputQty
+    ) {
+      setTimeout(() => {
+        inputPartNo.focus();
+      }, 10);
+    }
+  });
+
+  // Jaga juga saat klik mouse — jika partno kosong, selalu paksa balik ke sana
+  document.addEventListener('mousedown', (e) => {
+    if (
+      inputPartNo.value.trim() === '' &&
+      e.target !== inputPartNo &&
+      e.target !== inputQty
+    ) {
+      e.preventDefault(); // Cegah fokus pindah ke elemen lain
+      inputPartNo.focus();
+    }
+  });
+}
+
+
+
+function playSound(filePath) {
+  const audio = document.getElementById("notif-sound");
+  audio.src = filePath;
+  audio.currentTime = 0;  // mulai dari awal
+  audio.play().catch(e => console.warn("Audio play failed:", e));
+}
+
+// Tampilkan pesan status
+function showStatus(text) {
+  statusMessage.innerHTML = text;
+  statusMessage.className = `mt-3 bg-warning text-center fw-bold`;
+}
+
+// Tampilkan loading
+function showLoading() {
+  spinner.style.display = 'block';
+  showStatus("Sedang mencari DO ini...");
+}
+
+// Sembunyikan loading
+function hideLoading() {
+  spinner.style.display = 'none';
+}
+
+// Render tabel dari hasil pencarian
+function renderTable(data) {
+  tableBody.innerHTML = '';
+  if (data.length === 0) {
+    showStatus("DO ini belum di Upload di sistem ini");
+      playSound('../../../suara/yamaha_do_belum_ada_di_sistem.mp3');
+    
+    return;
+  }
+
+  statusMessage.innerHTML = ''; // Hapus pesan status kalau ada data
+
+  data.forEach((item, index) => {
+     const totalScanned = scanData
+  .filter(scan => scan.part_number === item.part_number && scan.no_do === item.no_do)
+  .reduce((sum, s) => sum + parseInt(s.qty_scan || 0), 0);
+
+
+     const isFull = parseInt(item.qty) === totalScanned;
+    const checkIcon = isFull ? "✅" : "";
+
+    tableBody.innerHTML += `
+       <tr >
+       <td>${index + 1}</td>
+        <td>${item.kode_depan + item.no_do}</td>
+        <td>${item.part_number}</td>
+        <td>${item.nama_barang}</td>
+          <td 
+        ${
+          totalScanned === 0
+            ? ''
+            : totalScanned === parseInt(item.qty)
+              ? 'style="background-color: green; font-weight: bold; color: white;"'
+              : 'style="background-color: orange; font-weight: bold; color: black;"'
+        }
+      >
+        ${item.qty} (scan: ${totalScanned}) ${checkIcon}
+      </td>
+
+      </tr>
+    `;
+  });
+  cekSemuaBarangSudahSelesai(data)
+}
+
+
+// proses cek scan
+let timer = null;
+document.getElementById('input-partno').addEventListener('input', function () {
+  if (this.value.trim() !== '' && !timer) {
+    timer = setTimeout(() => {
+      const partno = document.getElementById('input-partno').value.trim();
+      const qty = document.getElementById('input-qty').value.trim();
+      playSound('../../../suara/yamaha_scan_do.mp3');
+
+      if (qty === '') {
+        searchDO(partno);
+
+      } else {
+        // Kalau qty ada isinya, tampilkan alert
+    // proses_cek_scan(partno, qty, doData);
+     simpanKeKartuDO(partno, qty);
+        }
+
+      timer = null; // Reset timer
+    }, 6000);
+  }
+});
+
+// check sudah beres semua scan nya
+function cekSemuaBarangSudahSelesai(data) {
+  const semuaSelesai = data.every(item => {
+    const totalScanned = scanData
+      .filter(scan => scan.part_number === item.part_number && scan.no_do === item.no_do)
+      .reduce((sum, s) => sum + parseInt(s.qty_scan || 0), 0);
+    return totalScanned >= parseInt(item.qty);
+  });
+
+  if (semuaSelesai && data.length > 0) {
+    
+    playSound('../../../suara/yamaha_udah_di_scan_semua.mp3'); // (opsional: tambahkan file audio ini)
+  }
+}
+
+
+document.addEventListener("DOMContentLoaded", keepAutofocus);

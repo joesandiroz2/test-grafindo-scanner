@@ -131,5 +131,6 @@ function resetInputan(){
   document.getElementById('input-partno').value = '';
   document.getElementById('input-qty').value = '';
   document.getElementById('kosongan').value = '';
+  document.getElementById('kosongan2').value = '';
   document.getElementById('input-partno').focus();
 }
