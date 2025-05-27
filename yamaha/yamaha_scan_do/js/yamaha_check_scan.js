@@ -130,5 +130,6 @@ async function proses_cek_scan(partno, qty, dataDo) {
 function resetInputan(){
   document.getElementById('input-partno').value = '';
   document.getElementById('input-qty').value = '';
+  document.getElementById('kosongan').value = '';
   document.getElementById('input-partno').focus();
 }

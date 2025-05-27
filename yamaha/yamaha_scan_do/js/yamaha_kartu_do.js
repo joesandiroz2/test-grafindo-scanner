@@ -29,7 +29,7 @@ function simpanKeKartuDO(partno, qty) {
   // Jika DO sudah terpenuhi, input berikutnya langsung proses
   if (doFulfilled[partno]) {
     proses_cek_scan(partno, qtyInt, doData); // hanya kirim qty terbaru
-    showStatus(`✅ Scan setelah DO terpenuhi: ${partno} qty ${qtyInt}`);
+    showStatus(`✅ KARTU DO OK : ${partno} qty ${qtyInt}`);
     return;
   }
 
@@ -39,7 +39,7 @@ function simpanKeKartuDO(partno, qty) {
   const newTotalQty = totalQty + qtyInt;
 
   if (newTotalQty < qtyDo) {
-    showStatus(`✅ Disimpan sementara (${partno} total: ${newTotalQty}/${qtyDo})`);
+    showStatus(`✅ Mengecek  KARTU DO (${partno} total: ${newTotalQty}/${qtyDo})`);
   } else if (newTotalQty === qtyDo) {
     showStatus(`✅ Lanjut scan barang ${partno} `);
     playSound('../../../suara/yamaha_lanjut_scan_barang.mp3');
