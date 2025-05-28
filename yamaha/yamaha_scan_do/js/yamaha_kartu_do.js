@@ -40,6 +40,7 @@ function simpanKeKartuDO(partno, qty) {
 
   if (newTotalQty < qtyDo) {
     showStatus(`✅ Mengecek  KARTU DO (${partno} total: ${newTotalQty}/${qtyDo})`);
+    playSound('../../../suara/yamaha_cek_kartu_do.mp3');
   } else if (newTotalQty === qtyDo) {
     showStatus(`✅ Lanjut scan barang ${partno} `);
     playSound('../../../suara/yamaha_lanjut_scan_barang.mp3');
@@ -83,7 +84,7 @@ function renderKartuDO() {
     const qtyDo = doItem ? parseInt(doItem.qty) : 0;
     const isFull = totalQty === qtyDo;
     const emoji = isFull ? " ✅" : "";
-    html += `<li><strong>${partno}</strong>: Total Qty kartu <strong>${totalQty} dari Qty Do ${qtyDo}</strong>${emoji}</li>`;
+    html += `<li style="font-size:20px"><strong>${partno}</strong>: Total Qty kartu <strong>${totalQty} dari Qty Do ${qtyDo}</strong>${emoji}</li>`;
   }
   html += "</ul>";
 
