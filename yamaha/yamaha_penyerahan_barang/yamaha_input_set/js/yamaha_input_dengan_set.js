@@ -2,7 +2,7 @@
 // Inisialisasi PocketBase
 const pb = new PocketBase(pocketbaseUrl);
 
-async function fetchDataBarang() {
+async function fetchDataBarang(namaSetFilter) {
 try {
 // Tampilkan loading SweetAlert2
   const loader = document.createElement('div');
@@ -21,6 +21,7 @@ await pb.collection('users').authWithPassword(username_pocket, user_pass_pocket)
 // Ambil data dari koleksi `data_barang`
 const records = await pb.collection('yamaha_data_barang').getFullList({
     sort: "-created",  // Urutkan berdasarkan terbaru
+    filter:`ikut_set  ~  "${namaSetFilter}"`
 });
 
 
@@ -90,7 +91,7 @@ for (const [setName, items] of Object.entries(groupedData)) {
                         <td>${index + 1}</td>
                         <td><img src="${pocketbaseUrl}/api/files/yamaha_data_barang/${item.id}/${item.gambar}" style="width:100px;height:40px"></td>
                         <td>${item.nama_barang}</td>
-                        <td>${item.part_number}</td>
+                        <td style="font-weight:bold">${item.part_number}</td>
                        <td>
                 <select class="form-control select-dikalikan" data-part="${item.part_number}">
                     ${[...Array(10).keys()].map(i => `<option value="${i + 1}">${i + 1}</option>`).join("")}
@@ -224,5 +225,11 @@ document.getElementById("masukkanQty").addEventListener("click", async function 
 });
 
 
-// Panggil fungsi fetch saat halaman dimuat
-document.addEventListener("DOMContentLoaded", fetchDataBarang);
+document.getElementById("btnCariSet").addEventListener("click", () => {
+    const selectedSet = document.getElementById("selectSet").value;
+    if (selectedSet) {
+        fetchDataBarang(selectedSet); // kirim nama set sebagai parameter
+    } else {
+        Swal.fire("Pilih Set", "Silakan pilih nama set terlebih dahulu.", "warning");
+    }
+});
