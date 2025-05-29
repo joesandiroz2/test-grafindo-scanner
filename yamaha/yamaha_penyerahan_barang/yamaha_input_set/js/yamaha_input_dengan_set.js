@@ -170,9 +170,7 @@ document.getElementById("masukkanQty").addEventListener("click", async function 
             return;
         }
 
-        // Ambil semua kartu_stok untuk pengecekan
-        // const kartuRecords = await pb.collection("kartu_stok").getFullList();
-
+   
         // Proses semua barang yang cocok
         for (const barang of matchingBarangList) {
             const { id,part_number: partNumber, nama_barang: namaBarang, gambar } = barang;
@@ -184,7 +182,34 @@ document.getElementById("masukkanQty").addEventListener("click", async function 
             const dikalikan = selectElement ? parseInt(selectElement.value, 10) : 1;
             const totalQty = qty * dikalikan;
 
+            // proses ke penyerahan barang
+            // Cek apakah sudah ada entry dengan part_number dan lot yang sama di yamaha_penyerahan_barang
+            const existingPB = await pb.collection("yamaha_penyerahan_barang").getList(1, 1, {
+                filter: `part_number = "${partNumber}" && lot = "${nomorLot}"`
+            });
 
+            if (existingPB.items.length > 0) {
+                // Jika sudah ada, update qty_masuk
+                const currentQtyMasuk = parseInt(existingPB.items[0].qty_masuk, 10) || 0;
+                const updatedQtyMasuk = currentQtyMasuk + totalQty;
+
+                await pb.collection("yamaha_penyerahan_barang").update(existingPB.items[0].id, {
+                    qty_masuk: updatedQtyMasuk
+                });
+            } else {
+                // Jika belum ada, buat data baru
+                await pb.collection("yamaha_penyerahan_barang").create({
+                    part_number: partNumber,
+                    lot: nomorLot,
+                    nama_barang: namaBarang,
+                    tgl_pb: tglPB,
+                    no_pb: nomorPB,
+                    qty_masuk: totalQty
+                });
+            }
+
+            // =============================
+            // proses ke kartu stok
             // Cek apakah part_number dengan lot sudah ada di kartu_stok
              const existingKartu = await pb.collection("yamaha_kartu_stok").getList(1, 1, {
                 filter: `part_number = "${partNumber}"`,

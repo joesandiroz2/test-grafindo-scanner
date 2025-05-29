@@ -17,10 +17,22 @@ const inputQty = document.getElementById('input-qty');
 
 function playSound(filePath) {
   const audio = document.getElementById("notif-sound");
+
+  // Cegah gangguan jika audio sedang dimainkan
+  if (!audio.paused) {
+    audio.pause();
+    audio.currentTime = 0;
+  }
+
+  // Ganti source dan mainkan
   audio.src = filePath;
-  audio.currentTime = 0;  // mulai dari awal
-  audio.play().catch(e => console.warn("Audio play failed:", e));
+
+  // Tunggu sampai metadata/audio siap sebelum play
+  audio.onloadedmetadata = () => {
+    audio.play().catch(e => console.warn("Audio play failed:", e));
+  };
 }
+
 
 // Tampilkan pesan status
 function showStatus(text) {
