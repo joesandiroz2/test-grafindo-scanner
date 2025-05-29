@@ -115,6 +115,8 @@ document.getElementById('input-partno').addEventListener('input', function () {
 
     if (doVal && !qtyVal) {
       searchDO(doVal);
+      playSound('../../../suara/yamaha_scan_do.mp3');
+
     }
   }, doneTypingInterval);
 });
@@ -128,6 +130,7 @@ function submitData() {
 
   // Tampilkan alert atau kirim ke server
      simpanKeKartuDO(kode, qty);
+      playSound('../../../suara/yamaha_scan_do.mp3');
   
   // Kosongkan dan fokus kembali ke input DO
   document.getElementById('input-partno').value = '';
