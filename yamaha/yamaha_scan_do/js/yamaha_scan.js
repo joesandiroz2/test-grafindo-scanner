@@ -1,62 +1,17 @@
 
 let timeout = null;
-
 let doData = []; // akan menyimpan hasil search DO
-
-
-const inputPartNo = document.getElementById('input-partno');
-const inputQty = document.getElementById('input-qty');
+let buffer = '';
+let typingTimer;
+let doneTypingInterval = 700; // 0.7 detik setelah user berhenti ngetik
 
 const spinner = document.getElementById('loading-spinner');
 const statusMessage = document.getElementById('status-message');
 const tableBody = document.querySelector("#table-do-list tbody");
 
-function keepAutofocus() {
-  inputPartNo.focus();
+const inputPartNo = document.getElementById('input-partno');
+const inputQty = document.getElementById('input-qty');
 
-  // Jika blur dari inputPartNo dan kosong, langsung kembalikan fokus
-  inputPartNo.addEventListener('blur', () => {
-    if (inputPartNo.value.trim() === '') {
-      setTimeout(() => {
-        inputPartNo.focus();
-      }, 10);
-    }
-  });
-
-  // Cegah fokus ke inputQty kalau inputPartNo kosong
-  inputQty.addEventListener('focus', () => {
-    if (inputPartNo.value.trim() === '') {
-      setTimeout(() => {
-        inputPartNo.focus();
-      }, 10);
-    }
-  });
-
-  // Jika user klik/fokus ke mana pun, cek dan kembalikan fokus jika perlu
-  document.addEventListener('focusin', (e) => {
-    if (
-      inputPartNo.value.trim() === '' &&
-      e.target !== inputPartNo &&
-      e.target !== inputQty
-    ) {
-      setTimeout(() => {
-        inputPartNo.focus();
-      }, 10);
-    }
-  });
-
-  // Jaga juga saat klik mouse — jika partno kosong, selalu paksa balik ke sana
-  document.addEventListener('mousedown', (e) => {
-    if (
-      inputPartNo.value.trim() === '' &&
-      e.target !== inputPartNo &&
-      e.target !== inputQty
-    ) {
-      e.preventDefault(); // Cegah fokus pindah ke elemen lain
-      inputPartNo.focus();
-    }
-  });
-}
 
 
 
@@ -130,28 +85,7 @@ function renderTable(data) {
 }
 
 
-// proses cek scan
-let timer = null;
-document.getElementById('input-partno').addEventListener('input', function () {
-  if (this.value.trim() !== '' && !timer) {
-    timer = setTimeout(() => {
-      const partno = document.getElementById('input-partno').value.trim();
-      const qty = document.getElementById('input-qty').value.trim();
-      playSound('../../../suara/yamaha_scan_do.mp3');
 
-      if (qty === '') {
-        searchDO(partno);
-
-      } else {
-        // Kalau qty ada isinya, tampilkan alert
-    // proses_cek_scan(partno, qty, doData);
-     simpanKeKartuDO(partno, qty);
-        }
-
-      timer = null; // Reset timer
-    }, 500);
-  }
-});
 
 // check sudah beres semua scan nya
 function cekSemuaBarangSudahSelesai(data) {
@@ -169,4 +103,39 @@ function cekSemuaBarangSudahSelesai(data) {
 }
 
 
-document.addEventListener("DOMContentLoaded", keepAutofocus);
+
+
+
+// Deteksi input manual di input1 (DO)
+document.getElementById('input-partno').addEventListener('input', function () {
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(() => {
+    const doVal = document.getElementById('input-partno').value.trim();
+    const qtyVal = document.getElementById('input-qty').value.trim();
+
+    if (doVal && !qtyVal) {
+      searchDO(doVal);
+    }
+  }, doneTypingInterval);
+});
+
+
+
+
+function submitData() {
+  const kode = document.getElementById('input-partno').value;
+  const qty = document.getElementById('input-qty').value;
+
+  // Tampilkan alert atau kirim ke server
+     simpanKeKartuDO(kode, qty);
+  
+  // Kosongkan dan fokus kembali ke input DO
+  document.getElementById('input-partno').value = '';
+  document.getElementById('input-qty').value = '';
+  document.getElementById('input-partno').focus();
+}
+
+// Autofocus ke input DO saat pertama kali
+window.onload = () => {
+  document.getElementById('input-partno').focus();
+};
