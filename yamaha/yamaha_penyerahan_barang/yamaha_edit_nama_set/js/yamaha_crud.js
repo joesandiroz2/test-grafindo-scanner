@@ -17,21 +17,16 @@ async function authpw() {
 }
 
 // Load Data
-let abortController = null;
 
 async function loadData() {
-  if (abortController) {
-    abortController.abort();
-  }
-  abortController = new AbortController();
-
+  
   listContainer.innerHTML = "";
   spinner.classList.remove("d-none");
 
   try {
     const records = await pb.collection("yamaha_data_barang").getFullList({
       sort: "-created",
-      signal: abortController.signal,
+       autoCancel: true, 
     });
 
     let no = 1;  // inisialisasi nomor urut
