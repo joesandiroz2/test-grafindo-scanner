@@ -33,6 +33,15 @@
 </div>
 
       <div class="col"><input class="form-control" id="dikalikan" placeholder="Dikalikan" required></div>
+      <div class="col">
+        gambar
+        <input type="file" id="gambar" class="form-control" accept="image/*" />
+      </div>
+      <div class="col">
+        <img id="gambar-preview" src="" style="display:none; max-width: 200px; margin-top:10px;">
+
+      </div>
+
       <div class="col"><button type="submit" class="btn btn-primary" id="btn-save">Simpan</button></div>
     </div>
   </form>
@@ -89,6 +98,25 @@
       setTimeout(loginUser, 500);
     });
   });
+
+
+  document.getElementById('gambar').addEventListener('change', function (event) {
+    const file = event.target.files[0];
+    const preview = document.getElementById('gambar-preview');
+    
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    } else {
+      preview.src = '';
+      preview.style.display = 'none';
+    }
+  });
+
 </script>
 
 </body>

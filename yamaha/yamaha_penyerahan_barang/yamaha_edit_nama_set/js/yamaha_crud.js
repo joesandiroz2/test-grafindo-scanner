@@ -34,9 +34,11 @@ async function loadData() {
 
       row.innerHTML = `
         <td>${no}</td>
-        <td><img src="${imageUrl}" style="width:100px;height:80px" alt="gambar" /></td>
+        <td>
+          ${item.gambar ? `<img src="${imageUrl}" style="width:100px;height:80px" alt="gambar" />` : '<span class="text-muted">Tidak ada gambar</span>'}
+        </td>
         <td>${item.nama_barang}</td>
-        <td style="font-weight:bold">${item.part_number}-00-80</td>
+        <td style="font-weight:bold">${item.part_number}</td>
         <td style="font-weight:bold">${item.ikut_set}</td>
         <td>${item.dikalikan}</td>
         <td>
@@ -63,22 +65,26 @@ async function loadData() {
 
 // Create Data
 async function createData() {
-   const btnSave = document.getElementById("btn-save");
+  const btnSave = document.getElementById("btn-save");
   btnSave.disabled = true;
   btnSave.textContent = "Sedang menyimpan...";
 
-  const data = {
-    nama_barang: document.getElementById("nama_barang").value,
-    part_number: document.getElementById("part_number").value,
-    ikut_set: getIkutSetValue(),
-    dikalikan: document.getElementById("dikalikan").value,
-  };
+  const formData = new FormData();
+  formData.append("nama_barang", document.getElementById("nama_barang").value);
+  formData.append("part_number", document.getElementById("part_number").value);
+  formData.append("ikut_set", getIkutSetValue());
+  formData.append("dikalikan", document.getElementById("dikalikan").value);
+
+  const gambarFile = document.getElementById("gambar").files[0];
+  if (gambarFile) {
+    formData.append("gambar", gambarFile);
+  }
 
   spinner.classList.remove("d-none");
   try {
-    await authpw()
-    await pb.collection("yamaha_data_barang").create(data);
-    clearForm()
+    await authpw();
+    await pb.collection("yamaha_data_barang").create(formData);
+    clearForm();
     await loadData();
   } catch (err) {
     alert("Gagal tambah data: " + err.message);
@@ -122,6 +128,14 @@ async function editData(id) {
   const checkbox = document.getElementById("manualCheckbox");
   const options = Array.from(select.options).map(opt => opt.value);
 
+   // Tampilkan gambar jika ada
+  if (record.gambar) {
+    const gambarUrl = pb.files.getUrl(record, record.gambar);
+    const preview = document.getElementById("gambar-preview");
+    preview.src = gambarUrl;
+    preview.style.display = "block"; // pastikan preview terlihat
+  }
+
   if (options.includes(record.ikut_set)) {
     // Gunakan select
     select.value = record.ikut_set;
@@ -148,24 +162,29 @@ async function updateData() {
     return;
   }
 
-  const data = {
-    nama_barang: document.getElementById("nama_barang").value,
-    part_number: document.getElementById("part_number").value,
-    ikut_set:getIkutSetValue(),
-    dikalikan: document.getElementById("dikalikan").value,
-  };
+  const formData = new FormData();
+  formData.append("nama_barang", document.getElementById("nama_barang").value);
+  formData.append("part_number", document.getElementById("part_number").value);
+  formData.append("ikut_set", getIkutSetValue());
+  formData.append("dikalikan", document.getElementById("dikalikan").value);
+
+  const gambarFile = document.getElementById("gambar").files[0];
+  if (gambarFile) {
+    formData.append("gambar", gambarFile);
+  }
 
   spinner.classList.remove("d-none");
   try {
-    await pb.collection("yamaha_data_barang").update(id, data);
+    await authpw();
+    await pb.collection("yamaha_data_barang").update(id, formData);
     document.getElementById("edit-id").value = "";
-    clearForm()
+    clearForm();
     await loadData();
   } catch (err) {
     alert("Gagal update data: " + err.message);
   } finally {
     spinner.classList.add("d-none");
-     btnSave.disabled = false;
+    btnSave.disabled = false;
     btnSave.textContent = "Simpan";
   }
 }
@@ -185,7 +204,11 @@ function clearForm() {
   document.getElementById("ikut_set_select").value = "";
   document.getElementById("dikalikan").value = "";
   document.getElementById("edit-id").value = "";
-  
+  document.getElementById("gambar").value = "";
+
+   const preview = document.getElementById("gambar-preview");
+  preview.src = "";
+  preview.style.display = "none";
   // Reset checkbox dan tampilkan select (default mode)
   document.getElementById("manualCheckbox").checked = false;
   toggleManualInput(); // agar tampilan ikut_set kembali ke select
