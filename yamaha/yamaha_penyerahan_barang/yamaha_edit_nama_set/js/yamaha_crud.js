@@ -1,19 +1,15 @@
 const pb = new PocketBase(pocketbaseUrl);
 
 let listContainer = document.getElementById("data-list");
-const spinner = document.getElementById("loading");
+const spinner = document.getElementById("loading_data_set");
 
 // Login User
 async function authpw() {
   try {
-    spinner.classList.remove("d-none");
     await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
-    loadData();  // Panggil load data setelah login sukses
   } catch (err) {
     alert("Login gagal: " + err.message);
-  } finally {
-    spinner.classList.add("d-none");
-  }
+  } 
 }
 
 // Load Data
@@ -24,6 +20,7 @@ async function loadData() {
   spinner.classList.remove("d-none");
 
   try {
+    await authpw()
     const records = await pb.collection("yamaha_data_barang").getFullList({
       sort: "-created",
        autoCancel: true, 
@@ -33,8 +30,11 @@ async function loadData() {
 
     records.forEach(item => {
       const row = document.createElement("tr");
+      const imageUrl = `${pocketbaseUrl}/api/files/yamaha_data_barang/${item.id}/${item.gambar}`;
+
       row.innerHTML = `
         <td>${no}</td>
+        <td><img src="${imageUrl}" style="width:100px;height:80px" alt="gambar" /></td>
         <td>${item.nama_barang}</td>
         <td style="font-weight:bold">${item.part_number}-00-80</td>
         <td style="font-weight:bold">${item.ikut_set}</td>
@@ -47,15 +47,16 @@ async function loadData() {
       listContainer.appendChild(row);
       no++;  // naikkan nomor urut
     });
+    spinner.classList.add("d-none");
+
   } catch (err) {
     if (err.name === "AbortError") {
       console.log("Request loadData dibatalkan");
     } else {
       alert("Gagal load data: " + err.message);
     }
-  } finally {
-    spinner.classList.add("d-none");
-  }
+     spinner.classList.add("d-none");
+  } 
 }
 
 
@@ -75,14 +76,13 @@ async function createData() {
 
   spinner.classList.remove("d-none");
   try {
-    authpw()
+    await authpw()
     await pb.collection("yamaha_data_barang").create(data);
     clearForm()
-    loadData();
+    await loadData();
   } catch (err) {
     alert("Gagal tambah data: " + err.message);
   } finally {
-    spinner.classList.add("d-none");
     spinner.classList.add("d-none");
     btnSave.disabled = false;
     btnSave.textContent = "Simpan";
@@ -95,10 +95,10 @@ async function deleteData(id) {
 
   spinner.classList.remove("d-none");
   try {
-    authpw()
+    await authpw()
     await pb.collection("yamaha_data_barang").delete(id);
     clearForm()
-    loadData();
+    await loadData();
   } catch (err) {
     alert("Gagal hapus data: " + err.message);
   } finally {
@@ -160,7 +160,7 @@ async function updateData() {
     await pb.collection("yamaha_data_barang").update(id, data);
     document.getElementById("edit-id").value = "";
     clearForm()
-    loadData();
+    await loadData();
   } catch (err) {
     alert("Gagal update data: " + err.message);
   } finally {
