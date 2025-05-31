@@ -85,7 +85,6 @@ async function createData() {
     await authpw();
     await pb.collection("yamaha_data_barang").create(formData);
     clearForm();
-    await loadData();
   } catch (err) {
     alert("Gagal tambah data: " + err.message);
   } finally {
@@ -104,7 +103,6 @@ async function deleteData(id) {
     await authpw()
     await pb.collection("yamaha_data_barang").delete(id);
     clearForm()
-    await loadData();
   } catch (err) {
     alert("Gagal hapus data: " + err.message);
   } finally {
@@ -179,8 +177,6 @@ async function updateData() {
     await pb.collection("yamaha_data_barang").update(id, formData);
     document.getElementById("edit-id").value = "";
     clearForm();
-    await loadData();
-  } catch (err) {
     alert("Gagal update data: " + err.message);
   } finally {
     spinner.classList.add("d-none");
@@ -198,21 +194,9 @@ function getIkutSetValue() {
 
 
 function clearForm() {
-  document.getElementById("nama_barang").value = "";
-  document.getElementById("part_number").value = "";
-  document.getElementById("ikut_set_input").value = "";
-  document.getElementById("ikut_set_select").value = "";
-  document.getElementById("dikalikan").value = "";
-  document.getElementById("edit-id").value = "";
-  document.getElementById("gambar").value = "";
-
-   const preview = document.getElementById("gambar-preview");
-  preview.src = "";
-  preview.style.display = "none";
-  // Reset checkbox dan tampilkan select (default mode)
-  document.getElementById("manualCheckbox").checked = false;
-  toggleManualInput(); // agar tampilan ikut_set kembali ke select
+  window.location.reload();
 }
+
 
 
 
