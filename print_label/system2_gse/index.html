@@ -103,6 +103,19 @@
 </div>
 <div class="container mt-5">
 <h4 style="font-weight: bold;">Buat Label Partnumber</h4>
+
+<button class="btn btn-info" id="openModalBtn">Tambah Part Number Baru</button>
+
+<!-- Spinner Bootstrap, pasang di body HTML -->
+<div id="loadingSpinner" style=" position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); z-index:9999;">
+  <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+  </div>
+    <span class="text-center">Loading Part number...</span>
+</div>
+
+
+
+
 <form id="inputForm" class="card shadow" style="padding: 3px;">
 
 <div class="row">
@@ -370,86 +383,10 @@
 <script src="./js/check_barang.js"></script>
 <script src="./js/load_input.js"></script>
 <script src="./js/check_akun/akun.js"></script>
+<script src="./js_tambah_part/crud_part.js"></script>
 <script>
 
-let search_part = [
-    {
-        "nama_part":"MARK,HONDA 90 MM TYPE 1 CBS",
-        "part_no":"86103K0WNA000001"
-    },
-    {
-        "nama_part":"MARK,HONDA 90 MM TYPE 2 ABS",
-        "part_no":"86103K0WNA000002"
-    },
-    {
-        "nama_part":"EMBLEM,ADV 160 TYPE 1",
-        "part_no":"86835K0WNA000001"
-    },
-    {
-        "nama_part":"EMBLEM,ADV 160 TYPE 2",
-        "part_no":"86835K0WNA000002"
-    },
-  {
-        "nama_part":"EMBLEM,ADV 160 TYPE 3",
-        "part_no":"86835K0WNA000003"
-    },
-    {
-        "nama_part":"MARK,SCOOPY & LINNER SET  TYPE 1",
-        "part_no":"8683AK2FND00DL01"
-    },
-    {
-        "nama_part":"MARK,SCOOPY & LINNER SET  TYPE 2",
-        "part_no":"8683AK2FND00DL02"
-    },
-    {
-        "nama_part":"EMBLEM,BODY COVER TYPE 1",
-        "part_no":"86833K3VN1000001"
-    },
-    {
-        "nama_part":"EMBLEM,,BEAT TYPE 1",
-        "part_no":"86834K1AN9010001"
-    },
-    {
-        "nama_part":"EMBLEM,PCX 160 TYPE 3",
-        "part_no":"86830K1ZNA000003"
-    },
-    {
-        "nama_part":"GESIT TEXT EMBLEM R",
-        "part_no":"G1.20-D01-0110R"
-    },
-    {
-        "nama_part":"SOFT EMBLEM FOX S",
-        "part_no":"SN89A834"
-    },
 
-]
-
-$(document).ready(function () {
-// Inisialisasi Select2
-$("#search-part").select2({
-    placeholder: "Cari Nama Part atau Part No",
-    allowClear: true,
-    data: search_part.map(item => ({
-        id: item.part_no,
-        text: `${item.nama_part} (${item.part_no})`,
-        nama_part: item.nama_part,  // Simpan nama_part di data
-        part_no: item.part_no       // Simpan part_no di data
-    }))
-});
-
-// Event saat memilih part
-$("#search-part").on("change", function () {
-    let selectedData = $("#search-part").select2("data")[0]; // Ambil data terpilih
-
-    if (selectedData) {
-        $("#part_number").val(selectedData.part_no);  // Isi Part Number
-        $("#nama_barang").val(selectedData.nama_part); // Isi Nama Barang
-    } else {
-        $("#part_number").val("");  // Kosongkan jika tidak ada yang dipilih
-        $("#nama_barang").val("");
-    }
-});
-});
 
 const pb = new PocketBase(pocketbaseUrl);
 
