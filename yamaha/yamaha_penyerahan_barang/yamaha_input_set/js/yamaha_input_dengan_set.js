@@ -104,8 +104,13 @@ for (const [setName, items] of Object.entries(groupedData)) {
 
                        <td>
                 <select class="form-control select-dikalikan" data-part="${item.part_number}">
-                    ${[...Array(10).keys()].map(i => `<option value="${i + 1}">${i + 1}</option>`).join("")}
+                  ${[...Array(10).keys()].map(i => {
+                      const value = i + 1;
+                      const selected = parseInt(item.dikalikan) === value ? 'selected' : '';
+                      return `<option value="${value}" ${selected}>${value}</option>`;
+                  }).join("")}
                 </select>
+
             </td>
 
                     </tr>

@@ -27,7 +27,6 @@ async function searchDO(partNoValue) {
 
     // Ambil data dari PocketBase
     const records = await pb.collection('yamaha_do').getFullList({
-      sort: '-created',
       filter: `no_do = "${partNoValue}"`,
     });
 
@@ -55,6 +54,7 @@ async function searchDO(partNoValue) {
       } else {
         try {
           await pb.collection('yamaha_do').delete(record.id);
+        showStatus("Lagi Menghapus Upload DO Excel yg Dobel Upload");
           console.log(`Deleted duplicate part_number ${record.part_number} with id ${record.id}`);
           playSound('../../../suara/yamaha_part_number_sama_dihapus.mp3');
         } catch (delErr) {
