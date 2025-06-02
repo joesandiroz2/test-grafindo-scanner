@@ -82,6 +82,7 @@ for (const [setName, items] of Object.entries(groupedData)) {
                     <th>Gambar</th>
                     <th>Nama Barang</th>
                     <th>Part Number</th>
+                    <th>Stok Awal/Akhir</th>
                       <th>Dikalikan</th> 
                 </tr>
             </thead>
@@ -92,6 +93,15 @@ for (const [setName, items] of Object.entries(groupedData)) {
                         <td><img src="${pocketbaseUrl}/api/files/yamaha_data_barang/${item.id}/${item.gambar}" style="width:100px;height:40px"></td>
                         <td>${item.nama_barang}</td>
                         <td style="font-weight:bold">${item.part_number}</td>
+                      <td colspan="2">
+                        <div class="stok-info mt-1" data-part="${item.part_number}">
+                            <span class="stok-awal">Stok Awal: ...</span> 
+                            <span class="stok-awal-bulan">Awal Bulan: ...</span>
+                            <span class="stok-akhir">Stok Akhir: ...</span>
+                      
+                        </div>
+                    </td>
+
                        <td>
                 <select class="form-control select-dikalikan" data-part="${item.part_number}">
                     ${[...Array(10).keys()].map(i => `<option value="${i + 1}">${i + 1}</option>`).join("")}
@@ -113,6 +123,7 @@ document.querySelectorAll(".tambah-pb").forEach(button => {
         openModal(setName);
     });
 });
+
 }
 
 function openModal(setName) {
@@ -258,3 +269,96 @@ document.getElementById("btnCariSet").addEventListener("click", () => {
         Swal.fire("Pilih Set", "Silakan pilih nama set terlebih dahulu.", "warning");
     }
 });
+
+
+// hitung stok awal akhir
+document.getElementById("btn-tampilkan-semua-stok").addEventListener("click", async function() {
+  const btn = this;
+
+  // Disable tombol dan ubah teks
+  btn.disabled = true;
+  btn.textContent = "Sedang cek stok...";
+
+  const stokElements = document.querySelectorAll(".stok-info");
+
+  for (const el of stokElements) {
+    const partNumber = el.getAttribute("data-part");
+
+    const stokAwalSpan = el.querySelector(".stok-awal");
+    const stokAwalBulanSpan = el.querySelector(".stok-awal-bulan");
+    const stokAkhirSpan = el.querySelector(".stok-akhir");
+
+    stokAwalSpan.textContent = "Stok Awal: ...";
+    stokAwalBulanSpan.textContent = "Stok Awal Bulan: ...";
+    stokAkhirSpan.textContent = "Stok Akhir: ...";
+
+    const { stokAwal, stokAwalBulan, stokAkhir } = await getStokAwalAkhir(partNumber);
+
+    let bulanSingkat = stokAwalBulan;
+    if (stokAwalBulan) {
+      const parts = stokAwalBulan.split(' ');
+      if (parts.length >= 2) {
+        const bulan = parts[0].substring(0,3).toUpperCase();
+        const tahun = parts[1];
+        bulanSingkat = `${bulan} ${tahun}`;
+      }
+    }
+    console.log('stokAwalBulan:', stokAwalBulan);
+
+    stokAwalSpan.textContent = `Stok Awal: ${stokAwal}`;
+    stokAwalBulanSpan.textContent = `Stok Awal Bulan: ${bulanSingkat}`;
+    stokAkhirSpan.textContent = `Stok Akhir: ${stokAkhir}`;
+  }
+
+  // Enable tombol dan kembalikan teks awal
+  btn.disabled = false;
+  btn.textContent = "Tampilkan Semua Stok";
+});
+
+
+async function getStokAwalAkhir(partNumber) {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+
+  // Format tanggal string
+  function formatDate(d) {
+    return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
+  }
+
+  // Dapatkan tanggal terakhir bulan sebelumnya
+  const lastDayPrevMonth = new Date(year, month - 1, 0); // 0 hari bulan ini artinya hari terakhir bulan sebelumnya
+  const lastDatePrevMonthStr = formatDate(lastDayPrevMonth);
+
+  // Tanggal 1 bulan ini (stok awal bulan)
+  const firstDayThisMonth = new Date(year, month - 1, 1);
+  const firstDateThisMonthStr = formatDate(firstDayThisMonth);
+
+  // Tanggal terakhir bulan ini (stok akhir)
+  const lastDayThisMonth = new Date(year, month, 0);
+  const lastDateThisMonthStr = formatDate(lastDayThisMonth);
+
+  // Ambil stok terakhir bulan sebelumnya (stok awal)
+  const stokAwalResult = await pb.collection("yamaha_kartu_stok").getList(1, 1, {
+    filter: `part_number = "${partNumber}"`,
+  });
+
+  // Ambil stok awal bulan ini (tanggal 1 bulan ini)
+  const stokAwalBulanResult = await pb.collection("yamaha_kartu_stok").getList(1, 1, {
+    filter: `part_number = "${partNumber}" && created >= "${firstDateThisMonthStr}T00:00:00"`,
+    sort: "created" // data paling awal bulan ini
+  });
+
+  // Ambil stok akhir bulan ini (tanggal terakhir bulan ini)
+  const stokAkhirResult = await pb.collection("yamaha_kartu_stok").getList(1, 1, {
+    filter: `part_number = "${partNumber}" && created <= "${lastDateThisMonthStr}T23:59:59"`,
+    sort: "-created" // data terbaru bulan ini
+  });
+
+  // Ambil balance dari masing-masing query, jika kosong maka default 0
+  const stokAwal = stokAwalResult.items.length > 0 ? stokAwalResult.items[0].balance : 0;
+  const stokAwalBulan = stokAwalBulanResult.items.length > 0 ? stokAwalBulanResult.items[0].balance : stokAwal; // fallback ke stokAwal
+  const stokAkhir = stokAkhirResult.items.length > 0 ? stokAkhirResult.items[0].balance : stokAwalBulan;
+
+  return { stokAwal, stokAwalBulan, stokAkhir };
+}

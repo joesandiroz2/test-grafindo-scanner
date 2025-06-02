@@ -3,7 +3,7 @@ let timeout = null;
 let doData = []; // akan menyimpan hasil search DO
 let buffer = '';
 let typingTimer;
-let doneTypingInterval = 1000; // 0.7 detik setelah user berhenti ngetik
+let doneTypingInterval = 700; // 0.7 detik setelah user berhenti ngetik
 
 const spinner = document.getElementById('loading-spinner');
 const statusMessage = document.getElementById('status-message');
@@ -118,19 +118,23 @@ function cekSemuaBarangSudahSelesai(data) {
 
 
 
-// Deteksi input manual di input1 (DO)
-document.getElementById('input-partno').addEventListener('input', function () {
-  clearTimeout(typingTimer);
-  typingTimer = setTimeout(() => {
-    const doVal = document.getElementById('input-partno').value.trim();
+
+document.getElementById('input-partno').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+
+    // Ambil value dan bersihkan enter atau newline
+    const rawVal = this.value;
+    const doVal = rawVal.replace(/[\n\r]/g, '').trim(); // buang \n dan \r
     const qtyVal = document.getElementById('input-qty').value.trim();
 
     if (doVal && !qtyVal) {
       searchDO(doVal);
       playSound('../../../suara/yamaha_scan_do.mp3');
-
+      this.value = ''; // reset kalau perlu
+      this.focus();    // tetap fokus di input
     }
-  }, doneTypingInterval);
+  }
 });
 
 
