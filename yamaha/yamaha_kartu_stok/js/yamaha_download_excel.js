@@ -81,7 +81,17 @@ document.getElementById("downloadexcel").addEventListener("click", async functio
 
         const ws = XLSX.utils.json_to_sheet(excelData, { origin: "A3" });
 
-        ws['A1'] = { t: 's', v: 'FRM-INV-06' };
+        const userGrafindo = localStorage.getItem("user-grafindo");
+
+        let a1Value = ""; // default kosong
+        if (userGrafindo === "kamto@gmail.com") {
+            a1Value = "FRM-INV-06";
+        } else if (userGrafindo === "pika@gmail.com") {
+            a1Value = "FRM-DEPO-02";
+        }
+
+        ws['A1'] = { t: 's', v: a1Value };
+
         ws['C1'] = { t: 's', v: 'KARTU STOK' };
 
         ws['!merges'] = ws['!merges'] || [];

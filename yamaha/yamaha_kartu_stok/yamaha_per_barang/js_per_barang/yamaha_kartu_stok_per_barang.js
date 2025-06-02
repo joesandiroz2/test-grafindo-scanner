@@ -297,6 +297,16 @@ function downloadExcel(data) {
     const partNumber = data[0].part_number; // Ambil part_number dari item pertama
     const namaBarang = data[0].nama_barang; // Ambil nama_barang dari item pertama
 
+    const userGrafindo = localStorage.getItem("user-grafindo");
+
+    let a1Value = ""; // default kosong
+    if (userGrafindo === "kamto@gmail.com") {
+        a1Value = "FRM-INV-06";
+    } else if (userGrafindo === "pika@gmail.com") {
+        a1Value = "FRM-DEPO-02";
+    }
+
+
     // Format data untuk worksheet
     const formattedData = data.map((item, index) => ({
         No: index + 1,
@@ -306,17 +316,34 @@ function downloadExcel(data) {
         part_number: item.part_number,
         nama_barang: item.nama_barang,
         no_do: item.no_do,
-        tgl_do: formatDateExcel(item.tgl_do), // Format tanggal
+        tgl_do: item.tgl_do, // Format tanggal
         tgl_pb: formatDateExcel(item.tgl_pb), // Format tanggal
         created: formatDateExcel(item.created) // Format tanggal
     }));
 
     // Buat workbook dan worksheet
     const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+    const ws = XLSX.utils.aoa_to_sheet([]); // Buat worksheet kosong
+
+    // Tulis data mulai dari A3 agar tidak tabrakan dengan A1 & C1
+    XLSX.utils.sheet_add_json(ws, formattedData, { origin: "A3", skipHeader: false });
+
+
+    // Tambahkan header manual di baris 1 sesuai permintaan
+    // A1 : formFormat (merge A1:B1)
+        ws['A1'] = { t: 's', v: a1Value };
+
+        ws['C1'] = { t: 's', v: 'KARTU STOK' };
+
+        ws['!merges'] = ws['!merges'] || [];
+        ws['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: 1 } });
+        ws['!merges'].push({ s: { r: 0, c: 2 }, e: { r: 0, c: 9 } });
+
+        ws['C1'].s = { font: { bold: true, sz: 30 }, alignment: { horizontal: "center" } };
+        ws['A1'].s = { alignment: { horizontal: "center" } };
 
     // Tambahkan worksheet ke workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Kartu Stok');
+    XLSX.utils.book_append_sheet(workbook, ws, 'Kartu Stok');
 
     // Buat nama file dengan format yang diinginkan
     const currentDate = new Date();
