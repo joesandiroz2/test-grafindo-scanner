@@ -3,7 +3,7 @@ let timeout = null;
 let doData = []; // akan menyimpan hasil search DO
 let buffer = '';
 let typingTimer;
-let doneTypingInterval = 700; // 0.7 detik setelah user berhenti ngetik
+let doneTypingInterval = 1000; // 0.7 detik setelah user berhenti ngetik
 
 const spinner = document.getElementById('loading-spinner');
 const statusMessage = document.getElementById('status-message');
