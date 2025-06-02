@@ -28,7 +28,7 @@ async function searchDO(partNoValue) {
     // Ambil data dari PocketBase
     const records = await pb.collection('yamaha_do').getFullList({
       sort: '-created',
-      filter: `no_do ~ "${partNoValue}"`,
+      filter: `no_do = "${partNoValue}"`,
     });
 
     const currentNoDo = records.length > 0 ? records[0].no_do : null;
