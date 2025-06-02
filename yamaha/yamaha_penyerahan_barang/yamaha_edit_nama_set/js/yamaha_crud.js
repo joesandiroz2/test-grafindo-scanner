@@ -70,9 +70,15 @@ async function createData() {
   btnSave.textContent = "Sedang menyimpan...";
 
   const formData = new FormData();
-  formData.append("nama_barang", document.getElementById("nama_barang").value);
-  formData.append("part_number", document.getElementById("part_number").value);
-  formData.append("ikut_set", getIkutSetValue());
+ let namaBarang = document.getElementById("nama_barang").value.toUpperCase();
+ formData.append("nama_barang", namaBarang);
+
+ let partNumber = document.getElementById("part_number").value;
+partNumber = partNumber.replace(/\s+/g, "").toUpperCase(); // Hilangkan spasi & kapital semua
+formData.append("part_number", partNumber);
+  
+  let ikutSet = getIkutSetValue().toUpperCase();
+  formData.append("ikut_set", ikutSet);
   formData.append("dikalikan", document.getElementById("dikalikan").value);
 
   const gambarFile = document.getElementById("gambar").files[0];
