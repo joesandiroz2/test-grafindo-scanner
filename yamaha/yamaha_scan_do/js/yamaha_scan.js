@@ -15,23 +15,7 @@ const inputQty = document.getElementById('input-qty');
 
 
 
-function playSound(filePath) {
-  const audio = document.getElementById("notif-sound");
 
-  // Cegah gangguan jika audio sedang dimainkan
-  if (!audio.paused) {
-    audio.pause();
-    audio.currentTime = 0;
-  }
-
-  // Ganti source dan mainkan
-  audio.src = filePath;
-
-  // Tunggu sampai metadata/audio siap sebelum play
-  audio.onloadedmetadata = () => {
-    audio.play().catch(e => console.warn("Audio play failed:", e));
-  };
-}
 
 
 // Tampilkan pesan status
@@ -55,8 +39,8 @@ function hideLoading() {
 function renderTable(data) {
   tableBody.innerHTML = '';
   if (data.length === 0) {
-    showStatus("DO ini belum di Upload di sistem ini");
-      playSound('../../../suara/yamaha_do_belum_ada_di_sistem.mp3');
+    showStatus("DO  belum di Upload ");
+    playSound('../../../suara/yamaha_do_belum_ada_di_sistem.mp3');
     
     return;
   }
@@ -72,21 +56,20 @@ function renderTable(data) {
      const isFull = parseInt(item.qty) === totalScanned;
     const checkIcon = isFull ? "✅" : "";
 
+    const rowStyle = totalScanned === 0
+      ? ''
+      : isFull
+        ? 'style="background-color: green; font-weight: bold; color: white;"'
+        : 'style="background-color: orange; font-weight: bold; color: black;"';
+
+
     tableBody.innerHTML += `
        <tr >
-       <td>${index + 1}</td>
-        <td>${item.kode_depan + item.no_do}</td>
-        <td>${item.part_number}</td>
-        <td>${item.nama_barang}</td>
-          <td 
-        ${
-          totalScanned === 0
-            ? ''
-            : totalScanned === parseInt(item.qty)
-              ? 'style="background-color: green; font-weight: bold; color: white;"'
-              : 'style="background-color: orange; font-weight: bold; color: black;"'
-        }
-      >
+       <td ${rowStyle}>${index + 1}</td>
+        <td ${rowStyle}>${item.kode_depan + item.no_do}</td>
+        <td ${rowStyle}>${item.part_number}</td>
+        <td ${rowStyle}>${item.nama_barang}</td>
+          <td ${rowStyle}>
         ${item.qty} (scan: ${totalScanned}) ${checkIcon}
       </td>
 
@@ -141,12 +124,13 @@ document.getElementById('input-partno').addEventListener('keydown', function (e)
 
 
 function submitData() {
-  const kode = document.getElementById('input-partno').value;
+  let kode = document.getElementById('input-partno').value;
   const qty = document.getElementById('input-qty').value;
+
+  kode = kode.toUpperCase().replace(/\s+/g, '');
 
   // Tampilkan alert atau kirim ke server
      simpanKeKartuDO(kode, qty);
-      playSound('../../../suara/yamaha_scan_do.mp3');
   
   // Kosongkan dan fokus kembali ke input DO
   document.getElementById('input-partno').value = '';

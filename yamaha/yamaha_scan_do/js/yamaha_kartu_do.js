@@ -29,7 +29,7 @@ function simpanKeKartuDO(partno, qty) {
   // Jika DO sudah terpenuhi, input berikutnya langsung proses
   if (doFulfilled[partno]) {
     proses_cek_scan(partno, qtyInt, doData); // hanya kirim qty terbaru
-    showStatus(`✅ KARTU DO OK : ${partno} qty ${qtyInt}`);
+    showStatus(`✅ Sedang Menginput data Scan....`);
     return;
   }
 
@@ -40,9 +40,10 @@ function simpanKeKartuDO(partno, qty) {
 
   if (newTotalQty < qtyDo) {
     showStatus(`✅ Mengecek  KARTU DO (${partno} total: ${newTotalQty}/${qtyDo})`);
+    
     playSound('../../../suara/yamaha_cek_kartu_do.mp3');
   } else if (newTotalQty === qtyDo) {
-    showStatus(`✅ Lanjut scan barang ${partno} `);
+    showStatus(`🔥 BARANG NYA ${partno} 🔥`);
     playSound('../../../suara/yamaha_lanjut_scan_barang.mp3');
     
     doFulfilled[partno] = true; // tandai DO-nya sudah terpenuhi
@@ -84,7 +85,28 @@ function renderKartuDO() {
     const qtyDo = doItem ? parseInt(doItem.qty) : 0;
     const isFull = totalQty === qtyDo;
     const emoji = isFull ? " ✅" : "";
-    html += `<li style="font-size:20px"><strong>${partno}</strong>: Total Qty kartu <strong>${totalQty} dari Qty Do ${qtyDo}</strong>${emoji}</li>`;
+    const bgColor = isFull ? 'green' : 'red';
+
+    const label = isFull
+      ? `<span style="background-color: white; color: green; font-weight: bold; padding: 3px;">FULL</span> OK ✅`
+      : `<span style="background-color: white; color: red; font-weight: bold; padding: 3px;">TIDAK FULL</span>`;
+
+
+     const text = isFull
+      ? `${partno}: Qty ${totalQty} / ${qtyDo} ${label}`
+      : `${partno}: Qty ${totalQty} dari ${qtyDo} ${label}`;
+
+
+    html += `<li style="
+     background-color: ${bgColor};
+        color: white;
+        font-weight: bold;
+        padding: 8px;
+        margin-bottom: 5px;
+        border-radius: 5px;
+    font-size:20px">
+     ${text}
+    </li>`;
   }
   html += "</ul>";
 
