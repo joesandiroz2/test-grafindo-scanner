@@ -33,9 +33,8 @@ async function searchDo(no_do) {
         grouped[no_do][part_number].qty_scan += parseInt(stok.qty_scan) || 0;
       }
     }
-
-    renderReport(grouped);
-
+    const groupedOrder = [no_do]; // Tambahkan ini
+    renderReport(grouped, groupedOrder); // Panggil dengan dua argumen
   } catch (error) {
     console.error("Gagal cari DO:", error);
     Swal.fire("Error", "Gagal mencari data DO.", "error");
