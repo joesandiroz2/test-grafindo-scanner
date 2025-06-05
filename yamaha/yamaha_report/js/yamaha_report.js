@@ -14,10 +14,8 @@ async function fetchReportData() {
   try {
     await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
 
-    const unikNoDoResult = await pb.collection("yamaha_unik_no_do").getList(currentPage, perPage, {
-      sort: "-created",
-    });
-
+    const unikNoDoResult = await pb.collection("yamaha_unik_no_do").getList(currentPage, perPage);
+    console.log(unikNoDoResult)
     const grouped = {};
     const totalItems = unikNoDoResult.items.length;
 
@@ -27,8 +25,7 @@ async function fetchReportData() {
 
       // Ambil data dari kartu stok dengan filter status=keluar dan no_do = item.no_do
       const kartuStokItems = await pb.collection("yamaha_kartu_stok").getFullList({
-        filter: `no_do="${no_do}"`,
-        sort: "-created"
+        filter: `no_do="${no_do}"`
       });
 
       if (!grouped[no_do]) grouped[no_do] = {};
