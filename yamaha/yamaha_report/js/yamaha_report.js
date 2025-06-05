@@ -14,7 +14,9 @@ async function fetchReportData() {
   try {
     await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
 
-    const unikNoDoResult = await pb.collection("yamaha_unik_no_do").getList(currentPage, perPage);
+    const unikNoDoResult = await pb.collection("yamaha_unik_no_do").getList(currentPage, perPage,{
+      sort:"-created"
+    });
     console.log(unikNoDoResult)
     const grouped = {};
     const totalItems = unikNoDoResult.items.length;
