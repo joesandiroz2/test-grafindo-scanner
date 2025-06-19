@@ -1,6 +1,7 @@
 let kartuDO = [];
 let doFulfilled = {}; // penanda DO partno yang sudah penuh
 let noDoTerakhir = null;
+let partnoYangHarusDiproses = null; // ⬅️ Tambahan penting!
 
 
 function simpanKeKartuDO(partno, qty) {
@@ -26,15 +27,39 @@ function simpanKeKartuDO(partno, qty) {
     .filter(item => item.partno === partno)
     .reduce((sum, item) => sum + item.qty, 0);
 
+    // ✅ Cek jika sedang proses partno yang sudah FULL sebelumnya
+  // Jika sedang proses partno lain, jangan lanjut sebelum full scan
+if (partnoYangHarusDiproses && partno !== partnoYangHarusDiproses) {
+  const partnoSebelumnya = partnoYangHarusDiproses;
+  const doItemSebelumnya = doData.find(item => item.part_number === partnoSebelumnya);
+  const qtyDoSebelumnya = parseInt(doItemSebelumnya.qty);
+
+  // Hitung total scan dari scanData
+  const totalQtyScanSebelumnya = scanData
+    .filter(item => item.part_number === partnoSebelumnya)
+    .reduce((sum, item) => sum + parseInt(item.qty_scan || 0), 0);
+
+  if (totalQtyScanSebelumnya >= qtyDoSebelumnya) {
+    // Sudah scan penuh, partno bisa diganti
+    partnoYangHarusDiproses = null;
+  } else {
+    showStatus("❌ Barang Ga sesuai dengan partnumber Kartu DO");
+    playSound('../../../suara/yamaha_kartu_do_ga_sesuai_barang.mp3');
+    resetInputan();
+    return;
+  }
+}
+
   // Jika DO sudah terpenuhi, input berikutnya langsung proses
-  if (doFulfilled[partno]) {
-    proses_cek_scan(partno, qtyInt, doData); // hanya kirim qty terbaru
+   if (doFulfilled[partno]) {
+    proses_cek_scan(partno, qtyInt, doData);
     showStatus(`✅ Sedang Menginput data Scan....`);
     return;
   }
 
   // Simpan ke kartuDO
   kartuDO.push({ partno, qty: qtyInt });
+  partnoYangHarusDiproses = partno; // kunci sampai benar-benar scan
 
   const newTotalQty = totalQty + qtyInt;
 

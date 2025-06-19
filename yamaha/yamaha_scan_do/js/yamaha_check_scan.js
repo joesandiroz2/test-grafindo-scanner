@@ -1,5 +1,12 @@
 
 async function proses_cek_scan(partno, qty, dataDo) {
+   // ambil elemen
+  const inpPart = document.getElementById('input-partno');
+  const inpQty  = document.getElementById('input-qty');
+  const btn     = document.querySelector('#scan-form button');
+
+  // disable semuanya
+  inpPart.disabled = inpQty.disabled = btn.disabled = true;
 
   partno = partno.replace(/\s+/g, "").toUpperCase();
 
@@ -57,7 +64,7 @@ async function proses_cek_scan(partno, qty, dataDo) {
       totalQtyScanned = scannedItems.reduce((sum, item) => sum + parseInt(item.qty_scan || 0), 0);
     } catch (err) {
       console.error("Gagal mengambil data scan sebelumnya:", err);
-      showStatus("❌ Gagal ambil data scan sebelumnya!");
+      showStatus("❌ gagal , masalah koneksi internet , coba lagi ");
       return;
     }
 
@@ -65,7 +72,10 @@ async function proses_cek_scan(partno, qty, dataDo) {
     if (totalQtyScanned + qty_scan > qty_do) {
        showStatus(`❌ Part number "${partno}" sudah full scan! (Qty DO: ${qty_do}, sudah discan: ${totalQtyScanned})`);
       playSound('../../../suara/yamaha_scan_full.mp3');
-      resetInputan();
+      inpPart.disabled = inpQty.disabled = btn.disabled = false;
+    inpPart.value = '';
+    inpQty.value  = '';
+    inpPart.focus();
       return;
     }
 
@@ -86,7 +96,13 @@ async function proses_cek_scan(partno, qty, dataDo) {
       console.error("Gagal ambil balance terakhir:", error);
       showStatus("Gagal ambil saldo terakhir!");
       return;
-    }
+    }finally {
+    // enable kembali, sembunyikan spinner, fokus ke partno
+    inpPart.disabled = inpQty.disabled = btn.disabled = false;
+    inpPart.value = '';
+    inpQty.value  = '';
+    inpPart.focus();
+  }
     // ambil tgl do
     const found_tgl_do = dataDo.find(item => item.part_number === partno);
 
@@ -113,6 +129,11 @@ async function proses_cek_scan(partno, qty, dataDo) {
       showStatus("✅ Stok berhasil diperbarui!");
       playSound('../../../suara/yamaha_ok_berhasil.mp3');
       await searchDO(no_do)
+      // ✅ Tambahkan pengecekan ini setelah create berhasil:
+      if ((totalQtyScanned + qty_scan) === qty_do) {
+        partnoYangHarusDiproses = null;
+      }
+  
     } catch (err) {
       console.error("Gagal create data baru:", err);
       showStatus("❌ Gagal menyimpan data stok!");

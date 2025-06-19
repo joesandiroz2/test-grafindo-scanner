@@ -21,7 +21,7 @@ const inputQty = document.getElementById('input-qty');
 // Tampilkan pesan status
 function showStatus(text) {
   statusMessage.innerHTML = text;
-  statusMessage.className = `mt-3 bg-warning text-center fw-bold`;
+  statusMessage.className = `mt-3 white-text text-center fw-bold`;
 }
 
 // Tampilkan loading
