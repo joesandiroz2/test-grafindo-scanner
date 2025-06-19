@@ -53,6 +53,13 @@
              
               style="color:red; font-weight:bold;background-color:white; border:2px solid red; padding: 5px 10px; margin: 5px;">YAMAHA</a>
              </li>
+
+            <li class="nav-item" id="honda-nav">
+            <a 
+             href="/pages/honda.html"
+             
+              style="color:blue; font-weight:bold;background-color:white; border:2px solid blue; padding: 5px 10px; margin: 5px;">AHM</a>
+             </li>
         </li>
 
         <li class="nav-item" id="gselabel-nav" style="background-color:yellow;color:white;border-radius: 30px;">
@@ -153,6 +160,7 @@ function restrictMenu() {
         "gselabel-nav": document.getElementById("gselabel-nav"),
         "reportlabel-nav": document.getElementById("reportlabel-nav"),
         "yamaha-nav": document.getElementById("yamaha-nav"),
+        "honda-nav": document.getElementById("honda-nav"),
     };
 
     // Semua menu disembunyikan dulu
@@ -160,13 +168,13 @@ function restrictMenu() {
         if (item) item.style.display = "none";
     });
 if (userEmail === "sopian@gmail.com") {
-    // Tampilkan semua menu kecuali "gselabel-nav"
-    Object.keys(menuItems).forEach(menuId => {
-        if (menuId !== "gselabel-nav") {
-            menuItems[menuId].style.display = "block";
-        }
+    // Hanya tampilkan menu tertentu untuk Sopian
+    let allowedMenus = ["honda-nav", "yamaha-nav", "buatlabel-nav", "reportlabel-nav"];
+    allowedMenus.forEach(menuId => {
+        if (menuItems[menuId]) menuItems[menuId].style.display = "block";
     });
-} else if (userEmail === "daren.rasyidx@gmail.com") {
+}
+ else if (userEmail === "daren.rasyidx@gmail.com") {
     // User daren melihat semua menu
     Object.values(menuItems).forEach(item => {
         if (item) item.style.display = "block";
@@ -199,15 +207,8 @@ else if (userEmail === "kamto@gmail.com") {
     }else if (userEmail === "dian@gmail.com") {
     // Jika user dian@gmail.com, tampilkan menu tertentu
     let allowedMenus = [
-        "scan-do-nav",
-        "semua-do-nav",
-        "penyerahan-barang-nav",
-        "data-barang-nav",
-        "kesalahan-nav",
-        "kartu-stok-nav",
+        "honda-nav",
         "buatlabel-nav", 
-        "kartu-stok-perbarang-nav",
-        "report-detail-nav"
     ];
     allowedMenus.forEach(menuId => {
         if (menuItems[menuId]) menuItems[menuId].style.display = "block";
