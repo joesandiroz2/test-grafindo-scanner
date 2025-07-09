@@ -3,8 +3,9 @@ let doFulfilled = {}; // penanda DO partno yang sudah penuh
 let noDoTerakhir = null;
 let partnoYangHarusDiproses = null; // ⬅️ Tambahan penting!
 
+let isTerkunci = false;
 
-function simpanKeKartuDO(partno, qty) {
+function simpanKeKartuDO(partno, qty,nopo) {
   const qtyInt = parseInt(qty);
   if (isNaN(qtyInt) || qtyInt <= 0) {
     showStatus("❌ Qty tidak valid!");
@@ -19,6 +20,8 @@ function simpanKeKartuDO(partno, qty) {
     resetInputan();
     return;
   }
+
+  
 
   const qtyDo = parseInt(doItem.qty);
 
@@ -45,6 +48,16 @@ if (partnoYangHarusDiproses && partno !== partnoYangHarusDiproses) {
   } else {
     showStatus("❌ Barang Ga sesuai dengan partnumber Kartu DO");
     playSound('../../../suara/yamaha_kartu_do_ga_sesuai_barang.mp3');
+isTerkunci = true;
+document.getElementById("tabelscanner").setAttribute("style", "display: none !important;");
+
+   document.getElementById("doTerkunci").style.display = "block";
+
+
+// 🔒 Kunci DO ke PocketBase
+updateDoTerkunci(doItem.no_do);
+
+delete cacheByNoDo[doItem.no_do]; // <– Tambahkan ini
     resetInputan();
     return;
   }
@@ -52,8 +65,16 @@ if (partnoYangHarusDiproses && partno !== partnoYangHarusDiproses) {
 
   // Jika DO sudah terpenuhi, input berikutnya langsung proses
    if (doFulfilled[partno]) {
-    proses_cek_scan(partno, qtyInt, doData);
+    proses_cek_scan(partno, qtyInt, doData,nopo);
     showStatus(`✅ Sedang Menginput data Scan....`);
+    return;
+  }
+
+  // ✅ Cek apakah noPo sesuai dengan remarks dari DO
+  if (doItem.remarks && nopo !== doItem.remarks) {
+    showStatus(`❌ No PO / Remarks Kagak sesuai dengan remarks di Do!\n\nInput anda: ${nopo}\n  Dari  ${doItem.no_do} harusnya : ${doItem.remarks}`);
+    playSound('../../../suara/yamaha_kartu_do_po_ga_sesuai.mp3'); // opsional
+    resetInputan();
     return;
   }
 
@@ -137,3 +158,34 @@ function renderKartuDO() {
 
   div.innerHTML = html;
 }
+
+
+async function updateDoTerkunci(noDo) {
+  try {
+    // Ambil semua DO yang punya no_do sama
+    const records = await pb.collection('yamaha_do').getFullList({
+      filter: `no_do="${noDo}"`
+    });
+
+    if (records.length === 0) {
+      console.warn(`Tidak ada DO ditemukan dengan no_do = ${noDo}`);
+      return;
+    }
+
+    console.log(`Jumlah DO yang akan dikunci: ${records.length}`);
+
+    // Loop dan update semua record
+    for (const record of records) {
+      await pb.collection('yamaha_do').update(record.id, {
+        is_lock: "terkunci",
+        is_lock_msg: "Scan barang ga sesuai dengan kartu DO"
+      });
+      console.log(`Berhasil mengunci record ID: ${record.id}`);
+    }
+
+    console.log(`Semua DO dengan no_do ${noDo} berhasil dikunci`);
+  } catch (error) {
+    console.error('Gagal mengupdate yamaha_do:', error);
+  }
+}
+

@@ -1,12 +1,7 @@
 
-async function proses_cek_scan(partno, qty, dataDo) {
+async function proses_cek_scan(partno, qty, dataDo,nopo) {
    // ambil elemen
-  const inpPart = document.getElementById('input-partno');
-  const inpQty  = document.getElementById('input-qty');
-  const btn     = document.querySelector('#scan-form button');
-
-  // disable semuanya
-  inpPart.disabled = inpQty.disabled = btn.disabled = true;
+  const inpPart = inputPartNo
 
   partno = partno.replace(/\s+/g, "").toUpperCase();
 
@@ -72,10 +67,8 @@ async function proses_cek_scan(partno, qty, dataDo) {
     if (totalQtyScanned + qty_scan > qty_do) {
        showStatus(`❌ Part number "${partno}" sudah full scan! (Qty DO: ${qty_do}, sudah discan: ${totalQtyScanned})`);
       playSound('../../../suara/yamaha_scan_full.mp3');
-      inpPart.disabled = inpQty.disabled = btn.disabled = false;
-    inpPart.value = '';
-    inpQty.value  = '';
-    inpPart.focus();
+     
+    resetInputan()
       return;
     }
 
@@ -98,10 +91,9 @@ async function proses_cek_scan(partno, qty, dataDo) {
       return;
     }finally {
     // enable kembali, sembunyikan spinner, fokus ke partno
-    inpPart.disabled = inpQty.disabled = btn.disabled = false;
-    inpPart.value = '';
-    inpQty.value  = '';
-    inpPart.focus();
+   
+        resetInputan()
+
   }
     // ambil tgl do
     const found_tgl_do = dataDo.find(item => item.part_number === partno);
@@ -118,6 +110,7 @@ async function proses_cek_scan(partno, qty, dataDo) {
       remarks,
       balance,
       qty_masuk: "",
+      lot:nopo,
       tgl_pb: "",
       tgl_do:found_tgl_do.tgl_do || "",
       jumlah_barang: dataDo.length.toString()
@@ -149,7 +142,6 @@ async function proses_cek_scan(partno, qty, dataDo) {
 
 
 function resetInputan(){
-  document.getElementById('input-partno').value = '';
-  document.getElementById('input-qty').value = '';
-  document.getElementById('input-partno').focus();
+  document.getElementById('scannerInput').value = '';
+  document.getElementById('scannerInput').focus();
 }

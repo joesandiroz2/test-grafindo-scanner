@@ -9,12 +9,77 @@ const spinner = document.getElementById('loading-spinner');
 const statusMessage = document.getElementById('status-message');
 const tableBody = document.querySelector("#table-do-list tbody");
 
-const inputPartNo = document.getElementById('input-partno');
-const inputQty = document.getElementById('input-qty');
+let inputPartNo 
+let inputQty 
+let inputPo 
 
 
+window.onload = () => {
+  const input = document.getElementById('scannerInput');
+  if (!input) {
+    console.error("scannerInput tidak ditemukan!");
+    return;
+  }
+
+  let timeoutId;
+
+  function startTimer() {
+    clearTimeout(timeoutId);
+
+    timeoutId = setTimeout(() => {
+      const value = input.value.trim();
+      if (value) {
+        const illegalCharRegex = /[^a-zA-Z0-9\s\-]/;
+        if (illegalCharRegex.test(value)) {
+          alert(`⚠️ Input tidak standar: mengandung karakter ilegal\n\nInput: ${value}`);
+          return;
+        }
+
+        const parts = value.split(/\s+/);
+
+        // ❌ Jumlah blok tidak boleh 2 atau lebih dari 3
+        if (parts.length === 2 || parts.length > 3) {
+          alert(`⚠️ Input tidak standar: jumlah blok harus 1 atau 3, bukan ${parts.length}\n\nInput: ${value}`);
+          resetInputan()
+          return;
+        }
+
+        // ✅ Jika 1 blok → jalankan searchDO
+        if (parts.length === 1) {
+          const doVal = parts[0];
+          searchDO(doVal);
+          playSound('../../../suara/yamaha_scan_do.mp3');
+          input.value = '';        // kosongkan input
+          input.focus();           // kembalikan fokus
+          return;
+        }
+
+        // ✅ Jika 3 blok → tampilkan alert nilai1, nilai2, nilai3
+        if (parts.length === 3) {
+          inputPartNo = parts[0];
+          inputQty = parts[1];
+          let poRaw = parts[2].toUpperCase().trim();
+
+          if (poRaw.startsWith('#')) {
+            inputPo = poRaw; // Sudah pakai #, biarkan
+          } else if (poRaw.startsWith('K')) {
+            inputPo = '#' + poRaw.substring(1); // K00049 → #00049
+          } else if (/^\d+$/.test(poRaw)) {
+            inputPo = poRaw; // Angka murni → jangan pakai #
+          } else {
+            inputPo = '#' + poRaw; // Default, tetap tambahkan #
+          }
 
 
+          submitData()
+        }
+      }
+    }, 200); // 5 menit
+  }
+
+  startTimer();
+  input.addEventListener('input', startTimer);
+};
 
 
 
@@ -37,6 +102,7 @@ function hideLoading() {
 
 // Render tabel dari hasil pencarian
 function renderTable(data) {
+   
   tableBody.innerHTML = '';
   if (data.length === 0) {
     showStatus("DO  belum di Upload ");
@@ -69,6 +135,7 @@ function renderTable(data) {
         <td ${rowStyle}>${item.kode_depan + item.no_do}</td>
         <td ${rowStyle}>${item.part_number}</td>
         <td ${rowStyle}>${item.nama_barang}</td>
+        <td ${rowStyle}>${item.remarks}</td>
           <td ${rowStyle}>
         ${item.qty} (scan: ${totalScanned}) ${checkIcon}
       </td>
@@ -102,43 +169,20 @@ function cekSemuaBarangSudahSelesai(data) {
 
 
 
-document.getElementById('input-partno').addEventListener('keydown', function (e) {
-  if (e.key === 'Enter') {
-    e.preventDefault();
 
-    // Ambil value dan bersihkan enter atau newline
-    const rawVal = this.value;
-    const doVal = rawVal.replace(/[\n\r]/g, '').trim(); // buang \n dan \r
-    const qtyVal = document.getElementById('input-qty').value.trim();
-
-    if (doVal && !qtyVal) {
-      searchDO(doVal);
-      playSound('../../../suara/yamaha_scan_do.mp3');
-      this.value = ''; // reset kalau perlu
-      this.focus();    // tetap fokus di input
-    }
-  }
-});
 
 
 
 
 function submitData() {
-  let kode = document.getElementById('input-partno').value;
-  const qty = document.getElementById('input-qty').value;
-
-  kode = kode.toUpperCase().replace(/\s+/g, '');
 
   // Tampilkan alert atau kirim ke server
-     simpanKeKartuDO(kode, qty);
-  
-  // Kosongkan dan fokus kembali ke input DO
-  document.getElementById('input-partno').value = '';
-  document.getElementById('input-qty').value = '';
-  document.getElementById('input-partno').focus();
+     simpanKeKartuDO(inputPartNo, inputQty,inputPo);
+    document.getElementById('scannerInput').value = '';
+  document.getElementById('scannerInput').focus();
 }
 
-// Autofocus ke input DO saat pertama kali
-window.onload = () => {
-  document.getElementById('input-partno').focus();
-};
+
+
+
+
