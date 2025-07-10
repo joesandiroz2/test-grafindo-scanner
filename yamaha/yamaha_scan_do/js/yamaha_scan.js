@@ -31,7 +31,18 @@ window.onload = () => {
       if (value) {
         const illegalCharRegex = /[^a-zA-Z0-9\s\-]/;
         if (illegalCharRegex.test(value)) {
-          alert(`⚠️ Input tidak standar: mengandung karakter ilegal\n\nInput: ${value}`);
+          Swal.fire({
+            icon: 'warning',
+            title: '⚠️ Input tidak standar',
+            html: `Mengandung karakter ilegal<br><br><strong>Input:</strong> ${value}`,
+            timer: 1000,
+            showConfirmButton: false,
+            timerProgressBar: true
+          });
+          playSound('../../../suara/yamaha_partnumber_ga_standar.mp3');
+
+             input.value = '';        // kosongkan input
+            input.focus();           // kembalikan fokus
           return;
         }
 
@@ -39,7 +50,17 @@ window.onload = () => {
 
         // ❌ Jumlah blok tidak boleh 2 atau lebih dari 3
         if (parts.length === 2 || parts.length > 3) {
-          alert(`⚠️ Input tidak standar: jumlah blok harus 1 atau 3, bukan ${parts.length}\n\nInput: ${value}`);
+        Swal.fire({
+          icon: 'warning',
+          title: '⚠️ Input tidak standar',
+          html: `Jumlah blok harus 1 atau 3, bukan <strong>${parts.length}</strong><br><br><strong>Input:</strong> ${value}`,
+          timer: 1000,
+          showConfirmButton: false,
+          timerProgressBar: true
+        });
+          playSound('../../../suara/yamaha_partnumber_ga_standar.mp3');
+        
+
           resetInputan()
           return;
         }

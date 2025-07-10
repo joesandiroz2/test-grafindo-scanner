@@ -73,7 +73,7 @@ delete cacheByNoDo[doItem.no_do]; // <– Tambahkan ini
   // ✅ Cek apakah noPo sesuai dengan remarks dari DO
   if (doItem.remarks && nopo !== doItem.remarks) {
     showStatus(`❌ No PO / Remarks Kagak sesuai dengan remarks di Do!\n\nInput anda: ${nopo}\n  Dari  ${doItem.no_do} harusnya : ${doItem.remarks}`);
-    playSound('../../../suara/yamaha_kartu_do_po_ga_sesuai.mp3'); // opsional
+    playSound('../../../suara/yamaha_nomor_po_ga_sesuai.mp3'); // opsional
     resetInputan();
     return;
   }
