@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
 
     // Ambil hanya 50 data terbaru
-    const result = await pb.collection("yamaha_penyerahan_barang").getList(1, 50, {
+    const result = await pb.collection("yamaha_kartu_stok").getList(1, 50, {
       sort: "-created"
     });
     fullData = result.items;

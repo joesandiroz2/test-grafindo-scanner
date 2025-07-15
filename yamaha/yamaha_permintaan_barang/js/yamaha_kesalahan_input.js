@@ -24,48 +24,7 @@ async function Kurangi_stok_part() {
                 Swal.showLoading();
             }
         });
-        // ==============================
-        // proses yamaha penyerahan barang
-        const filterPenyerahan = `part_number="${partNumber}" && lot="${lot}"`;
-        const penyerahanList = await pb.collection('yamaha_penyerahan_barang').getList(1, 1, {
-            sort: '-created',
-            filter: filterPenyerahan
-        });
-
-        let bolehKurangi = false;
-        let dataPenyerahan = null;
-
-        if (penyerahanList.items.length > 0) {
-            dataPenyerahan = penyerahanList.items[0];
-            if (parseInt(dataPenyerahan.qty_masuk, 10) > 0) {
-                // Kurangi qty_masuk
-                const sisaQty = parseInt(dataPenyerahan.qty_masuk, 10) - qty_kurangi;
-                if (sisaQty < 0) {
-                    Swal.fire('Error', 'Qty yang dikurangi melebihi qty_masuk yang tersedia.', 'error');
-                    loadingButton.prop("disabled", false).text("Masukkan Qty");
-                    return;
-                }
-
-                // Update qty_masuk
-                await pb.collection('yamaha_penyerahan_barang').update(dataPenyerahan.id, {
-                    qty_masuk: sisaQty
-                });
-
-                bolehKurangi = true;
-            }
-        } else {
-            // Tidak ditemukan, tapi tetap lanjut ke kartu stok tanpa update penyerahan
-            bolehKurangi = true;
-        }
-
-        if (!bolehKurangi) {
-            Swal.fire('Dibatalkan', 'Tidak ditemukan atau qty_masuk 0.', 'info');
-            loadingButton.prop("disabled", false).text("Masukkan Qty");
-            return;
-        }
-    
-
-
+        
 
         // ==============================
         // proses yamaha kartu stok
