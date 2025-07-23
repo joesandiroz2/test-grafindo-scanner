@@ -218,7 +218,7 @@ function openBarenganPrint(merk, partNumber, namaBarang, qty, satuan, berapa_lem
         // **Loop berdasarkan jumlah label tanpa memisahkan lembar**
         for (let i = 0; i < jumlahLabelPerLembar; i++) {
             let qrData = (merk.toLowerCase() === 'yamaha') 
-                ? `${partNumber}|${supplierId}|${qty}` 
+                ? `${partNumber}|${supplierId}|${qty}|${lot}` 
                 : `${partNumber}|${supplierId}|${qty}|${lot}`;
                 let qrId = `qrcode-${partNumber.replace(/\s+/g, '')}-${lot}-${qty}-${i}`;
             
@@ -259,7 +259,7 @@ function openBarenganPrint(merk, partNumber, namaBarang, qty, satuan, berapa_lem
 
                 if (qrElement) {
                     let qrText = (merk.toLowerCase() === 'yamaha') 
-                        ? `${partNumber}|${supplierId}|${qty}`
+                        ? `${partNumber}|${supplierId}|${qty}|${lot}`
                         : `${partNumber}|${supplierId}|${qty}|${lot}`;
 
                     new QRCode(qrElement, {
@@ -355,7 +355,7 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, berapa_lembar
             // Loop untuk jumlah label per lembar
             for (let i = 0; i < satuan; i++) {
                 let qrData = (merk.toLowerCase() === 'yamaha') 
-                    ? `${partNumber}|${supplierId}|${qty}`
+                    ? `${partNumber}|${supplierId}|${qty}|${lot}`
                     : `${partNumber}|${supplierId}|${qty}|${lot}`;
 
 lembarHTML += `
@@ -393,7 +393,7 @@ lembarHTML += `
                 for (let i = 0; i < satuan; i++) {
                     new QRCode(document.getElementById(`qrcode-${l}-${i}`), {
                         text: (merk.toLowerCase() === 'yamaha') 
-                            ? `${partNumber}|${supplierId}|${qty}`
+                            ? `${partNumber}|${supplierId}|${qty}|${lot}`
                             : `${partNumber}|${supplierId}|${qty}|${lot}`,
                         width: 70,
                         height: 70,
