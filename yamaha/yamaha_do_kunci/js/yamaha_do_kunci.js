@@ -13,7 +13,14 @@ async function loginPocketBase() {
 }
 
 async function fetchDoTerkunci() {
+  const container = document.getElementById("daftarDoTerkunci");
+  const spinner = document.getElementById("loadingSpinner");
+
   try {
+
+    spinner.style.display = "inline-block"; // 🔄 Tampilkan spinner
+    container.innerHTML = ""; // Kosongkan dulu konten (tapi biarkan spinner tetap)
+
     await loginPocketBase();
 
     const records = await pb.collection("yamaha_do").getFullList({
@@ -36,8 +43,9 @@ async function fetchDoTerkunci() {
       }
     }
 
-    const container = document.getElementById("daftarDoTerkunci");
     container.innerHTML = "";
+
+     spinner.style.display = "none"; // ✅ Sembunyikan spinner
 
     if (uniqueNoDOs.length === 0) {
       container.innerHTML = "<div class='alert alert-success'>Tidak ada DO yang terkunci.</div>";
@@ -66,7 +74,7 @@ async function fetchDoTerkunci() {
             <td>${formatTanggal(item.created)}</td>
             <td>
               <button class="btn btn-sm btn-success perbaiki-btn" data-nodo="${item.no_do}">
-                Perbaiki dan kembalikan
+                Buka Kunci dan kembalikan
               </button>
             </td>
           </tr>
@@ -191,5 +199,6 @@ document.addEventListener("click", async (e) => {
 });
 
 
-// Mulai saat halaman siap
-fetchDoTerkunci();
+document.addEventListener("DOMContentLoaded", () => {
+  fetchDoTerkunci();
+});

@@ -116,6 +116,14 @@ async function proses_cek_scan(partno, qty, dataDo,nopo) {
       jumlah_barang: dataDo.length.toString()
     };
 
+
+    // ⛔ Cek apakah lot diawali dengan #
+    if (nopo.startsWith('#')) {
+      showStatus("⛔ No Lot diawali dengan '#' → Batal disimpan ke kartu stok.");
+      playSound('../../../suara/yamaha_nomor_lot_di_depan.mp3');
+      return;
+    }
+
     // Buat record baru
     try {
       await pb.collection("yamaha_kartu_stok").create(newData);

@@ -29,7 +29,8 @@ window.onload = () => {
     timeoutId = setTimeout(() => {
       const value = input.value.trim();
       if (value) {
-        const illegalCharRegex = /[^a-zA-Z0-9\s\-]/;
+        const illegalCharRegex = /[^a-zA-Z0-9\s\-#]/;
+
         if (illegalCharRegex.test(value)) {
           Swal.fire({
             icon: 'warning',
@@ -83,12 +84,11 @@ window.onload = () => {
 
           if (poRaw.startsWith('#')) {
             inputPo = poRaw; // Sudah pakai #, biarkan
-          } else if (poRaw.startsWith('K')) {
-            inputPo = '#' + poRaw.substring(1); // K00049 → #00049
-          } else if (/^\d+$/.test(poRaw)) {
+          }
+            else if (/^\d+$/.test(poRaw)) {
             inputPo = poRaw; // Angka murni → jangan pakai #
           } else {
-            inputPo = '#' + poRaw; // Default, tetap tambahkan #
+            inputPo = poRaw; // Default, tetap tambahkan #
           }
 
 
