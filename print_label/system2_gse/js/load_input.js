@@ -174,7 +174,7 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, berapa_lembar
                     : `${partNumber}|${supplierId}|${qty}|${lot}`;
 
 lembarHTML += `
-<div  style="color:black;padding: 3px  2px; width: calc(33.33% - 70px);display:inline-block">
+<div  style="color:black;padding: 30px  2px; width: calc(33.33% - 20px);display:inline-block">
     <div class="label" style=" page-break-inside: avoid; width:280px;border-radius:10px; border: 1px solid black;position: relative;margin-bottom:15px;margin-left:51px">
         <p style="font-size:10px;padding:0px;border-bottom:1px solid black;margin:0px;text-align:center; display:block;">PT. GRAFINDO MITRASEMESTA</p>
          <p class="no-margin" style="font-size:9px;text-decoration:underline; display: block; width: 100%; margin: 1px 0; line-height: 1;">Part Name &nbsp;&nbsp;&nbsp;:&nbsp;${namaBarang}</p>
