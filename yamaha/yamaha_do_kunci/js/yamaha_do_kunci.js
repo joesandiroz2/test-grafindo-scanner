@@ -167,7 +167,20 @@ document.addEventListener("click", async (e) => {
           is_lock: "",
           is_lock_msg: ""
         });
+
+        
       }
+
+      // Tambahkan sekali saja ke yamaha_do_kuncian
+    if (recordsToUpdate.length > 0) {
+      await pb.collection("yamaha_do_kuncian").create({
+        no_do: recordsToUpdate[0].no_do,
+        alasan: recordsToUpdate[0].is_lock_msg || "Scan ga sesuai kartu do dengan part no barang",
+        tgl_terkunci: recordsToUpdate[0].created
+      });
+    }
+
+
 
       // Toast berhasil
       Swal.fire({
