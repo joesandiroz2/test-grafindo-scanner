@@ -1,7 +1,7 @@
 // Fungsi untuk memeriksa barang berdasarkan nomor barang
-async function checkBarang() {
-       const nomor_barang = document.getElementById('partnumber_scan').value.trim().replace(/\s+/g, '').toUpperCase(); 
-    const qty = document.getElementById('qty_scan').value.trim(); // Ambil qty
+async function checkBarang(part_number,qty_part) {
+       const nomor_barang = part_number.trim().replace(/\s+/g, '').toUpperCase(); 
+    const qty = qty_part; // Ambil qty
     let nomorcari = `${nomor_barang.toUpperCase()}`
     console.log("nomorcari",nomorcari)
     document.getElementById('part_number').value = nomor_barang; // Set part_number
@@ -36,8 +36,7 @@ async function checkBarang() {
                 showConfirmButton: false,
                 timer: 1500
             });
-            document.getElementById('partnumber_scan').value = '';
-                document.getElementById('qty_scan').value = '';
+              
         } else {
             const audio = new Audio('../../suara/system2_partnumber_belom_ada.mp3');
             audio.play();
@@ -49,9 +48,10 @@ async function checkBarang() {
                 confirmButtonText: 'OK',
                 timer:1300
             });
-            document.getElementById('partnumber_scan').value = '';
-                document.getElementById('qty_scan').value = '';
-                document.getElementById('partnumber_scan').focus();
+            document.getElementById('qr_scanner').value = '';
+            document.getElementById('nama_barang').value = ''; // Set nama_barang
+
+            document.getElementById('qr_scanner').focus();
         }
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -64,18 +64,29 @@ async function checkBarang() {
     } 
 }
 
-// Event listener untuk menangani input scan
-// Fungsi untuk memeriksa apakah kedua input terisi
-function checkInputsAndRun() {
-    const nomor_barang = document.getElementById('partnumber_scan').value.trim();
-    const qty = document.getElementById('qty_scan').value.trim();
 
-    // Memastikan kedua input terisi
-    if (nomor_barang && qty) {
-        checkBarang(); // Panggil fungsi checkBarang jika kedua input terisi
-    }
-}
+let debounceTimer;
 
-// Event listener untuk menangani input scan
-document.getElementById('partnumber_scan').addEventListener('input', checkInputsAndRun);
-document.getElementById('qty_scan').addEventListener('input', checkInputsAndRun);
+document.getElementById('qr_scanner').addEventListener('input', function (e) {
+    clearTimeout(debounceTimer); // Reset timer setiap kali ada input baru
+
+    debounceTimer = setTimeout(() => {
+        const value = e.target.value.trim();
+
+        if (value.includes(" ") && value.length > 10) {
+            const parts = value.split(/\s+/); // Pisah semua spasi
+
+            if (parts.length >= 2) {
+                const partNumber = parts[0];
+                const qty = parts[1];
+
+                // Kosongkan input scanner agar bisa scan lagi
+                e.target.value = "";
+
+                // Panggil fungsi pengecekan
+                checkBarang(partNumber, qty);
+            }
+        }
+    }, 500); // Tunggu 600ms setelah input terakhir
+});
+
