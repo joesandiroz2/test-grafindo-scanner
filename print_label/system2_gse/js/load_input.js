@@ -2,59 +2,43 @@ let currentLoadPage = 1; // Ganti nama variabel untuk halaman saat ini
 const itemsPerPageLoad = 50; // Ganti nama variabel untuk jumlah item per halaman
 
 
-
 async function loadInputData(page = 1) {
     // Tampilkan loading spinner
     document.getElementById('loadinput').innerHTML = '<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>';
 
     const userGrafindo = localStorage.getItem('operator_label');
     try {
+        let allItems = JSON.parse(localStorage.getItem('scan_data') || '[]');
 
-        // Mengambil data dari API dengan pagination
-          // let url = `${pocketbaseUrl}/api/collections/system2_scan_input/records?page=${page}&perPage=${itemsPerPageLoad}`;
-        const allItems = JSON.parse(localStorage.getItem('scan_data') || '[]');
+        // Batasi maksimal 20 item, hapus yang paling awal jika lebih
+        // Maksimal simpan 8 data di localStorage
+            if (allItems.length > 20) {
+                allItems = allItems.slice(allItems.length - 20); // simpan 8 data terakhir
+                localStorage.setItem('scan_data', JSON.stringify(allItems));
+            }
 
-        // // Tambahkan filter jika user bukan "sopian@gmail.com"
-        // if (userGrafindo !== "sopian@gmail.com") {
-        //     url += `&filter=operator%20%3D%20%27${encodeURIComponent(userGrafindo)}%27`;
-        // }
-        // const response = await fetch(url);
-        
-        // if (!response.ok) {
-        //     throw new Error('Network response was not ok');
-        // }
 
-        // const result = await response.json();
-        // const items = result.items;
-         // Filter jika bukan sopian@gmail.com
+        // Filter jika bukan sopian@gmail.com
         const filteredItems = userGrafindo !== "sopian@gmail.com"
             ? allItems.filter(item => item.operator === userGrafindo)
             : allItems;
 
-        // Urutkan dari yang terbaru berdasarkan tgl_inspeksi
-        filteredItems.sort((a, b) => new Date(b.tgl_inspeksi) - new Date(a.tgl_inspeksi));
+        // Urutkan berdasarkan index terbaru (data paling akhir ditampilkan di atas)
+        const sortedItems = filteredItems.reverse();
 
-        const totalItems = filteredItems.length;
-
-        // const totalItems = result.totalItems; // Total items untuk pagination
-
-        // Mengurutkan data berdasarkan tanggal dibuat (created) terbaru di atas
-        // items.sort((a, b) => new Date(b.created) - new Date(a.created));
-         // Hitung index data berdasarkan halaman
+        const totalItems = sortedItems.length;
         const startIndex = (page - 1) * itemsPerPageLoad;
         const endIndex = startIndex + itemsPerPageLoad;
-        const paginatedItems = filteredItems.slice(startIndex, endIndex);
-            displayDataInTable(paginatedItems);
+        const paginatedItems = sortedItems.slice(startIndex, endIndex);
+
+        displayDataInTable(paginatedItems);
         displayPagination(totalItems, page);
-        // // Menampilkan data dalam tabel
-        // displayDataInTable(items);
-        // // Menampilkan pagination
-        // displayPagination(totalItems, page);
     } catch (error) {
         console.error('Error fetching data:', error);
         document.getElementById('loadinput').innerHTML = '<p>Error loading data.</p>';
     }
 }
+
 
 
 
@@ -90,8 +74,6 @@ function displayDataInTable(items) {
                  <td>
             <button class="btn btn-warning" onclick="openPrintModal('${item.merk}', '${item.part_number}', '${item.nama_barang}', '${item.qty}', '${item.satuan}', '${item.berapa_lembar}','${item.lot}', '${item.depo}', '${item.supplier_id}', '${item.tgl_inspeksi}')">Cetak</button>
             ${showEditDeleteButtons ? `
-                <button class="btn btn-danger" onclick="openDeleteModal('${item.id}')">Hapus</button>
-                <button class="btn btn-success" onclick="openEditModal('${item.id}', '${item.merk}', '${item.part_number}', '${item.nama_barang}', '${item.qty}', '${item.satuan}','${item.berapa_lembar}','${item.depo}','${item.tgl_inspeksi}','${item.lot}')">Edit</button>
             ` : ''}
                 </td>
                 <td>${item.operator}</td>
