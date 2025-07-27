@@ -11,29 +11,45 @@ async function loadInputData(page = 1) {
     try {
 
         // Mengambil data dari API dengan pagination
-          let url = `${pocketbaseUrl}/api/collections/system2_scan_input/records?page=${page}&perPage=${itemsPerPageLoad}`;
+          // let url = `${pocketbaseUrl}/api/collections/system2_scan_input/records?page=${page}&perPage=${itemsPerPageLoad}`;
+        const allItems = JSON.parse(localStorage.getItem('scan_data') || '[]');
 
-        // Tambahkan filter jika user bukan "sopian@gmail.com"
-        if (userGrafindo !== "sopian@gmail.com") {
-            url += `&filter=operator%20%3D%20%27${encodeURIComponent(userGrafindo)}%27`;
-        }
-        const response = await fetch(url);
+        // // Tambahkan filter jika user bukan "sopian@gmail.com"
+        // if (userGrafindo !== "sopian@gmail.com") {
+        //     url += `&filter=operator%20%3D%20%27${encodeURIComponent(userGrafindo)}%27`;
+        // }
+        // const response = await fetch(url);
         
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
+        // if (!response.ok) {
+        //     throw new Error('Network response was not ok');
+        // }
 
-        const result = await response.json();
-        const items = result.items;
-        const totalItems = result.totalItems; // Total items untuk pagination
+        // const result = await response.json();
+        // const items = result.items;
+         // Filter jika bukan sopian@gmail.com
+        const filteredItems = userGrafindo !== "sopian@gmail.com"
+            ? allItems.filter(item => item.operator === userGrafindo)
+            : allItems;
+
+        // Urutkan dari yang terbaru berdasarkan tgl_inspeksi
+        filteredItems.sort((a, b) => new Date(b.tgl_inspeksi) - new Date(a.tgl_inspeksi));
+
+        const totalItems = filteredItems.length;
+
+        // const totalItems = result.totalItems; // Total items untuk pagination
 
         // Mengurutkan data berdasarkan tanggal dibuat (created) terbaru di atas
-        items.sort((a, b) => new Date(b.created) - new Date(a.created));
-
-        // Menampilkan data dalam tabel
-        displayDataInTable(items);
-        // Menampilkan pagination
+        // items.sort((a, b) => new Date(b.created) - new Date(a.created));
+         // Hitung index data berdasarkan halaman
+        const startIndex = (page - 1) * itemsPerPageLoad;
+        const endIndex = startIndex + itemsPerPageLoad;
+        const paginatedItems = filteredItems.slice(startIndex, endIndex);
+            displayDataInTable(paginatedItems);
         displayPagination(totalItems, page);
+        // // Menampilkan data dalam tabel
+        // displayDataInTable(items);
+        // // Menampilkan pagination
+        // displayPagination(totalItems, page);
     } catch (error) {
         console.error('Error fetching data:', error);
         document.getElementById('loadinput').innerHTML = '<p>Error loading data.</p>';
