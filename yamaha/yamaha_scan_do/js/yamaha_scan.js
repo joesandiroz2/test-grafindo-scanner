@@ -21,6 +21,13 @@ window.onload = () => {
     return;
   }
 
+  const pendingDO = localStorage.getItem("pendingScanDO");
+  if (pendingDO) {
+    localStorage.removeItem("pendingScanDO"); // hapus biar ga ngulang terus
+    searchDO(pendingDO);
+    playSound('../../../suara/yamaha_scan_do.mp3');
+  }
+  
   let timeoutId;
 
   function startTimer() {
@@ -69,12 +76,11 @@ window.onload = () => {
         // ✅ Jika 1 blok → jalankan searchDO
         if (parts.length === 1) {
           const doVal = parts[0];
-          searchDO(doVal);
-          playSound('../../../suara/yamaha_scan_do.mp3');
-          input.value = '';        // kosongkan input
-          input.focus();           // kembalikan fokus
+          localStorage.setItem("pendingScanDO", doVal); // simpan sebelum reload
+          location.reload(); // refresh halaman
           return;
         }
+
 
         // ✅ Jika 3 blok → tampilkan alert nilai1, nilai2, nilai3
         if (parts.length === 3) {
