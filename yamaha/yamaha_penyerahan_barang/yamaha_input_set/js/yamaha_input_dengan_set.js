@@ -73,6 +73,7 @@ for (const [setName, items] of Object.entries(groupedData)) {
     const table = `
         <div style="background-color:cyan;color:black;display:flex;justify-content:space-between;padding:10px">
             <h4 class="mt-4">${setName}</h4>
+            <button class="btn btn-danger kurangi-pb" data-set="${setName}">Kurangi Qty Semua dari SET ini</button>
             <button class="btn btn-primary tambah-pb" data-set="${setName}">Tambahkan PB</button>
         </div>
         <table class="table table-bordered">
@@ -128,6 +129,19 @@ document.querySelectorAll(".tambah-pb").forEach(button => {
         openModal(setName);
     });
 });
+
+
+// Tambahkan event listener untuk tombol "Kurangi Qty"
+document.querySelectorAll(".kurangi-pb").forEach(button => {
+    button.addEventListener("click", function () {
+        const setName = this.getAttribute("data-set");
+        document.getElementById("setNameKurangi").value = setName;
+        document.getElementById("qtyKurangi").value = "";
+        document.getElementById("alasanKurangi").value = "";
+        $("#modalKurangiQty").modal("show");
+    });
+});
+
 
 }
 
@@ -343,3 +357,73 @@ async function getStokAwalAkhir(partNumber) {
 
   return { stokAwal, stokAwalBulan, stokAkhir };
 }
+
+
+// PROSES PENGURANGAN STOK
+document.getElementById("btnKurangiQty").addEventListener("click", async function () {
+    const setName = document.getElementById("setNameKurangi").value;
+    const qtyKurangi = parseInt(document.getElementById("qtyKurangi").value, 10);
+    const alasan = document.getElementById("alasanKurangi").value.trim();
+    const lot = document.getElementById("lotKurangi").value;
+
+    if (isNaN(qtyKurangi) || qtyKurangi <= 0 || !alasan) {
+        Swal.fire("Input Salah", "Harap isi jumlah qty dan alasan!", "warning");
+        return;
+    }
+
+    Swal.fire({
+        title: 'Sedang Mengurangi Stok...',
+        html: 'Silakan tunggu',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    });
+
+    try {
+        const barangRecords = await pb.collection("yamaha_data_barang").getFullList();
+        const matchingBarangList = barangRecords.filter(item => item.ikut_set === setName);
+
+        if (matchingBarangList.length === 0) {
+            Swal.fire({ icon: "error", title: "Set tidak ditemukan!" });
+            return;
+        }
+
+        for (const barang of matchingBarangList) {
+            const { id, part_number: partNumber, nama_barang: namaBarang, gambar } = barang;
+
+            const selectElement = document.querySelector(`.select-dikalikan[data-part="${partNumber}"]`);
+            const dikalikan = selectElement ? parseInt(selectElement.value, 10) : 1;
+            const totalQty = qtyKurangi * dikalikan;
+
+            // Ambil data stok terakhir
+            const existingKartu = await pb.collection("yamaha_kartu_stok").getList(1, 1, {
+                filter: `part_number = "${partNumber}"`,
+                sort: "-created"
+            });
+
+            let newBalance = 0;
+            if (existingKartu.items.length > 0) {
+                const lastBalance = parseInt(existingKartu.items[0].balance, 10);
+                newBalance = lastBalance - totalQty;
+                if (newBalance < 0) newBalance = 0;
+            }
+
+            await pb.collection("yamaha_kartu_stok").create({
+                part_number: partNumber,
+                nama_barang: namaBarang,
+                status: "keluar",
+                qty_scan:totalQty,
+                lot:lot,
+                balance: newBalance,
+                qty_keluar: totalQty,
+                no_do: alasan
+            });
+        }
+
+        Swal.fire({ icon: "success", title: "Qty berhasil dikurangi!" }).then(() => {
+            window.location.reload();
+        });
+
+    } catch (err) {
+        Swal.fire("Gagal", err.message, "error");
+    }
+});
