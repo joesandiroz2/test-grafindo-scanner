@@ -13,7 +13,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Ambil hanya 50 data terbaru
     const result = await pb.collection("yamaha_kartu_stok").getList(1, 50, {
-      sort: "-created"
+      sort: "-created",
+   filter: 'status = "masuk"'
     });
     fullData = result.items;
     renderTable(fullData);
@@ -34,12 +35,60 @@ document.addEventListener("DOMContentLoaded", async function () {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${index + 1}</td>
-        <td>${item.part_number}</td>
+        <td>${item.part_number} <br/> <span style="font-size:15px;font-weight:bold;color:green">${item.no_do}</span></td>
         <td>${item.nama_barang}</td>
         <td>${item.lot}</td>
         <td>${item.qty_masuk}</td>
         <td><i>${updatedFormatted}</i></td>
+        <td><button class="btn btn-danger  delete-btn">Hapus</button></td>
       `;
+        // Tambahkan event listener untuk tombol hapus
+        tr.querySelector(".delete-btn").addEventListener("click", async () => {
+      try {
+        const part_number = item.part_number;
+
+        // Tampilkan konfirmasi SweetAlert2
+        const confirm = await Swal.fire({
+          title: "Yakin ingin dihapus?",
+          text: `PB dengan Part Number ${part_number} akan dihapus!`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Ya, hapus!",
+          cancelButtonText: "Batal"
+        });
+
+        if (confirm.isConfirmed) {
+          // Hapus data dari PocketBase berdasarkan ID
+          await pb.collection("yamaha_kartu_stok").delete(item.id);
+
+          Swal.fire({
+            icon: "success",
+            title: "Dihapus!",
+            text: `PB dengan Part Number ${part_number} berhasil dihapus.`,
+            timer: 2000,
+            showConfirmButton: false
+          });
+
+          // Refresh data
+          const result = await pb.collection("yamaha_kartu_stok").getList(1, 50, {
+            sort: "-created",
+            filter: 'status = "masuk"'
+          });
+          renderTable(result.items);
+        }
+
+      } catch (err) {
+        console.error("Gagal menghapus data:", err);
+        Swal.fire({
+          icon: "error",
+          title: "Gagal menghapus",
+          text: err.message
+        });
+      }
+    });
+
       tbody.appendChild(tr);
     });
   }
