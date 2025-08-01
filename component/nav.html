@@ -59,6 +59,18 @@
              href="/pages/honda.html"
              
               style="color:blue; font-weight:bold;background-color:white; border:2px solid blue; padding: 5px 10px; margin: 5px;">AHM</a>
+            </li>
+            <li class="nav-item" id="salahinput-nav">
+
+          <a 
+            href="/pages/salah_input/salah_input.html"
+            style="color:black; font-weight:bold;background-color:white; border:2px solid orange; padding: 5px 10px; margin: 5px;"
+        >
+            Salah Stok
+        </a>
+
+
+
              </li>
         </li>
 
@@ -161,6 +173,7 @@ function restrictMenu() {
         "reportlabel-nav": document.getElementById("reportlabel-nav"),
         "yamaha-nav": document.getElementById("yamaha-nav"),
         "honda-nav": document.getElementById("honda-nav"),
+        "salahinput-nav": document.getElementById("salahinput-nav"),
     };
 
     // Semua menu disembunyikan dulu
@@ -169,7 +182,7 @@ function restrictMenu() {
     });
 if (userEmail === "sopian@gmail.com") {
     // Hanya tampilkan menu tertentu untuk Sopian
-    let allowedMenus = ["honda-nav", "yamaha-nav", "buatlabel-nav", "reportlabel-nav"];
+    let allowedMenus = ["honda-nav", "yamaha-nav", "buatlabel-nav", "reportlabel-nav","salahinput-nav"];
     allowedMenus.forEach(menuId => {
         if (menuItems[menuId]) menuItems[menuId].style.display = "block";
     });
