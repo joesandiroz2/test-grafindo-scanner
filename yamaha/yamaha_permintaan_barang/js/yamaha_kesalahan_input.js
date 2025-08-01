@@ -35,7 +35,8 @@ async function Kurangi_stok_part() {
         if (latestItem) {
             balance = parseInt(latestItem.balance, 10) - parseInt(qty_kurangi); // Konversi ke integer sebelum menjumlahkan
         } else {
-            balance = qty_kurangi;
+            balance = -parseInt(qty_kurangi);
+
         }
 
         // Buat data untuk disimpan
