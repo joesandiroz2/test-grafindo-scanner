@@ -10,7 +10,7 @@ async function loadSelectOptions() {
     selectElement.disabled = true; // disable saat loading
 
     try {
-        const response = await fetch(pocketbaseUrl + "/api/collections/yamaha_unik_nama_set/records?sort=-created&perPage=500");
+        const response = await fetch(pocketbaseUrl + "/api/collections/yamaha_unik_nama_set/records?sort=-created&perPage=100");
         const data = await response.json();
 
         const namaSetRecords = data.items || data;
