@@ -72,6 +72,7 @@ for (const [setName, items] of Object.entries(groupedData)) {
     const table = `
         <div style="background-color:maroon;color:white;display:flex;justify-content:space-between;padding:10px">
             <h4 class="mt-4">${setName}</h4>
+            <button class="btn btn-warning kurangi-pb" data-set="${setName}">Kurangi Semua QTY di SET ini</button>
             <button class="btn btn-primary tambah-pb" data-set="${setName}">Tambahkan PB</button>
         </div>
         <table class="table table-bordered">
@@ -105,6 +106,98 @@ document.querySelectorAll(".tambah-pb").forEach(button => {
         openModal(setName);
     });
 });
+
+
+// PROSES PENGURANGAN STOK
+document.querySelectorAll(".kurangi-pb").forEach(button => {
+    button.addEventListener("click", async function () {
+        const setName = this.getAttribute("data-set");
+
+        const { value: formValues } = await Swal.fire({
+            title: `Kurangi QTY dari semua barang di SET: ${setName}`,
+             html:
+        '<label for="swal-input-lot">LOT</label>' +
+        '<input id="swal-input-lot" class="swal2-input" placeholder="LOT">' +
+
+        '<label for="swal-input-dn">NO DN</label>' +
+        '<input id="swal-input-dn" class="swal2-input" placeholder="NO DN">' +
+
+        '<label for="swal-input-qty">QTY</label>' +
+        '<input id="swal-input-qty" class="swal2-input" type="number" placeholder="QTY" min="1">',
+  
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Kurangi',
+            preConfirm: () => {
+                const lot = document.getElementById('swal-input-lot').value.trim().toUpperCase();
+                const dn = document.getElementById('swal-input-dn').value.trim().toUpperCase();
+                const qty = parseInt(document.getElementById('swal-input-qty').value, 10);
+
+                if (!lot || !dn || isNaN(qty) || qty <= 0) {
+                    Swal.showValidationMessage('Semua input harus diisi dengan benar!');
+                    return false;
+                }
+
+                return { lot, dn, qty };
+            }
+        });
+
+        if (!formValues) return;
+
+        Swal.fire({
+            title: 'Sedang Memproses...',
+            html: 'Silakan tunggu',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        try {
+            const barangRecords = await pb.collection("data_barang").getFullList();
+            const matchingBarangList = barangRecords.filter(item => item.ikut_set === setName);
+
+            for (const barang of matchingBarangList) {
+                const { id, part_number, nama_barang, gambar } = barang;
+
+                const existingKartu = await pb.collection("kartu_stok").getList(1, 1, {
+                    filter: `part_number = "${part_number}"`,
+                    sort: "-created"
+                });
+
+                if (existingKartu.items.length > 0) {
+                    const lastBalance = parseInt(existingKartu.items[0].balance, 10);
+                    const newBalance = lastBalance - formValues.qty;
+
+                    if (newBalance < 0) continue;
+
+                    const newId = Math.random().toString(36).substr(2, 6);
+                    await pb.collection("kartu_stok").create({
+                        id: newId,
+                        part_number,
+                        nama_barang,
+                        lot: formValues.lot,
+                        no_dn: formValues.dn,
+                        gambar: gambar ? `${pocketbaseUrl}/api/files/data_barang/${id}/${gambar}` : 'tidak ada gambar',
+                        status: "keluar",
+                        qty_ambil:formValues.qty,
+                        balance: newBalance,
+                        qty_keluar: formValues.qty,
+                        tgl_pb: new Date().toLocaleDateString("en-GB", {
+                            day: "2-digit", month: "long", year: "numeric"
+                        })
+                    });
+                }
+            }
+
+            Swal.fire({ icon: "success", title: "QTY berhasil dikurangi!" }).then(() => {
+                window.location.reload();
+            });
+
+        } catch (error) {
+            Swal.fire({ icon: "error", title: "Terjadi kesalahan!", text: error.message });
+        }
+            });
+        });
+
 }
 
 function openModal(setName) {
@@ -206,6 +299,13 @@ document.getElementById("masukkanQty").addEventListener("click", async function 
         Swal.fire({ icon: "error", title: "Terjadi kesalahan!", text: error.message });
     }
 });
+
+
+
+
+
+
+
 
 
 // Panggil fungsi fetch saat halaman dimuat

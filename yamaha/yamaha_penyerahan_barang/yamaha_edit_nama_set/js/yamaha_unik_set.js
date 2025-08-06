@@ -2,24 +2,39 @@ const ikutSetSelect = document.getElementById("ikut_set_select");
 const ikutSetInput = document.getElementById("ikut_set_input");
 const spinnerUnikSet = document.getElementById("spinner_unik_set"); // spinner khusus untuk unik set
 
+
+
 // Fungsi ambil data unik set dari API
 async function loadUnikSet() {
   if (spinnerUnikSet) spinnerUnikSet.classList.remove("d-none");
 
   try {
-    const response = await fetch(pocketbaseUrl + "/api/collections/yamaha_unik_nama_set/records?perPage=4000");
-    if (!response.ok) {
-      throw new Error("Gagal mengambil data dari API");
-    }
+    const perPage = 100; // jangan terlalu besar, biar aman
+    let page = 1;
+    let allItems = [];
 
-    const data = await response.json();
-    const sets = data.items;
+    // Ambil halaman pertama dulu untuk tahu totalPages
+    const firstResponse = await fetch(`${pocketbaseUrl}/api/collections/yamaha_unik_nama_set/records?page=${page}&perPage=${perPage}`);
+    if (!firstResponse.ok) throw new Error("Gagal ambil data dari API (halaman 1)");
+
+    const firstData = await firstResponse.json();
+    allItems = firstData.items;
+    const totalPages = firstData.totalPages;
+
+    // Ambil sisa halaman jika ada
+    for (page = 2; page <= totalPages; page++) {
+      const res = await fetch(`${pocketbaseUrl}/api/collections/yamaha_unik_nama_set/records?page=${page}&perPage=${perPage}`);
+      if (!res.ok) throw new Error(`Gagal ambil data dari API (halaman ${page})`);
+
+      const data = await res.json();
+      allItems = allItems.concat(data.items);
+    }
 
     // Kosongkan opsi dulu
     ikutSetSelect.innerHTML = "";
 
-    // Tambahkan opsi baru
-    sets.forEach(item => {
+    // Tambahkan opsi baru dari semua data
+    allItems.forEach(item => {
       const opt = document.createElement("option");
       opt.value = item.ikut_set;
       opt.textContent = item.ikut_set;
@@ -32,6 +47,7 @@ async function loadUnikSet() {
     if (spinnerUnikSet) spinnerUnikSet.classList.add("d-none");
   }
 }
+
 
 // Checkbox toggle antara input dan select
 function toggleManualInput() {

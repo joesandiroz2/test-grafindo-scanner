@@ -74,7 +74,14 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
     // Ambil nilai dari input
     const nama_barang = document.getElementById('nama_barang').value;
     const part_number = document.getElementById('part_number').value.trim().toUpperCase(); // Normalisasi input
-    const ikut_set = document.getElementById('ikut_set').value;
+   let ikut_set = '';
+    if (document.getElementById('toggle_set_input').checked) {
+        ikut_set = document.getElementById('ikut_set_input').value.trim();
+    } else {
+        ikut_set = document.getElementById('ikut_set').value;
+    }
+
+
     const gambar = document.getElementById('gambar').files[0];
 
     // Cek apakah part_number sudah ada
@@ -96,7 +103,9 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
     formData.append('nama_barang', nama_barang);
     formData.append('part_number', part_number);
     formData.append('ikut_set', ikut_set);
+if (gambar) {
     formData.append('gambar', gambar);
+}
 
     try {
         await pb.collection('data_barang').create(formData);
@@ -113,16 +122,7 @@ async function editData(id) {
     try {
 
         const record = await pb.collection('data_barang').getOne(id);
-        
-
-        // Isi modal dengan data yang ada
-        // document.getElementById('edit_nama_barang').value = record.nama_barang;
-        // document.getElementById('edit_part_number').value = record.part_number;
-        // document.getElementById('edit_ikut_set').value = record.ikut_set;
-        // document.getElementById('edit_record_id').value = record.id; // Simpan ID record
-
-        // // Tampilkan modal
-        // $('#editModal').modal('show');
+      
           await loadIkutSetOptions('edit_ikut_set');
 
         // Gunakan setTimeout agar eksekusi menunggu dropdown terisi
@@ -131,6 +131,26 @@ async function editData(id) {
             document.getElementById('edit_part_number').value = record.part_number;
             document.getElementById('edit_ikut_set').value = record.ikut_set;
             document.getElementById('edit_record_id').value = record.id;
+
+         // Deteksi apakah 'ikut_set' ada di dropdown
+            const dropdownOptions = [...document.getElementById('edit_ikut_set').options].map(opt => opt.value.trim());
+            const ikutSetTrimmed = record.ikut_set ? record.ikut_set.trim() : '';
+
+            if (dropdownOptions.includes(ikutSetTrimmed)) {
+                // Pakai dropdown
+                document.getElementById('toggle_edit_set_input').checked = false;
+                document.getElementById('edit_ikut_set').value = ikutSetTrimmed;
+                document.getElementById('edit_ikut_set_input').style.display = 'none';
+                document.getElementById('edit_ikut_set').style.display = 'block';
+                document.getElementById('edit_ikut_set_input').value = '';
+            } else {
+                // Pakai input teks
+                document.getElementById('toggle_edit_set_input').checked = true;
+                document.getElementById('edit_ikut_set_input').value = ikutSetTrimmed;
+                document.getElementById('edit_ikut_set').style.display = 'none';
+                document.getElementById('edit_ikut_set_input').style.display = 'block';
+                document.getElementById('edit_ikut_set').value = '';
+            }
 
             // Tampilkan modal setelah semua data siap
             $('#editModal').modal('show');

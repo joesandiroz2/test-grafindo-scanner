@@ -1,5 +1,12 @@
 const pb = new PocketBase(pocketbaseUrl);
 
+
+let currentPage = 1;
+const perPage = 100;
+let totalPages = 1;
+
+
+
 let listContainer = document.getElementById("data-list");
 const spinner = document.getElementById("loading_data_set");
 
@@ -14,19 +21,23 @@ async function authpw() {
 
 // Load Data
 
-async function loadData() {
+async function loadData(page = 1) {
   
   listContainer.innerHTML = "";
   spinner.classList.remove("d-none");
 
   try {
     await authpw()
-    const records = await pb.collection("yamaha_data_barang").getFullList({
+    const result = await pb.collection("yamaha_data_barang").getList(page, perPage, {
       sort: "-created",
        autoCancel: true, 
     });
 
-    let no = 1;  // inisialisasi nomor urut
+     const records = result.items;
+    totalPages = result.totalPages;
+    currentPage = result.page;
+
+    let no = (currentPage - 1) * perPage + 1;
 
     records.forEach(item => {
       const row = document.createElement("tr");
@@ -49,6 +60,8 @@ async function loadData() {
       listContainer.appendChild(row);
       no++;  // naikkan nomor urut
     });
+
+    updatePaginationUI()
     spinner.classList.add("d-none");
 
   } catch (err) {
@@ -61,6 +74,20 @@ async function loadData() {
   } 
 }
 
+
+// change page
+function changePage(offset) {
+  const newPage = currentPage + offset;
+  if (newPage >= 1 && newPage <= totalPages) {
+    loadData(newPage);
+  }
+}
+
+function updatePaginationUI() {
+  document.getElementById("paginationInfo").textContent = `Halaman ${currentPage} dari ${totalPages}`;
+  document.getElementById("prevPage").disabled = currentPage === 1;
+  document.getElementById("nextPage").disabled = currentPage === totalPages;
+}
 
 
 // Create Data

@@ -77,16 +77,26 @@
             <label for="part_number">Part Number</label>
             <input type="text" class="form-control" id="part_number" required>
         </div>
+       
        <div class="form-group">
-        <label for="ikut_set">Ikut Set</label>
-        <select class="form-control" id="ikut_set" >
-            <option value="">Pilih Ikut Set</option>
-            <!-- Opsi akan ditambahkan di sini -->
-        </select>
-    </div>
+    <label>
+        <input type="checkbox" id="toggle_set_input"> Ada Set BARU?
+    </label>
+        </div>
+        <div class="form-group" id="ikut_set_group">
+            <label for="ikut_set">Ikut Set</label>
+            <select class="form-control" id="ikut_set">
+                <option value="">Pilih Ikut Set</option>
+                <!-- Opsi akan ditambahkan di sini -->
+            </select>
+            <input type="text" class="form-control mt-2" id="ikut_set_input" placeholder="Masukkan Set Baru" style="display: none;">
+        </div>
+
+
+
         <div class="form-group">
             <label for="gambar">Gambar</label>
-            <input type="file" class="form-control" id="gambar" required>
+            <input type="file" class="form-control" id="gambar" >
         </div>
         <button type="submit" class="btn btn-primary">Simpan</button>
     </form>
@@ -116,13 +126,20 @@
                 <label for="edit_part_number">Part Number</label>
                 <input type="text" class="form-control" id="edit_part_number" required>
             </div>
-            <div class="form-group">
-                <label for="edit_ikut_set">Ikut Set</label>
-                <select class="form-control" id="edit_ikut_set" >
-                    <option value="">Pilih Ikut Set</option>
-                    <!-- Opsi akan ditambahkan di sini -->
-                </select>
+           <div class="form-group">
+              <label>
+                <input type="checkbox" id="toggle_edit_set_input"> Ada Set BARU?
+              </label>
             </div>
+            <div class="form-group" id="edit_ikut_set_group">
+              <label for="edit_ikut_set">Ikut Set</label>
+              <select class="form-control" id="edit_ikut_set">
+                <option value="">Pilih Ikut Set</option>
+                <!-- Opsi dropdown akan diisi dari loadIkutSetOptions -->
+              </select>
+              <input type="text" class="form-control mt-2" id="edit_ikut_set_input" placeholder="Masukkan Set Baru" style="display: none;">
+            </div>
+
             <div class="form-group">
                 <label for="edit_gambar">Gambar</label>
                 <input type="file" class="form-control" id="edit_gambar">
@@ -152,6 +169,27 @@ $(document).ready(function() {
     $("#navbar-container").load("../../component/nav.html",function(){
         setTimeout(loginUser, 500);
     });
+
+    $("#toggle_set_input").change(function() {
+        if ($(this).is(":checked")) {
+            $("#ikut_set").hide();
+            $("#ikut_set_input").show();
+        } else {
+            $("#ikut_set_input").hide();
+            $("#ikut_set").show();
+        }
+    });
+
+    $('#toggle_edit_set_input').change(function() {
+      if ($(this).is(':checked')) {
+        $('#edit_ikut_set').hide();
+        $('#edit_ikut_set_input').show();
+      } else {
+        $('#edit_ikut_set_input').hide();
+        $('#edit_ikut_set').show();
+      }
+    });
+
 })
 </script>
 </html>
