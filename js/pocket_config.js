@@ -1,5 +1,5 @@
-//let pocketbaseUrl = "http://192.168.0.99:8090"
- let pocketbaseUrl = "https://terry-cleaner-cr-cognitive.trycloudflare.com"
+let pocketbaseUrl = "http://192.168.0.99:8090"
+// let pocketbaseUrl = "https://terry-cleaner-cr-cognitive.trycloudflare.com"
 let username_pocket = "daren.rasyidx@gmail.com"
 let user_pass_pocket = "admin12345"
 
