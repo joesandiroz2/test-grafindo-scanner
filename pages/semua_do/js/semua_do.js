@@ -51,6 +51,7 @@ function displayResults(items) {
                         <th>PO Number</th>
                         <th>Plant ID</th>
                         <th>Gate ID</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>`;
@@ -67,11 +68,101 @@ function displayResults(items) {
                     <td>${item.PO_Number}</td>
                     <td>${item.Plant_ID}</td>
                     <td>${item.Gate_ID}</td>
+                   <td>
+                        <button class="btn btn-sm btn-warning edit-btn" data-id="${item.id}">Edit</button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="${item.id}">Hapus</button>
+                    </td>
                 </tr>`;
         });
 
         table += '</tbody></table>';
         resultContainer.html(table);
+
+        // Event tombol Edit
+        $(".edit-btn").on("click", async function () {
+            const id = $(this).data("id");
+            const item = items.find(x => x.id === id);
+
+            const { value: formValues } = await Swal.fire({
+                title: 'Edit Data',
+                html: `
+                    <div style="text-align:left">
+                        <label>Delivery Note No:</label>
+                        <input id="dn_no" value="${item.Delivery_Note_No}"><br/>
+                        
+                        <label>Supplier Part Number:</label>
+                        <input id="supplier_part" value="${item.Supplier_Part_Number}"><br/>
+                        
+                        <label>Nama Barang:</label>
+                        <input id="part_desc" value="${item.Part_Number_Desc}"><br/>
+                        
+                        <label>Qty DN:</label>
+                        <input id="qty_dn" value="${item.Qty_DN}"><br/>
+                        
+                        <label>Delivery Note Date:</label>
+                        <input id="dn_date" value="${item.Delivery_Note_Date}"><br/>
+                        
+                        <label>PO Number:</label>
+                        <input id="po_number" value="${item.PO_Number}"><br/>
+                        
+                        <label>Plant ID:</label>
+                        <input id="plant_id" value="${item.Plant_ID}"><br/>
+                        
+                        <label>Gate ID:</label>
+                        <input id="gate_id" value="${item.Gate_ID}"><br/>
+                    </div>
+                `,
+                focusConfirm: false,
+                preConfirm: () => {
+                    return {
+                        Delivery_Note_No: document.getElementById('dn_no').value,
+                        Supplier_Part_Number: document.getElementById('supplier_part').value,
+                        Part_Number_Desc: document.getElementById('part_desc').value,
+                        Qty_DN: document.getElementById('qty_dn').value,
+                        Delivery_Note_Date: document.getElementById('dn_date').value,
+                        PO_Number: document.getElementById('po_number').value,
+                        Plant_ID: document.getElementById('plant_id').value,
+                        Gate_ID: document.getElementById('gate_id').value
+                    };
+                }
+            });
+
+            if (formValues) {
+                try {
+                    await pb.collection('data_do').update(id, formValues);
+                    Swal.fire('Berhasil', 'Data berhasil diupdate', 'success');
+                    fetchData(1); // refresh
+                } catch (err) {
+                    Swal.fire('Gagal', 'Gagal mengupdate data', 'error');
+                }
+            }
+        });
+
+
+
+
+           // Event tombol Hapus
+        $(".delete-btn").on("click", function () {
+            const id = $(this).data("id");
+            Swal.fire({
+                title: 'Yakin hapus?',
+                text: "Data yang dihapus tidak bisa dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, hapus',
+                cancelButtonText: 'Batal'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        await pb.collection('data_do').delete(id);
+                        Swal.fire('Terhapus!', 'Data berhasil dihapus.', 'success');
+                        fetchData(1); // refresh
+                    } catch (err) {
+                        Swal.fire('Gagal', 'Gagal menghapus data', 'error');
+                    }
+                }
+            });
+        });
     } else {
         resultContainer.html('<h6>Tidak ada data yang ditemukan.</h6>');
     }

@@ -119,6 +119,56 @@
 </div>
 
 
+<!-- Modal Edit Bootstrap -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="editForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Data</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="editId">
+          <div class="mb-3">
+            <label class="form-label">Kode Depan</label>
+            <input type="text" id="editKodeDepan" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">No DO</label>
+            <input type="text" id="editNoDo" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Part Number</label>
+            <input type="text" id="editPartNumber" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Nama Barang</label>
+            <input type="text" id="editNamaBarang" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Qty</label>
+            <input type="number" id="editQty" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Remarks</label>
+            <input type="text" id="editRemarks" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Tgl DO</label>
+            <input type="text" id="editTglDo" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Update</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 
 
 <!-- Bootstrap & jQuery -->

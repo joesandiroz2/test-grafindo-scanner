@@ -41,7 +41,6 @@ async function fetchData(page = 1) {
         <th>No</th>
             <th>No DO</th>
             <th>Alasan</th>
-            <th>Tanggal Do Terkunci</th>
             <th>Tanggal Terbuka</th>
           </tr>
         </thead>
@@ -56,7 +55,6 @@ async function fetchData(page = 1) {
           <td>${nomorUrut}</td>
           <td>${item.no_do}</td>
           <td>${item.alasan}</td>
-          <td>${formatTanggal(item.tgl_terkunci)}</td>
 
       <td>${formatTanggal(item.created)}</td>
         </tr>

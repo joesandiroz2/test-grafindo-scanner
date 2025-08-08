@@ -119,8 +119,8 @@ document.querySelectorAll(".kurangi-pb").forEach(button => {
         '<label for="swal-input-lot">LOT</label>' +
         '<input id="swal-input-lot" class="swal2-input" placeholder="LOT">' +
 
-        '<label for="swal-input-dn">NO DN</label>' +
-        '<input id="swal-input-dn" class="swal2-input" placeholder="NO DN">' +
+        '<label for="swal-input-dn">Alasan </label>' +
+        '<input id="swal-input-dn" class="swal2-input" placeholder="NO Pb / alasan">' +
 
         '<label for="swal-input-qty">QTY</label>' +
         '<input id="swal-input-qty" class="swal2-input" type="number" placeholder="QTY" min="1">',

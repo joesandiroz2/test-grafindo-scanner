@@ -53,31 +53,30 @@ document.addEventListener("DOMContentLoaded", async function () {
     return `${tanggal} ${jam}`;
   }
 
-  function renderTable(data) {
-    if (data.length === 0) {
-      tableBody.innerHTML = '<tr><td colspan="8" class="text-center">Tidak ada data</td></tr>';
-      return;
-    }
+ function renderTable(data) {
+  if (data.length === 0) {
+    tableBody.innerHTML = '<tr><td colspan="9" class="text-center">Tidak ada data</td></tr>';
+    return;
+  }
 
-    // Header manual
-    const headerRow = document.createElement("tr");
- const headers = ["Diupload", "No DO", "Part Number", "Nama Barang", "Qty", "Remarks", "Tgl DO"];
+  // Header tabel
+  const headerRow = document.createElement("tr");
+  const headers = ["Diupload", "No DO", "Part Number", "Nama Barang", "Qty", "Remarks", "Tgl DO", "Aksi"];
+  headers.forEach((header) => {
+    const th = document.createElement("th");
+    th.textContent = header;
+    headerRow.appendChild(th);
+  });
+  tableHead.appendChild(headerRow);
 
-    headers.forEach((header) => {
-      const th = document.createElement("th");
-      th.textContent = header;
-      headerRow.appendChild(th);
-    });
-    tableHead.appendChild(headerRow);
+  // Isi tabel
+  data.forEach((item) => {
+    const row = document.createElement("tr");
+    const createdFormatted = formatTanggal(item.created);
 
-    // Body
-    data.forEach((item) => {
-      const row = document.createElement("tr");
-
-      const createdFormatted = formatTanggal(item.created);
-      const fields = [
+    const fields = [
       createdFormatted,
-      `${item.kode_depan || ""}${item.no_do || ""}`, // Gabungkan kode_depan dan no_do
+      `${item.kode_depan || ""}${item.no_do || ""}`,
       item.part_number || "",
       item.nama_barang || "",
       item.qty || "",
@@ -85,16 +84,94 @@ document.addEventListener("DOMContentLoaded", async function () {
       item.tgl_do || ""
     ];
 
-
-      fields.forEach((value) => {
-        const td = document.createElement("td");
-        td.textContent = value;
-        row.appendChild(td);
-      });
-
-      tableBody.appendChild(row);
+    fields.forEach((value) => {
+      const td = document.createElement("td");
+      td.textContent = value;
+      row.appendChild(td);
     });
+
+    // Kolom Aksi
+    const tdAksi = document.createElement("td");
+    tdAksi.innerHTML = `
+      <button class="btn btn-warning btn-sm edit-btn" data-id="${item.id}">Edit</button>
+      <button class="btn btn-danger btn-sm delete-btn" data-id="${item.id}">Delete</button>
+    `;
+    row.appendChild(tdAksi);
+
+    tableBody.appendChild(row);
+  });
+
+  // Event tombol Edit
+  document.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      const id = e.target.dataset.id;
+      const record = await pb.collection("yamaha_do").getOne(id);
+
+      document.getElementById("editId").value = record.id;
+      document.getElementById("editNoDo").value = record.no_do;
+      document.getElementById("editPartNumber").value = record.part_number;
+      document.getElementById("editNamaBarang").value = record.nama_barang;
+      document.getElementById("editQty").value = record.qty;
+      document.getElementById("editRemarks").value = record.remarks;
+      document.getElementById("editTglDo").value = record.tgl_do;
+      document.getElementById("editKodeDepan").value = record.kode_depan || "";
+
+      // Buka modal
+      const modal = new bootstrap.Modal(document.getElementById("editModal"));
+      modal.show();
+    });
+  });
+
+  // Event tombol Delete
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const id = e.target.dataset.id;
+      Swal.fire({
+        title: "Yakin mau hapus ??",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Ya, hapus",
+        cancelButtonText: "Batal"
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await pb.collection("yamaha_do").delete(id);
+          Swal.fire("Terhapus!", "Data berhasil dihapus", "success");
+          fetchData(currentPage);
+        }
+      });
+    });
+  });
+}
+
+
+document.getElementById("editForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const id = document.getElementById("editId").value;
+  const data = {
+    no_do: document.getElementById("editNoDo").value,
+    part_number: document.getElementById("editPartNumber").value,
+    nama_barang: document.getElementById("editNamaBarang").value,
+    qty: document.getElementById("editQty").value,
+    remarks: document.getElementById("editRemarks").value,
+    tgl_do: document.getElementById("editTglDo").value
+  };
+
+  try {
+    await pb.collection("yamaha_do").update(id, data);
+    Swal.fire("Berhasil", "Data berhasil diupdate", "success");
+
+    // Tutup modal
+    const modalElement = document.getElementById("editModal");
+    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+    modalInstance.hide();
+
+    fetchData(currentPage);
+  } catch (err) {
+    Swal.fire("Gagal", "Tidak dapat mengupdate data", "error");
   }
+});
+
 
   prevBtn.addEventListener("click", () => {
     if (currentPage > 1) fetchData(currentPage - 1);
