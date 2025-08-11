@@ -155,7 +155,7 @@ function renderReport(data,order) {
       let status = "";
 
          if (!item.qty_do || item.qty_do == 0) {
-        status = '<span style="color: white; background: red; font-weight: bold; padding: 2px 5px;">PB.KELUAR</span>';
+        status = '<span style="color: white; background: green; font-weight: bold; padding: 2px 5px;">PB.SUKSES</span>';
         } else if (item.qty_do === item.qty_scan) {
             status = '<span style="color: green; font-weight: bold;">OK</span>';
         } else {
