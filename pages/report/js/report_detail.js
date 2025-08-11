@@ -183,7 +183,7 @@ function renderTable(data) {
                          let status = "";
 
                         if (!item.qty_minta || item.qty_minta == 0) {
-                            status = '<span style="color: white; background: red; font-weight: bold; padding: 2px 5px;">PB.KELUAR</span>';
+                            status = '<span style="color: white; background: green; font-weight: bold; padding: 2px 5px;">PB.SUKSES</span>';
                         } else if (item.qty_minta == item.qty_ambil) {
                             status = '<span style="color: green; font-weight: bold; text-align: center;">OK</span>';
                         } else {
