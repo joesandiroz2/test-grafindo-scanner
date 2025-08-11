@@ -152,7 +152,15 @@ function renderReport(data,order) {
     // Generate table rows
     partno.forEach((part_number, index) => {
       const item = data[no_do][part_number];
-      const status = item.qty_do === item.qty_scan ? "ok" : "not Full";
+      let status = "";
+
+         if (!item.qty_do || item.qty_do == 0) {
+        status = '<span style="color: white; background: red; font-weight: bold; padding: 2px 5px;">PB.KELUAR</span>';
+        } else if (item.qty_do === item.qty_scan) {
+            status = '<span style="color: green; font-weight: bold;">OK</span>';
+        } else {
+            status = '<span style="color: red; font-weight: bold;">Not FUll</span>';
+        }
       html += `
         <tr>
           <td>${index + 1}</td>

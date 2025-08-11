@@ -180,9 +180,16 @@ function renderTable(data) {
                 </thead>
                 <tbody>
                     ${noDnGroups[no_dn].map(item => {
-                        const status = item.qty_minta == item.qty_ambil 
-                            ? '<span style="color: green; font-weight: bold; text-align: center;">OK</span>'
-                            : '<span style="color: red; font-weight: bold; text-align: center;">Tidak Full Scan</span>';
+                         let status = "";
+
+                        if (!item.qty_minta || item.qty_minta == 0) {
+                            status = '<span style="color: white; background: red; font-weight: bold; padding: 2px 5px;">PB.KELUAR</span>';
+                        } else if (item.qty_minta == item.qty_ambil) {
+                            status = '<span style="color: green; font-weight: bold; text-align: center;">OK</span>';
+                        } else {
+                            status = '<span style="color: red; font-weight: bold; text-align: center;">Tidak Full Scan</span>';
+                        }
+
                         return `
                         <tr>
                             <td>${rowIndex++}</td>
