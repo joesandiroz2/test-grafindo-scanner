@@ -84,7 +84,7 @@ window.onload = () => {
 
         // ✅ Jika 3 blok → tampilkan alert nilai1, nilai2, nilai3
         if (parts.length === 3) {
-          inputPartNo = parts[0];
+          inputPartNo = parts[0].toUpperCase().trim();
           inputQty = parts[1];
           let poRaw = parts[2].toUpperCase().trim();
 
