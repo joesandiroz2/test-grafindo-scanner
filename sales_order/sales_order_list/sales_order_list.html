@@ -10,51 +10,42 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
 </head>
-<body>
+<body >
 
 <div id="navbar-container"></div>
 
-<div class="container mt-4">
-  <h4>Upload Sales Order</h4>
-
-
-  <div class="mb-3">
-    <input type="file" id="excelFile" accept=".xlsx,.xls" class="form-control" />
+<div class="p-2">
+  <div class="container mt-4">
+  <h3>Sales List</h3>
+  <div id="loading" class="loading-spinner">
+    <div class="spinner-border text-primary" role="status"></div>
   </div>
-  
-<button id="uploadBtn" class="btn btn-success mt-2" disabled>
-    <i class="bi bi-cloud-upload"></i> Upload ke PocketBase
-  </button>
-
-
-<div class="progress mt-3" style="height: 25px; display:none;">
-    <div id="uploadProgress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%">
-      0%
-    </div>
-  </div>
-
-  <div class="table-responsive">
-    <table class="table table-bordered" id="previewTable">
+  <div id="table-container" style="display:none;">
+    <table class="table table-bordered">
       <thead>
         <tr>
-          <th>no</th>
-          <th>part_number</th>
-          <th>nama_barang</th>
-          <th>qty</th>
-          <th>unit_price</th>
-          <th>no_po</th>
-          <th>tgl_schedule</th>
-          <th>sales</th>
+          <th>No </th>
+          <th>No PO</th>
+          <th>No SO</th>
+          <th>No IO</th>
+          <th>No Do</th>
+          <th>Sales</th>
+          <th>Ok atau Batal</th>
+          <th>Dibuat</th>
+          <th>Lihat</th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody id="sales-body"></tbody>
     </table>
+    <!-- Pagination -->
+    <nav>
+      <ul class="pagination" id="pagination"></ul>
+    </nav>
   </div>
-
-  
-
-  
 </div>
+</div>
+
+
 
 
 <!-- Bootstrap & jQuery -->
@@ -67,7 +58,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="../../js/sdk/pocketbase.umd.js"></script>
 <script src="../../js/pocket_config.js"></script>
-<script src="./js/sales_excel_input.js"></script>
+<script src="./js/sales_order_list.js"></script>
 <script>
   $(document).ready(function () {
     $("#navbar-container").load("../../component/nav.html", function () {
