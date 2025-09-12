@@ -146,7 +146,6 @@ async function submitPerbaikan() {
 
   try {
  
-  await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
   
     const data = {
       kode_depan: "",  // kalau ada logika isi, bisa diganti
