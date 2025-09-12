@@ -65,7 +65,7 @@ async function loadSalesData(page = 1) {
           <a class="btn btn-info" href="./sales_order_detail/sales_order_detail.html?id=${encodeURIComponent(item.no_so || "")}">
                 Lihat SO
             </a>
-         <a class="btn btn-warning" href="/sales_order/information_order/information_order_list.html?id=${encodeURIComponent(item.no_so || "")}">
+         <a class="btn btn-warning" href="/sales_order/information_order/information_order_list.html?id=${encodeURIComponent(item.no_io || "")}">
                 Buat IO
             </a>
         </td>
