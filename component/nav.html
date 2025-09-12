@@ -77,6 +77,9 @@
         <li class="nav-item" id="gselabel-nav" style="background-color:yellow;color:white;border-radius: 30px;">
                 <a style="color:black" class="nav-link" href="/print_label/system2_gse/index.html">GSE Bikin Label</a>
             </li>
+        <li class="nav-item" id="sales-nav" style="background-color:yellow;color:white;border-radius: 30px;">
+                <a style="color:black" class="nav-link" href="/sales_order/input_sales_order_excel/input_excel_sales_order.html">sales order</a>
+            </li>
         </ul>
     </div>
 </nav>
@@ -174,6 +177,7 @@ function restrictMenu() {
         "yamaha-nav": document.getElementById("yamaha-nav"),
         "honda-nav": document.getElementById("honda-nav"),
         "salahinput-nav": document.getElementById("salahinput-nav"),
+        "sales-nav": document.getElementById("sales-nav"),
     };
 
     // Semua menu disembunyikan dulu
@@ -182,7 +186,7 @@ function restrictMenu() {
     });
 if (userEmail === "sopian@gmail.com") {
     // Hanya tampilkan menu tertentu untuk Sopian
-    let allowedMenus = ["honda-nav", "yamaha-nav", "buatlabel-nav", "reportlabel-nav","salahinput-nav"];
+    let allowedMenus = ["honda-nav", "yamaha-nav", "buatlabel-nav", "reportlabel-nav","salahinput-nav","sales-nav"];
     allowedMenus.forEach(menuId => {
         if (menuItems[menuId]) menuItems[menuId].style.display = "block";
     });

@@ -24,6 +24,8 @@ async function fetchAllParts() {
 // --- Ambil balance & created terakhir per part_number ---
 async function getLastBalance(partNumber) {
   try {
+     await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
+     
     const res = await pb.collection("yamaha_kartu_stok").getList(1, 1, {
       filter: `part_number = "${partNumber}"`,
       sort: "-created",
