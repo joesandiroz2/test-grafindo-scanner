@@ -49,7 +49,7 @@ async function loadSalesData(page = 1) {
             } else {
                 statusCell = `<td style="background:green;color:white;">Ok</td>`;
             }
-
+            console.log(item)
 
             const row = `
                 <tr>
@@ -59,6 +59,7 @@ async function loadSalesData(page = 1) {
                     <td>${item.no_io || ""}</td>
                     <td>${item.no_do || ""}</td>
                     <td>${item.sales || ""}</td>
+                    <td>${item.setujui_io || ""}</td>
                     ${statusCell}
                     <td>${createdFormatted}</td>
                    <td>
@@ -66,7 +67,7 @@ async function loadSalesData(page = 1) {
                 Lihat SO
             </a>
          <a class="btn btn-warning" href="/sales_order/information_order/information_order_list.html?id=${encodeURIComponent(item.no_io || "")}">
-                Buat IO
+                Lihat IO
             </a>
         </td>
                 </tr>`;

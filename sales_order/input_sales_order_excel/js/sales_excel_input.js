@@ -165,7 +165,8 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
         no_po: row.no_po,
         tgl_schedule: row.tgl_schedule,
         no_so: noSOBaru,  
-         no_io: noSOBaru.replace(/^SO-/, 'IO-'),
+       no_io: `IO-${noSOBaru.slice(3)}`, // pastikan SO- diganti IO-
+       no_do: `DO-${noSOBaru.slice(3)}`, // pastikan SO- diganti IO-
         shipped: "",
         back_order: "",
         sales: row.sales,
