@@ -85,6 +85,13 @@ async function renderStock() {
       <td>${part.nama_barang}</td>
       <td ${balanceStyle}>${balance}</td>
       <td>${formatTanggal(created)}</td>
+       <td>
+        <button class="btn btn-warning btn-sm perbaiki-btn"
+          data-part="${part.part_number}"
+          data-nama="${part.nama_barang}">
+          <i class="bi bi-tools"></i> Perbaiki
+        </button>
+      </td>
     `;
     tableBody.appendChild(row);
 
@@ -98,6 +105,71 @@ async function renderStock() {
   progressBar.classList.remove("progress-bar-animated");
   progressBar.innerText = `Selesai ✔️ Total part number: ${total}`;
   statusText.innerText = ""; // hapus tulisan h6
+}
+
+
+
+// --- Handler klik tombol perbaiki ---
+// --- Handler klik tombol perbaiki ---
+document.addEventListener("click", function (e) {
+  if (e.target.closest(".perbaiki-btn")) {
+    const btn = e.target.closest(".perbaiki-btn");
+    const partNumber = btn.dataset.part;
+    const namaBarang = btn.dataset.nama;
+
+    // Konfirmasi password dulu
+    const inputPass = prompt("Masukkan password untuk perbaiki:");
+    if (inputPass !== "sp102103") {
+      alert("Password salah! Tidak bisa membuka perbaikan.");
+      return; // hentikan, jangan buka modal
+    }
+
+    // Kalau password benar → isi modal
+    document.getElementById("modalPartNumber").value = partNumber;
+    document.getElementById("modalNamaBarang").value = namaBarang;
+
+    // Tampilkan modal
+    const modal = new bootstrap.Modal(document.getElementById("perbaikiModal"));
+    modal.show();
+  }
+});
+
+
+// --- Submit perbaikan ---
+async function submitPerbaikan() {
+  const partNumber = document.getElementById("modalPartNumber").value;
+  const namaBarang = document.getElementById("modalNamaBarang").value;
+  const noDo = document.getElementById("modalNoDo").value;
+  const qtyPerbaikan = parseInt(document.getElementById("modalQty").value);
+
+  try {
+ 
+  await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
+  
+    const data = {
+      kode_depan: "",  // kalau ada logika isi, bisa diganti
+      no_do: noDo,
+      part_number: partNumber,
+      nama_barang: namaBarang,
+      qty_scan: 0,
+      qty_do: 0,
+      status: "perbaikan",
+      remarks: "",
+      balance: qtyPerbaikan,
+      qty_masuk: qtyPerbaikan,
+      tgl_pb: new Date().toISOString(),
+      lot: "-",
+      jumlah_barang: qtyPerbaikan,
+      tgl_do: new Date().toISOString()
+    };
+
+    await pb.collection("yamaha_kartu_stok").create(data);
+    alert("Data perbaikan berhasil disimpan!");
+    location.reload();
+  } catch (err) {
+    console.error("Error simpan perbaikan:", err);
+    alert("Gagal menyimpan data!");
+  }
 }
 
 renderStock();
