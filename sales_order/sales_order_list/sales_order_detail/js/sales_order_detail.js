@@ -51,6 +51,20 @@ async function loadDetailSO() {
         $("#no_po").text(firstItem.no_po || "-");
         $("#salesman").text(firstItem.sales || "-");
 
+
+            // === ambil data customer berdasarkan customer_id ===
+    if (firstItem.customer_id) {
+        try {
+            const customer = await pb.collection("sales_customer").getOne(firstItem.customer_id);
+            $("#cust_pt").text(customer.nama_pt || "-");
+            $("#cust_alamat").text(customer.alamat || "-");
+            $("#cust_telp").text(customer.no_telp || "-");
+        } catch (err) {
+            console.warn("Customer tidak ditemukan:", err);
+        }
+    }
+
+
           records.forEach((item, index) => {
 
     const amount = item.qty && item.unit_price ? item.qty * item.unit_price : 0;

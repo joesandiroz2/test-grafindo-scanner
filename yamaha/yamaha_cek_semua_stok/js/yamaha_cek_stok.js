@@ -6,9 +6,9 @@ async function fetchAllParts() {
   let allParts = [];
   let page = 1;
   let totalPages = 1;
-    statusText.innerText = `Sedang mengambil semua part .......`;
-
   while (page <= totalPages) {
+    statusText.innerText = `Sedang mengambil part ${page} dari ${totalPages}...`;
+
     const res = await fetch(
       `${pocketbaseUrl}/api/collections/yamaha_unik_part_number/records?page=${page}&perPage=30`
     );

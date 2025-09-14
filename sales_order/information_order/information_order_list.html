@@ -64,21 +64,36 @@
     </div>
 
   </div>
-  <div class="row" style="margin:3px;border:1px solid black;">
-   <div style="border:2x solid black;">
-        <span>Sales Order Number : <span 
-        style="font-weight:bold" 
-          id="no_io"></span></span>
-          <br>
-        <span>No po : <span 
-        style="font-weight:bold" 
-          id="no_po"></span></span>
-          <br>
-        <span>Salesman : <span 
-        style="font-weight:bold" 
-          id="salesman"></span></span>
-      </div>
+ <div class="row" 
+     style="margin:3px; border:1px solid black; display:flex; justify-content:space-around; padding:10px;">
+
+  <!-- blok kiri -->
+  <div style="border:1px solid black; padding:10px; flex:1; margin:5px;">
+    <span>Sales Order Number : 
+      <span style="font-weight:bold" id="no_io"></span>
+    </span><br>
+    <span>No PO : 
+      <span style="font-weight:bold" id="no_po"></span>
+    </span><br>
+    <span>Salesman : 
+      <span style="font-weight:bold" id="salesman"></span>
+    </span>
+  </div>
+
+  <!-- blok kanan -->
+  <div style="border:1px solid black; padding:10px; flex:1; margin:5px;">
+    <span>Customer : 
+      <span style="font-weight:bold" id="cust_pt"></span>
+    </span><br>
+    <span>Alamat : 
+      <span style="font-weight:bold" id="cust_alamat"></span>
+    </span><br>
+    <span>Telp : 
+      <span style="font-weight:bold" id="cust_telp"></span>
+    </span>
+  </div>
 </div>
+
  <table class="table table-bordered">
   <thead class="table-dark">
        <tr>

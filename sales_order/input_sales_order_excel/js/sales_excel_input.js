@@ -1,4 +1,4 @@
-const pb = new PocketBase(pocketbaseUrl);
+
 
 // --- Login user PocketBase ---
 async function loginPocketBase() {
@@ -140,6 +140,12 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
   // Generate nomor SO baru
   const noSOBaru = await generateNoSO();
 
+    const customerId = document.getElementById("customerSelect").value;
+  if (!customerId) {
+    Swal.fire("Pilih Customer", "Anda harus pilih customer terlebih dahulu", "warning");
+    return;
+  }
+
   Swal.fire({
     title: `Konfirmasi Upload , No SO anda ${noSOBaru}.`,
     text: `No SO anda ${noSOBaru}. Anda yakin ingin mengupload ${parsedData.length} data ke PocketBase?`,
@@ -170,6 +176,7 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
         shipped: "",
         back_order: "",
         sales: row.sales,
+         customer_id: customerId || null,
         is_batal: result.isConfirmed ? "" : "batal"
       };
 
@@ -199,4 +206,35 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
     progressBar.style.width = "0%";
     progressBar.innerText = "0%";
   });
+});
+
+
+// select search customer
+
+// Ambil list customer dan render ke Select2
+async function loadCustomerList() {
+  try {
+    await loginPocketBase();
+    const records = await pb.collection("sales_customer").getFullList({
+      sort: "nama_pt"
+    });
+
+    const $select = $("#customerSelect");
+    $select.empty();
+
+    records.forEach(cust => {
+      $select.append(new Option(`${cust.nama_pt} - ${cust.alamat}`, cust.id));
+    });
+
+    $select.select2({
+      placeholder: "Cari Customer...",
+      allowClear: true
+    });
+  } catch (err) {
+    console.error("❌ Gagal load customer", err);
+  }
+}
+
+$(document).ready(function () {
+  loadCustomerList();
 });

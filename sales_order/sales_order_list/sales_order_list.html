@@ -25,7 +25,21 @@
     <nav>
       <ul class="pagination" id="pagination"></ul>
     </nav>
-    
+  
+
+<div class="container">
+  <!-- Tempat edit customer (inline, muncul saat klik tombol edit) -->
+<div id="editCustomerContainer" style="display:none; margin-top:15px; padding:10px; border:1px solid #ccc; border-radius:5px;">
+  <input type="hidden" id="editRecordId">
+  <label for="customerSelect" class="form-label">Pilih Customer:</label>
+  <select id="customerSelect" style="width:100%"></select>
+  <div style="margin-top:10px;">
+    <button id="saveCustomerBtn" class="btn btn-primary btn-sm">Simpan</button>
+    <button id="cancelEditBtn" class="btn btn-secondary btn-sm">Batal</button>
+  </div>
+</div>
+</div>
+
   <div id="table-container" style="display:none;">
     <table class="table table-bordered">
       <thead>
@@ -33,8 +47,7 @@
           <th>No </th>
           <th>No PO</th>
           <th>No SO</th>
-          <th>No IO</th>
-          <th>No Do</th>
+          <th>PT</th>
           <th>Sales</th>
           <th>Io Approve</th>
           <th>Ok atau Batal</th>
@@ -52,11 +65,15 @@
 
 
 
+
+
 <!-- Bootstrap & jQuery -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <!-- External JS -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -68,7 +85,7 @@
     $("#navbar-container").load("../../component/nav.html", function () {
       setTimeout(loginUser, 500);
     });
-  });
+     });
 </script>
 
 </body>

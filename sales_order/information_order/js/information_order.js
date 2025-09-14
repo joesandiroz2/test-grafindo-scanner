@@ -51,6 +51,22 @@ async function loadDetail_io() {
         $("#no_po").text(firstItem.no_po || "-");
         $("#salesman").text(firstItem.sales || "-");
 
+
+         // 🔹 ambil data customer dari sales_customer
+        if (firstItem.customer_id) {
+            try {
+                const cust = await pb.collection("sales_customer").getOne(firstItem.customer_id);
+                $("#cust_pt").text(cust.nama_pt || "-");
+                $("#cust_alamat").text(cust.alamat || "-");
+                $("#cust_telp").text(cust.no_telp || "-");
+            } catch (err) {
+                console.warn("Customer tidak ditemukan:", firstItem.customer_id, err);
+                $("#cust_pt").text("-");
+                $("#cust_alamat").text("-");
+                $("#cust_telp").text("-");
+            }
+        }
+
         // render tabel
         records.forEach((item, index) => {
             const amount = item.qty && item.unit_price ? item.qty * item.unit_price : 0;

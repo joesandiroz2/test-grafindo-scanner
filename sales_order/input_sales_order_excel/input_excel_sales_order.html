@@ -9,6 +9,10 @@
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+
 </head>
 <body>
 
@@ -30,9 +34,17 @@
     <a href="https://docs.google.com/spreadsheets/d/1MVmfjS0cNuo8dz3Ag5ebosekaxQ82rVjzmZXulMhYdU/edit?usp=sharing" target="_blank">Download contoh File Excel </a>
   </div>
 
+
+<!-- pilih customer -->
+<div class="mb-3">
+  <label for="customerSelect" class="form-label fw-bold">Pilih Customer</label>
+  <select id="customerSelect" class="form-select" style="width:100%"></select>
+</div>
+
 <button id="uploadBtn" class="btn btn-success mt-2" disabled>
     <i class="bi bi-cloud-upload"></i> Upload ke database
   </button>
+
 
 
 <div class="progress mt-3" style="height: 25px; display:none;">
@@ -70,13 +82,20 @@
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 
 <!-- External JS -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="../../js/sdk/pocketbase.umd.js"></script>
 <script src="../../js/pocket_config.js"></script>
 <script src="./js/sales_excel_input.js"></script>
+
 <script>
+
+const pb = new PocketBase(pocketbaseUrl);
+
   $(document).ready(function () {
     $("#navbar-container").load("../../component/nav.html", function () {
       setTimeout(loginUser, 500);
