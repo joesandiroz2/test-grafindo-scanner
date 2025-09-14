@@ -36,16 +36,36 @@
 
    <div class="row mb-3">
     <div class="col-12 col-md-6">
-      <h3>Detail Information Order</h3>
 
       <a href="/sales_order/sales_order_list/sales_order_list.html"
       class="btn btn-info"
       >Kembali</a>
+
+  <button id="btnPrint" class="btn btn-success">
+    <i class="bi bi-printer"></i> Print
+  </button>
     </div>
 
+  </div>
+
+  
+  <div id="loading" class="text-center" style="display:none;">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p>Loading data...</p>
+  </div>
+
+
+<div id="print_page">
+  <div class="row" style="margin:30px">
+      <h3>Detail Information Order</h3>
     
-    <div class="col-12 col-md-6 text-md-end">
-      <div style="border:2x solid black;">
+    <div>
+      <div id="status_io"></div>
+    </div>
+
+  </div>
+  <div class="row" style="margin:3px;border:1px solid black;">
+   <div style="border:2x solid black;">
         <span>Sales Order Number : <span 
         style="font-weight:bold" 
           id="no_io"></span></span>
@@ -58,20 +78,7 @@
         style="font-weight:bold" 
           id="salesman"></span></span>
       </div>
-    </div>
-  </div>
-
-  <div class="row" style="margin:30px">
-    <div>
-      <div id="status_io"></div>
-    </div>
-
-  </div>
-  <div id="loading" class="text-center" style="display:none;">
-    <div class="spinner-border text-primary" role="status"></div>
-    <p>Loading data...</p>
-  </div>
-
+</div>
  <table class="table table-bordered">
   <thead class="table-dark">
        <tr>
@@ -89,6 +96,7 @@
       <tr><td colspan="13" class="text-center">Belum ada data</td></tr>
     </tbody>
   </table>
+</div>
 
 
 </div>
@@ -104,6 +112,7 @@
 
 <!-- External JS -->
 <script src="./js/information_order.js"></script>
+<script src="./js/print.js"></script>
 
 <script>
   $(document).ready(function () {

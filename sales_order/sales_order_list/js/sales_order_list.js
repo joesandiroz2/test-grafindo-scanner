@@ -59,15 +59,21 @@ async function loadSalesData(page = 1) {
                     <td>${item.no_io || ""}</td>
                     <td>${item.no_do || ""}</td>
                     <td>${item.sales || ""}</td>
-                    <td>${item.setujui_io || ""}</td>
+                <td style="${item.setujui_io 
+                              ? 'color:green; font-weight:bold;' 
+                              : 'color:red; font-weight:bold;'}">
+                  ${item.setujui_io || "Blm Aproved"}
+                </td>
+
+
                     ${statusCell}
                     <td>${createdFormatted}</td>
                    <td>
           <a class="btn btn-info" href="./sales_order_detail/sales_order_detail.html?id=${encodeURIComponent(item.no_so || "")}">
-                Lihat SO
+                 SO
             </a>
          <a class="btn btn-warning" href="/sales_order/information_order/information_order_list.html?id=${encodeURIComponent(item.no_io || "")}">
-                Lihat IO
+                 IO
             </a>
         </td>
                 </tr>`;
@@ -107,13 +113,27 @@ function renderPagination() {
     const pagination = $("#pagination");
     pagination.empty();
 
-    for (let i = 1; i <= totalPages; i++) {
-        pagination.append(`
-            <li class="page-item ${i === currentPage ? "active" : ""}">
-                <a class="page-link" href="#" onclick="loadSalesData(${i}); return false;">${i}</a>
-            </li>
-        `);
-    }
+    // tombol sebelumnya
+    pagination.append(`
+        <li class="page-item ${currentPage === 1 ? "disabled" : ""}">
+            <a class="page-link" href="#" onclick="if(currentPage > 1) loadSalesData(${currentPage - 1}); return false;">Sebelumnya</a>
+        </li>
+    `);
+
+    // info halaman
+    pagination.append(`
+        <li class="page-item disabled">
+            <span class="page-link">Halaman ${currentPage} dari ${totalPages}</span>
+        </li>
+    `);
+
+    // tombol selanjutnya
+    pagination.append(`
+        <li class="page-item ${currentPage === totalPages ? "disabled" : ""}">
+            <a class="page-link" href="#" onclick="if(currentPage < totalPages) loadSalesData(${currentPage + 1}); return false;">Selanjutnya</a>
+        </li>
+    `);
 }
+
 
 loadSalesData();

@@ -61,7 +61,14 @@ async function loadDetail_io() {
                     <td>${item.nama_barang || ""}</td>
                     <td>${item.part_number || ""}</td>
                     <td>${item.qty ? item.qty.toLocaleString('id-ID') : ""} Pcs</td>
-                    <td>${item.is_batal === "batal" ? "Batal" : "Ok"}</td>
+            <td style="${item.is_batal === 'batal' 
+                          ? 'color:red; font-weight:bold;' 
+                          : 'color:green; font-weight:bold;'}">
+              ${item.is_batal === "batal" 
+                  ? "❌ Batal" 
+                  : "✅ Ok"}
+            </td>
+
                 </tr>`;
             tbody.append(row);
         });

@@ -62,8 +62,14 @@ async function loadDetailSO() {
            <td>${item.qty ? item.qty.toLocaleString('id-ID') : ""}</td>
             <td>${item.unit_price ? item.unit_price.toLocaleString('id-ID') : ""}</td>
            <td>${(item.qty * item.unit_price).toLocaleString('id-ID')}</td>
+            <td style="${item.is_batal === 'batal' 
+                          ? 'color:red; font-weight:bold;' 
+                          : 'color:green; font-weight:bold;'}">
+              ${item.is_batal === "batal" 
+                  ? "❌ Batal" 
+                  : "✅ Ok"}
+            </td>
 
-            <td>${item.is_batal === "batal" ? "Batal" : "Ok"}</td>
         </tr>`;
     tbody.append(row);
 

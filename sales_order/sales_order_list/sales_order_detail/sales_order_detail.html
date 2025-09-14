@@ -15,27 +15,16 @@
 
    <div class="row mb-3">
     <div class="col-12 col-md-6">
-      <h3>Detail Sales Order</h3>
 
       <a href="/sales_order/sales_order_list/sales_order_list.html"
       class="btn btn-info"
       >Kembali</a>
+      <button id="btnPrint" class="btn btn-success">
+      <i class="bi bi-printer"></i> Print
+    </button>
+
     </div>
-    <div class="col-12 col-md-6 text-md-end">
-      <div style="border:2x solid black;">
-        <span>Sales Order Number : <span 
-        style="font-weight:bold" 
-          id="no_so"></span></span>
-          <br>
-        <span>No po : <span 
-        style="font-weight:bold" 
-          id="no_po"></span></span>
-          <br>
-        <span>Salesman : <span 
-        style="font-weight:bold" 
-          id="salesman"></span></span>
-      </div>
-    </div>
+   
   </div>
 
   <div id="loading" class="text-center" style="display:none;">
@@ -43,6 +32,31 @@
     <p>Loading data...</p>
   </div>
 
+  <div id="print_page">
+  <div class="row" style="margin:30px">
+      <h3>Detail Sales Order</h3>
+    
+  </div>    
+  <div class="d-flex justify-content-between p-1" style="margin:60px; border:2px solid black;">
+  
+  <!-- Box kiri -->
+  <div>
+    <span id="grandtotal"></span><br>
+    <span id="ppn_11%"></span><br>
+    <span>ppn 23 (jasa) : 0% 0</span><br>
+    <span style="font-weight: bold;">Net Total : <span id="grandtotal_ppn"></span></span>
+  </div>
+
+  <!-- Box kanan -->
+  <div style="border:2px solid black; padding:5px;">
+    <span>Sales Order Number : <span style="font-weight:bold" id="no_so"></span></span><br>
+    <span>No po : <span style="font-weight:bold" id="no_po"></span></span><br>
+    <span>Salesman : <span style="font-weight:bold" id="salesman"></span></span>
+  </div>
+
+</div>
+
+  
   <table class="table table-bordered">
     <thead>
       <tr>
@@ -61,12 +75,8 @@
     </tbody>
   </table>
 
-  <div class="p-1" style="margin:60px;border:2px solid black">
-    <span id="grandtotal"></span><br>
-    <span id="ppn_11%"></span><br>
-    <span>ppn 23 (jasa) : 0% 0</span><br>
-    <span style="font-weight: bold;">Net Total : <span id="grandtotal_ppn"></span></span>
   </div>
+
 </div>
 
 <!-- Bootstrap & jQuery -->
@@ -80,6 +90,7 @@
 
 <!-- External JS -->
 <script src="./js/sales_order_detail.js"></script>
+<script src="./js/print.js"></script>
 
 <script>
   $(document).ready(function () {
