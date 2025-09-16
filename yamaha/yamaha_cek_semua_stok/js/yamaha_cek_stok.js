@@ -10,7 +10,7 @@ async function fetchAllParts() {
     statusText.innerText = `Sedang mengambil part ${page} dari ${totalPages}...`;
 
     const res = await fetch(
-      `${pocketbaseUrl}/api/collections/yamaha_unik_part_number/records?page=${page}&perPage=30`
+      `${pocketbaseUrl}/api/collections/yamaha_unik_part_number/records?page=${page}&perPage=30&sort=-created`
     );
     const data = await res.json();
 
@@ -35,6 +35,7 @@ async function getLastBalance(partNumber) {
       return {
         balance: res.items[0].balance || 0,
         created: res.items[0].created,
+        status: res.items[0].status,
       };
     }
     return { balance: 0, created: null };
@@ -71,13 +72,22 @@ async function renderStock() {
     statusText.innerText = `Sedang mengambil part , Proses Ke ${count + 1} dari ${total}...`;
 
     // ambil balance + created
-    const { balance, created } = await getLastBalance(part.part_number);
+    const { balance, created ,status} = await getLastBalance(part.part_number);
 
     // style balance
     const balanceStyle =
       balance < 0
         ? `style="color:red; font-weight:bold;"`
         : `style="font-weight:bold;"`;
+
+    // tentukan style berdasarkan status
+    let statusCell = "";
+    if (status === "masuk") {
+      statusCell = `<td style="background-color:green; color:white; font-weight:bold;">${formatTanggal(created)} <br/> status Terakhir  : ${status}</td>`;
+    } else {
+      statusCell = `<td style="background-color:red; color:white; font-weight:bold;">${formatTanggal(created)} <br/> status Terakhir  :  ${status}</td>`;
+    }
+
 
     // render row
     const row = document.createElement("tr");
@@ -86,7 +96,7 @@ async function renderStock() {
       <td>${part.part_number}</td>
       <td>${part.nama_barang}</td>
       <td ${balanceStyle}>${balance}</td>
-      <td>${formatTanggal(created)}</td>
+        ${statusCell}
        <td>
         <button class="btn btn-warning btn-sm perbaiki-btn"
           data-part="${part.part_number}"
@@ -94,6 +104,14 @@ async function renderStock() {
           <i class="bi bi-tools"></i> Perbaiki
         </button>
       </td>
+    <td>
+      <button class="btn btn-danger btn-sm hapus-btn"
+        data-part="${part.part_number}"
+        data-nama="${part.nama_barang}">
+        <i class="bi bi-trash"></i> Hapus
+      </button>
+    </td>
+
     `;
     tableBody.appendChild(row);
 
@@ -133,6 +151,80 @@ document.addEventListener("click", function (e) {
     // Tampilkan modal
     const modal = new bootstrap.Modal(document.getElementById("perbaikiModal"));
     modal.show();
+  }
+});
+
+// --- Handler klik tombol hapus ---
+// --- Handler klik tombol hapus ---
+document.addEventListener("click", async function (e) {
+  if (e.target.closest(".hapus-btn")) {
+    const btn = e.target.closest(".hapus-btn");
+    const partNumber = btn.dataset.part;
+    const namaBarang = btn.dataset.nama;
+
+    // Step 1: Konfirmasi password
+    const { value: inputPass } = await Swal.fire({
+      title: "Masukkan Password",
+      input: "password",
+      inputPlaceholder: "Password",
+      inputAttributes: { autocapitalize: "off" },
+      showCancelButton: true,
+      confirmButtonText: "Submit",
+    });
+
+    if (inputPass !== "sp102103") {
+      Swal.fire("Gagal", "Password salah!", "error");
+      return;
+    }
+
+    // Step 2: Konfirmasi hapus
+    const confirm = await Swal.fire({
+      title: "Yakin ingin hapus?",
+      html: `<b>${partNumber} - ${namaBarang}</b><br>Kartu stok dihapus tidak dapat dikembalikan.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, hapus",
+      cancelButtonText: "Batal",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      // Disable tombol hapus
+      btn.disabled = true;
+      btn.innerHTML = `<i class="bi bi-hourglass-split"></i> Sedang menghapus...`;
+
+      // Tampilkan preloader Swal
+      Swal.fire({
+        title: "Sedang menghapus...",
+        html: "Mohon tunggu, proses penghapusan sedang berjalan.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      // Ambil semua data dengan getFullList tanpa auto-cancel
+      const records = await pb.collection("yamaha_kartu_stok").getFullList({
+        filter: `part_number = "${partNumber}"`,
+        $autoCancel: false,
+      });
+
+      // Hapus satu per satu (juga matikan auto-cancel)
+      for (const item of records) {
+        await pb.collection("yamaha_kartu_stok").delete(item.id, { $autoCancel: false });
+      }
+
+      Swal.fire("Berhasil", "Semua kartu stok sudah dihapus.", "success")
+        .then(() => location.reload());
+    } catch (err) {
+      console.error("Error hapus:", err);
+      Swal.fire("Error", "Gagal menghapus data!", "error");
+    } finally {
+      // Enable lagi tombol hapus (kalau tidak reload)
+      btn.disabled = false;
+      btn.innerHTML = `<i class="bi bi-trash"></i> Hapus`;
+    }
   }
 });
 
