@@ -1,7 +1,26 @@
 let currentPage = 1;
-const perPage = 10;
+const perPage = 15;
 let totalPages = 1;
+
+let selectedHari = "";
+let filterBelumAproved = false; // default: tampilkan semua
+
+
 const pb = new PocketBase(pocketbaseUrl);
+
+
+function buildScheduleFilter(hariOffset) {
+    if (!hariOffset) return "";
+
+    const today = new Date();
+    const target = new Date(today);
+    target.setDate(today.getDate() + parseInt(hariOffset));
+
+    const start = new Date(target.setHours(0, 0, 0, 0)).toISOString();
+    const end = new Date(target.setHours(23, 59, 59, 999)).toISOString();
+
+    return encodeURIComponent(`tgl_schedule >= "${start}" && tgl_schedule <= "${end}"`);
+}
 
 
 
@@ -10,7 +29,27 @@ async function loadSalesData(page = 1) {
     $("#table-container").hide();
 
     try {
-        const res = await fetch(`${pocketbaseUrl}/api/collections/sales_order_unik/records?page=${page}&perPage=${perPage}&sort=-created`);
+            let filters = [];
+
+        let filterQuery = "";
+            if (selectedHari) {
+                filterQuery = `&filter=${buildScheduleFilter(selectedHari)}`;
+            }
+
+
+        // filter belum aproved
+        if (filterBelumAproved) {
+            filters.push(`setujui_io = ""`);
+        }
+
+        // gabung filter (pakai &&)
+        if (filters.length > 0) {
+            filterQuery = `&filter=${encodeURIComponent(filters.join(" && "))}`;
+        }
+
+          const res = await fetch(
+            `${pocketbaseUrl}/api/collections/sales_order_unik/records?page=${page}&perPage=${perPage}&sort=-created${filterQuery}`
+        );
 
         if (!res.ok) throw new Error("Gagal fetch data");
         const result = await res.json();
@@ -56,6 +95,46 @@ async function loadSalesData(page = 1) {
                     });
             }
 
+           // ===== DEADLINE (tgl_schedule) =====
+            let deadCell = "";
+            if (item.tgl_schedule) {
+                // hari ini (tanggal doang, jam direset)
+                const today = new Date();
+                const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+                // tanggal schedule (ambil tahun, bulan, tanggal doang biar ga geser timezone)
+                const rawDate = new Date(item.tgl_schedule);
+                const tglSchedule = new Date(rawDate.getFullYear(), rawDate.getMonth(), rawDate.getDate());
+
+                // hitung selisih hari
+                const diffTime = tglSchedule - todayOnly;
+                const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+                let status = "";
+                if (diffDays < 0) {
+                    status = `H+${Math.abs(diffDays)} (terlewat)`; // sudah lewat
+                } else if (diffDays === 0) {
+                    status = "Hari ini";
+                } else {
+                    status = `H-${diffDays}`; // masih ke depan
+                }
+
+                const tglFormatted = tglSchedule.toLocaleDateString("id-ID", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric"
+                });
+
+                const bgColor = diffDays < 0
+                    ? "color:blue;font-weight:bold;"
+                    : "color:red;font-weight:bold;";
+
+                deadCell = `<td style="${bgColor}">${status}<br><small>${tglFormatted}</small></td>`;
+            } else {
+                deadCell = `<td>-</td>`;
+            }
+
+    
             // status batal / ok
             let statusCell = "";
             if (
@@ -66,7 +145,6 @@ async function loadSalesData(page = 1) {
             } else {
                 statusCell = `<td style="background:green;color:white;">Ok</td>`;
             }
-            console.log(item)
              // ambil nama_pt sesuai customer_id
             const namaPt = customerMap[item.customer_id] || "";
 
@@ -76,6 +154,7 @@ async function loadSalesData(page = 1) {
                     <td>${item.no_po || ""}</td>
                     <td>${item.no_so || ""}</td>
                  <td>${namaPt}</td>
+                     ${deadCell}
                     <td>${item.sales || ""}</td>
                 <td style="${item.setujui_io 
                               ? 'color:green; font-weight:bold;' 
@@ -228,3 +307,8 @@ $("#saveCustomerBtn").on("click", async function() {
 
 
 loadSalesData();
+
+$("#filterHari").on("change", function () {
+    selectedHari = $(this).val();
+    loadSalesData(1); // reload data dengan filter baru
+});

@@ -27,7 +27,7 @@
   </div>
 
   <div >
-    <h6 style="font-weight: bold;">Standar Kolom di excel : part_number,nama_barang,qty,unit_price,no_po,tgl_schedule,sales</h6>
+    <h6 style="font-weight: bold;">Standar Kolom di excel : part_number,nama_barang,qty,unit_price,no_po,sales</h6>
   </div>
   
   <div>
@@ -35,15 +35,32 @@
   </div>
 
 
-<!-- pilih customer -->
-<div class="mb-3">
-  <label for="customerSelect" class="form-label fw-bold">Pilih Customer</label>
-  <select id="customerSelect" class="form-select" style="width:100%"></select>
+<div class="row g-3">
+  <!-- pilih customer -->
+  <div class="col-sm-12 col-md-4 col-lg-4">
+    <label for="customerSelect" class="form-label fw-bold">Pilih Customer</label>
+    <select id="customerSelect" class="form-select" style="width:100%"></select>
+  </div>
+
+  <!-- pilih kode_depan -->
+  <div class="col-sm-12 col-md-4 col-lg-4">
+    <label for="kode_depan_do" class="form-label fw-bold">Pilih Kode Depan Do</label>
+    <select id="kode_depan_do" class="form-select" style="width:100%"></select>
+  </div>
+
+  <!-- pilih tanggal -->
+  <div class="col-sm-12 col-md-4 col-lg-4">
+    <label for="tgl_input_schedule" class="form-label fw-bold">Pilih Tgl Schedule</label>
+    <input type="date" id="tgl_input_schedule" class="form-control">
+  </div>
 </div>
 
-<button id="uploadBtn" class="btn btn-success mt-2" disabled>
+<div class="mt-3">
+  <button id="uploadBtn" class="btn btn-success" disabled>
     <i class="bi bi-cloud-upload"></i> Upload ke database
   </button>
+</div>
+
 
 
 
@@ -100,6 +117,42 @@ const pb = new PocketBase(pocketbaseUrl);
     $("#navbar-container").load("../../component/nav.html", function () {
       setTimeout(loginUser, 500);
     });
+  });
+
+  $(document).ready(function () {
+    const specialCodes = ["G", "N", "X"]; // huruf yang muncul duluan
+    const allLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+    const $select = $("#kode_depan_do");
+
+    // Tambahkan grup untuk kode spesial
+    $select.append('<optgroup label="Kode Khusus"></optgroup>');
+    specialCodes.forEach(code => {
+      $select.find("optgroup[label='Kode Khusus']").append(`<option value="${code}">${code}</option>`);
+    });
+
+    // Tambahkan garis pemisah
+    $select.append('<option disabled>====</option>');
+
+    // Tambahkan grup untuk semua abjad
+    $select.append('<optgroup label="Abjad"></optgroup>');
+    allLetters.forEach(letter => {
+      $select.find("optgroup[label='Abjad']").append(`<option value="${letter}">${letter}</option>`);
+    });
+
+    // Aktifkan select2 biar lebih cakep
+    $select.select2({
+      placeholder: "Pilih kode depan",
+      allowClear: true
+    });
+  });
+
+   // Set default date = besok
+  document.addEventListener("DOMContentLoaded", () => {
+    const input = document.getElementById("tgl_input_schedule");
+    const besok = new Date();
+    besok.setDate(besok.getDate() + 1); // tambah 1 hari
+    input.value = besok.toISOString().split("T")[0];
   });
 </script>
 

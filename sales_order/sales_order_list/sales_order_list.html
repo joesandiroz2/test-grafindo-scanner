@@ -25,7 +25,33 @@
     <nav>
       <ul class="pagination" id="pagination"></ul>
     </nav>
-  
+
+
+
+<div class="container my-3">
+  <div class="row g-3 align-items-end">
+    
+    <!-- Filter H-X -->
+    <div class="col-md-4 col-sm-12">
+      <label for="filterHari" class="form-label fw-bold">Filter Berdasarkan Jarak Hari</label>
+      <select id="filterHari" class="form-select">
+        <option value="">-- Pilih H-X --</option>
+      </select>
+    </div>
+
+    <!-- Tombol Toggle -->
+    <div class="col-md-4 col-sm-12">
+      <label class="form-label fw-bold d-block">&nbsp;</label>
+      <button id="btnToggleAprove" class="btn btn-warning w-100">
+        Tampilkan yg belum Aproved
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+
 
 <div class="container">
   <!-- Tempat edit customer (inline, muncul saat klik tombol edit) -->
@@ -48,9 +74,10 @@
           <th>No PO</th>
           <th>No SO</th>
           <th>PT</th>
+          <th>Tgl Schedule</th>
           <th>Sales</th>
-          <th>Io Approve</th>
-          <th>Ok atau Batal</th>
+          <th>Io Acc</th>
+          <th>Ok / Batal</th>
           <th>Dibuat</th>
           <th>Lihat</th>
         </tr>
@@ -86,6 +113,39 @@
       setTimeout(loginUser, 500);
     });
      });
+
+
+$("#btnToggleAprove").on("click", function () {
+    filterBelumAproved = !filterBelumAproved; // toggle true/false
+
+    if (filterBelumAproved) {
+        $(this).text("Tampilkan semua").removeClass("btn-warning").addClass("btn-secondary");
+    } else {
+        $(this).text("Tampilkan yg belum Aproved").removeClass("btn-secondary").addClass("btn-warning");
+    }
+
+    loadSalesData(1); // reload data
+});
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const select = document.getElementById("filterHari");
+
+  // generate H-1 sampai H-300
+  for (let i = 1; i <= 300; i++) {
+    const opt = document.createElement("option");
+    opt.value = i;           // value = 1,2,3... (bisa dipake untuk query)
+    opt.textContent = `H-${i}`;
+    select.appendChild(opt);
+  }
+
+  // kalau mau include "Hari ini" juga
+  const optToday = document.createElement("option");
+  optToday.value = 0;
+  optToday.textContent = "Hari ini";
+  select.insertBefore(optToday, select.children[1]); 
+});
 </script>
 
 </body>

@@ -9,7 +9,7 @@ async function loginPocketBase() {
 }
 
 // Kolom wajib
-const requiredCols = ["part_number", "nama_barang", "qty", "unit_price", "no_po", "tgl_schedule", "sales"];
+const requiredCols = ["part_number", "nama_barang", "qty", "unit_price", "no_po", "sales"];
 
 let parsedData = [];
 
@@ -54,9 +54,7 @@ function handleFile(e) {
       Object.keys(row).forEach(key => {
         const normalizedKey = key.trim().toLowerCase().replace(/\s+/g, "_");
         let val = row[key];
-        if (normalizedKey === "tgl_schedule") {
-          val = formatExcelDate(val);
-        }
+        
         newRow[normalizedKey] = val;
       });
       return newRow;
@@ -140,6 +138,21 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
   // Generate nomor SO baru
   const noSOBaru = await generateNoSO();
 
+ // Ambil input tanggal schedule
+  const tglInput = document.getElementById("tgl_input_schedule").value;
+    if (!tglInput) {
+      Swal.fire("Pilih Tanggal", "Anda harus pilih tanggal schedule terlebih dahulu", "warning");
+      return;
+    }
+    const tglSchedule = new Date(tglInput).toISOString(); // format timestamp string
+
+    // Ambil kode depan
+    const kodeDepan = document.getElementById("kode_depan_do").value;
+    if (!kodeDepan) {
+      Swal.fire("Pilih Kode Depan", "Anda harus pilih kode depan terlebih dahulu", "warning");
+      return;
+    }
+
     const customerId = document.getElementById("customerSelect").value;
   if (!customerId) {
     Swal.fire("Pilih Customer", "Anda harus pilih customer terlebih dahulu", "warning");
@@ -169,13 +182,14 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
         qty: row.qty,
         unit_price: row.unit_price,
         no_po: row.no_po,
-        tgl_schedule: row.tgl_schedule,
+        tgl_schedule: tglSchedule,
         no_so: noSOBaru,  
        no_io: `IO-${noSOBaru.slice(3)}`, // pastikan SO- diganti IO-
-       no_do: `DO-${noSOBaru.slice(3)}`, // pastikan SO- diganti IO-
+       no_do: `${kodeDepan}-${noSOBaru.slice(3)}`, // pastikan SO- diganti IO-
         shipped: "",
         back_order: "",
         sales: row.sales,
+        kode_depan: kodeDepan,   
          customer_id: customerId || null,
         is_batal: result.isConfirmed ? "" : "batal"
       };
