@@ -1,5 +1,5 @@
 //let pocketbaseUrl = "http://192.168.0.99:8090"
- let pocketbaseUrl = "https://forbidden-hey-ppm-skating.trycloudflare.com"
+ let pocketbaseUrl = "https://insider-believe-exchange-powell.trycloudflare.com"
 let username_pocket = "daren.rasyidx@gmail.com"
 let user_pass_pocket = "admin12345"
 
