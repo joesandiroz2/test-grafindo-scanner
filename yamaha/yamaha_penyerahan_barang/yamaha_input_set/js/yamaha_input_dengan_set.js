@@ -404,7 +404,7 @@ document.getElementById("btnKurangiQty").addEventListener("click", async functio
             if (existingKartu.items.length > 0) {
                 const lastBalance = parseInt(existingKartu.items[0].balance, 10);
                 newBalance = lastBalance - totalQty;
-                if (newBalance < 0) newBalance = 0;
+               
             }
 
             await pb.collection("yamaha_kartu_stok").create({
