@@ -8,6 +8,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<!-- Select2 CSS + JS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 </head>
 <body>
@@ -28,7 +30,22 @@
     <h4 class="mb-0" style="margin-left: 10px; flex-grow: 1; text-align: right;font-weight: bold;">Input Penyerahan Barang</h4>
   </div>
 
+      <div class="row" style="margin:20px"> 
+            <input type="text" id="scan_input_part" placeholder="Auto scan input partnumber"
+            style="font-weight:bold;font-size:20px"
+            />
+      </div>
+      
+    <div class="mb-3" style="border:5px solid black;margin:20px;padding:20px">
+      <label for="selectPart" class="form-label">Cari Part Number</label>
+      <p id="loadingText" style="color:purple;font-weight:bold">sedang mengumpulkan semua part...</p>
+      <select id="selectPart" class="form-control" style="width:100%"></select>
+    </div>
+
+
+
       <form id="pbForm">
+
         <div class="row g-3">
           <div class="col-12 col-md-6 col-xl-10">
             <input type="text" class="form-control" id="part_number" placeholder="Part Number" list="partNumberList" 
@@ -120,13 +137,133 @@
 <script src="./js/yamaha_auto_complete_part_number.js"></script>
 <script src="./js/yamaha_load_penyerahan.js"></script>
 
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
   $(document).ready(function () {
     $("#navbar-container").load("../../component/nav.html", function () {
       setTimeout(loginUser, 500);
     });
   });
+
+
+document.getElementById("scan_input_part").addEventListener("input", async function () {
+  let inputVal = this.value.trim();
+
+  // pecah string berdasarkan spasi
+  let parts = inputVal.split(" ");
+
+  if (parts.length >= 3) {
+    let partNumber = parts[0];
+    let qty = parts[1];
+    let lot = parts[2];
+
+    // isi otomatis ke inputan
+    document.getElementById("part_number").value = partNumber;
+    document.getElementById("qty_masuk").value = qty;
+    document.getElementById("lot").value = lot;
+
+    try {
+      // Panggil API PocketBase untuk cari part_number
+      let url = `${pocketbaseUrl}/api/collections/yamaha_unik_part_number/records?filter=part_number="${partNumber}"`;
+
+      let response = await fetch(url);
+      let data = await response.json();
+
+      if (data.items && data.items.length > 0) {
+        let namaBarang = data.items[0].nama_barang || "";
+        document.getElementById("nama_barang").value = namaBarang;
+      Swal.fire({
+        title: "Barang Ketemu",
+        text: "barang ditemukan",
+        icon: "success",
+        timer: 1000,
+        showConfirmButton: false
+      });
+
+      } else {
+        document.getElementById("nama_barang").value = "";
+        Swal.fire("Not Found", "Nama barang tidak ditemukan di database", "warning");
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Gagal ambil data dari server", "error");
+    } finally {
+      // clear input scan supaya siap scan berikutnya
+      document.getElementById("scan_input_part").value = "";
+      document.getElementById("scan_input_part").focus();
+    }
+  }
+});
+
+
+//loadpartnumber dengan progress
+async function loadAllPartNumbers() {
+  let allItems = [];
+  let page = 1;
+  let perPage = 50;
+
+  // ambil totalPages dulu
+  let urlFirst = `${pocketbaseUrl}/api/collections/yamaha_unik_part_number/records?page=1&perPage=${perPage}`;
+  let resFirst = await fetch(urlFirst);
+  let dataFirst = await resFirst.json();
+
+  let totalPages = dataFirst.totalPages;
+  let totalItems = dataFirst.totalItems; // total semua part
+  allItems = allItems.concat(dataFirst.items);
+
+  // update progress pertama
+  $("#loadingText").text(`Sedang mengumplkan part : proses ${allItems.length} dari ${totalItems} part...`);
+
+  // loop mulai dari page 2
+  for (page = 2; page <= totalPages; page++) {
+    let url = `${pocketbaseUrl}/api/collections/yamaha_unik_part_number/records?page=${page}&perPage=${perPage}`;
+    let res = await fetch(url);
+    let data = await res.json();
+
+    allItems = allItems.concat(data.items);
+
+    // update progress setiap kali page selesai diambil
+    $("#loadingText").text(`Memuat ${allItems.length} dari ${totalItems} part...`);
+  }
+
+  return allItems;
+}
+
+
+$(document).ready(async function() {
+  // tampilkan loading
+  $("#loadingText").show();
+
+  let partData = await loadAllPartNumbers();
+
+  // setelah selesai → sembunyikan loading
+  $("#loadingText").hide();
+
+  // convert ke format Select2
+  let options = partData.map(item => ({
+    id: item.part_number,
+    text: `${item.part_number} - ${item.nama_barang}`,
+    nama_barang: item.nama_barang
+  }));
+
+  $("#selectPart").select2({
+    placeholder: "Ketik Part Number / Nama Barang",
+    allowClear: true,
+    data: options
+  });
+
+  // ketika dipilih → isi inputan form
+  $("#selectPart").on("select2:select", function(e) {
+    let data = e.params.data;
+    $("#part_number").val(data.id);
+    $("#nama_barang").val(data.nama_barang);
+  });
+});
+
 </script>
+
 
 </body>
 </html>

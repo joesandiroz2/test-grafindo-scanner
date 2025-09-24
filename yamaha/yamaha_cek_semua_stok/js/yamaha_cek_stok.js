@@ -33,6 +33,8 @@ async function getLastBalance(partNumber) {
 
     if (res.items.length > 0) {
       return {
+        qty_masuk:res.items[0].qty_masuk || 0,
+        qty_scan:res.items[0].qty_scan || 0,
         balance: res.items[0].balance || 0,
         created: res.items[0].created,
         status: res.items[0].status,
@@ -72,7 +74,7 @@ async function renderStock() {
     statusText.innerText = `Sedang mengambil part , Proses Ke ${count + 1} dari ${total}...`;
 
     // ambil balance + created
-    const { balance, created ,status} = await getLastBalance(part.part_number);
+    const { balance, created ,status,qty_scan,qty_masuk} = await getLastBalance(part.part_number);
 
     // style balance
     const balanceStyle =
@@ -83,9 +85,9 @@ async function renderStock() {
     // tentukan style berdasarkan status
     let statusCell = "";
     if (status === "masuk") {
-      statusCell = `<td style="background-color:green; color:white; font-weight:bold;">${formatTanggal(created)} <br/> status Terakhir  : ${status}</td>`;
+      statusCell = `<td style="color:green; font-weight:bold;">${formatTanggal(created)} <br/> status Terakhir  : ${status} ${qty_masuk || qty_scan} Pcs </td>`;
     } else {
-      statusCell = `<td style="background-color:red; color:white; font-weight:bold;">${formatTanggal(created)} <br/> status Terakhir  :  ${status}</td>`;
+      statusCell = `<td style=" color:red; font-weight:bold;">${formatTanggal(created)} <br/> status Terakhir  :  ${status}  ${qty_masuk || qty_scan} Pcs</td>`;
     }
 
 
