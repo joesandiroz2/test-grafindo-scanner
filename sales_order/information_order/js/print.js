@@ -3,14 +3,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (btnPrint) {
     btnPrint.addEventListener("click", function () {
-      const printContent = document.getElementById("print_page").innerHTML;
+      // update value input agar sinkron dengan isi terbaru
+      document.querySelectorAll("#print_page input").forEach(input => {
+        input.setAttribute("value", input.value);
+      });
 
+      const printContent = document.getElementById("print_page").innerHTML;
       const printWindow = window.open("", "", "width=900,height=650");
+
+      // ambil semua <link> dan <style> dari halaman utama
+      const styles = Array.from(document.querySelectorAll("link[rel='stylesheet'], style"))
+        .map(el => el.outerHTML)
+        .join("\n");
+
       printWindow.document.write(`
         <html>
           <head>
             <title>Print</title>
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+            ${styles} <!-- 🔹 copy semua CSS -->
             <style>
               @media print {
                 body {
@@ -21,6 +31,11 @@ document.addEventListener("DOMContentLoaded", function () {
                   -webkit-print-color-adjust: exact !important;
                   print-color-adjust: exact !important;
                 }
+                /* sembunyikan kolom aksi saat print */
+                table th:last-child,
+                table td:last-child {
+                  display: none !important;
+                }
               }
             </style>
           </head>
@@ -29,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
           </body>
         </html>
       `);
+
       printWindow.document.close();
       printWindow.focus();
       printWindow.print();
