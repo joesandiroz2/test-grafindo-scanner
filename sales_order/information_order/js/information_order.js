@@ -17,6 +17,22 @@ async function loginUser() {
     }
 }
 
+// fungsi format tanggal ke format: 23 September 2025
+function formatTanggal(tglString) {
+    if (!tglString) return "-";
+    const bulan = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+    const d = new Date(tglString);
+    const day = d.getDate();
+    const month = bulan[d.getMonth()];
+    const year = d.getFullYear();
+    return `${day} ${month} ${year}`;
+}
+
+
+
 async function loadDetail_io() {
     const params = new URLSearchParams(window.location.search);
     const no_io = params.get("id");
@@ -73,7 +89,7 @@ async function loadDetail_io() {
             const row = `
                 <tr>
                     <td>${index + 1}</td>
-                    <td>${item.tgl_schedule}</td>
+                <td>${formatTanggal(item.tgl_schedule)}</td>
                     <td>${item.nama_barang || ""}</td>
                     <td>${item.part_number || ""}</td>
                     <td>${item.qty ? item.qty.toLocaleString('id-ID') : ""} Pcs</td>

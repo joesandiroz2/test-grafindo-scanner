@@ -178,7 +178,9 @@ async function loadSalesData(page = 1) {
         <button class="btn btn-danger btn-edit" data-id="${item.no_so}">
           <i class="bi bi-wrench"></i>
         </button>
-
+        <button class="btn btn-danger btn-batal" data-id="${item.no_so}">
+          Batalkan 
+        </button>
         </td>
                 </tr>`;
             tbody.append(row);
@@ -311,4 +313,74 @@ loadSalesData();
 $("#filterHari").on("change", function () {
     selectedHari = $(this).val();
     loadSalesData(1); // reload data dengan filter baru
+});
+
+
+//batalkan so
+// klik batal
+$(document).on("click", ".btn-batal", async function() {
+    const noSo = $(this).data("id");
+
+    // step 1: prompt password
+    const { value: password } = await Swal.fire({
+        title: 'Masukkan Password Buat Batalin',
+        input: 'password',
+        inputLabel: 'Password untuk membatalkan SO',
+        inputPlaceholder: 'Password...',
+        showCancelButton: true
+    });
+
+    if (!password) return; // batal jika tidak diisi
+    if (password !== 'sp102103') {
+        Swal.fire("Error", "Password salah ❌", "error");
+        return;
+    }
+
+    // step 2: konfirmasi pembatalan
+    const confirm = await Swal.fire({
+        title: 'Konfirmasi',
+        text: `Apakah yakin ingin membatalkan SO ${noSo}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Batalkan',
+        cancelButtonText: 'Batal'
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+        // step 3: loading
+        Swal.fire({
+            title: 'Sedang membatalkan...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // ambil semua record sales_order berdasarkan no_so
+        const records = await pb.collection("sales_order").getFullList({
+            filter: `no_so = "${noSo}"`
+        });
+
+        if (records.length === 0) {
+            Swal.close();
+            Swal.fire("Info", `Tidak ada record ditemukan untuk SO ${noSo}`, "info");
+            return;
+        }
+
+        // update semua record
+        await Promise.all(records.map(rec => pb.collection("sales_order").update(rec.id, { is_batal: "batal" })));
+
+        Swal.close();
+        Swal.fire("Sukses", `SO ${noSo} berhasil dibatalkan ✅`, "success");
+
+        // reload data
+        loadSalesData(currentPage);
+
+    } catch (err) {
+        Swal.close();
+        console.error(err);
+        Swal.fire("Error", "Gagal membatalkan SO", "error");
+    }
 });
