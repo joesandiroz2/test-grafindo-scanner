@@ -355,9 +355,18 @@ document.getElementById("buat_do_baru").addEventListener("click", async (e) => {
     const oldText = btn.innerHTML;
     btn.innerHTML = `Sedang membuat DO baru ${newNoDoId}...`;
 
+
+    function generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
     // bentuk data array
     const detailData = sourceData.map(item => ({
-      uid: crypto.randomUUID(),
+      uid: generateUUID(),
       part_number: item.part_number,
       nama_barang: item.nama_barang,
       qty: item.qty,
