@@ -67,7 +67,6 @@ async function Kurangi_stok_part() {
 
     } catch (error) {
         console.error(error);
-        Swal.fire('Error', 'Terjadi kesalahan saat menambahkan data.', 'error');
     } finally {
         loadingButton.prop("disabled", false).text("Masukkan Qty");
     }
