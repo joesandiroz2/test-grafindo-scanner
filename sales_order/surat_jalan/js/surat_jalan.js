@@ -316,6 +316,14 @@ document.getElementById("buat_do_baru").addEventListener("click", async (e) => {
   const params = new URLSearchParams(window.location.search);
   const no_do = params.get("id");
 
+
+
+    btn.disabled = true;
+    const oldText = btn.innerHTML;
+    btn.innerHTML = `sedang membuat nomor do .....`;
+
+
+
   if (!no_do) {
     Swal.fire("Error", "Nomor DO tidak ditemukan di URL", "error");
     return;
@@ -351,11 +359,9 @@ document.getElementById("buat_do_baru").addEventListener("click", async (e) => {
     const urut = existing.length + 1;
     const newNoDoId = `${no_do}D${urut}`;
 
-    btn.disabled = true;
-    const oldText = btn.innerHTML;
     btn.innerHTML = `Sedang membuat DO baru ${newNoDoId}...`;
 
-
+    
     function generateUUID() {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         const r = Math.random() * 16 | 0;
