@@ -43,16 +43,22 @@
   </div>
 
   <!-- pilih kode_depan -->
-  <div class="col-sm-12 col-md-4 col-lg-4">
+  <div class="col-sm-12 col-md-3 col-lg-3">
     <label for="kode_depan_do" class="form-label fw-bold">Pilih Kode Depan Do</label>
     <select id="kode_depan_do" class="form-select" style="width:100%"></select>
   </div>
 
   <!-- pilih tanggal -->
-  <div class="col-sm-12 col-md-4 col-lg-4">
+  <div class="col-sm-12 col-md-3 col-lg-3">
     <label for="tgl_input_schedule" class="form-label fw-bold">Pilih Tgl Schedule</label>
     <input type="date" id="tgl_input_schedule" class="form-control">
   </div>
+
+   <div class="col-sm-12 col-md-3 col-lg-3">
+    <label for="bulan_do" class="form-label fw-bold">Pilih Bulan untuk Do</label>
+    <input type="month" id="bulan_do" class="form-control">
+  </div>
+
 </div>
 
 <div class="mt-3">
@@ -154,6 +160,23 @@ const pb = new PocketBase(pocketbaseUrl);
     besok.setDate(besok.getDate() + 1); // tambah 1 hari
     input.value = besok.toISOString().split("T")[0];
   });
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+    // Set default tgl_input_schedule = besok
+    const inputSchedule = document.getElementById("tgl_input_schedule");
+    const besok = new Date();
+    besok.setDate(besok.getDate() + 1);
+    inputSchedule.value = besok.toISOString().split("T")[0];
+
+    // Set default bulan_do = bulan sekarang
+    const bulanInput = document.getElementById("bulan_do");
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, "0"); // 01-12
+    const year = now.getFullYear();
+    bulanInput.value = `${year}-${month}`;
+  });
+
 </script>
 
 </body>

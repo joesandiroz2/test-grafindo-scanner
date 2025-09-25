@@ -12,6 +12,7 @@ async function loadHistoryKeluar() {
 
         // Ambil data dari PocketBase dengan sort -created
         const records = await pb.collection("yamaha_kartu_stok").getList(1, 50, {
+              filter: 'status = "keluar"',
             sort: "-created"
         });
 
@@ -53,7 +54,7 @@ function renderHistoryTable(data) {
                 <td><p style="color:red;font-weight:bold">${item.kode_depan} ${item.no_do}</p></td>
                 <td><p style="font-weight:bold">${item.part_number || ""}</p></td>
                 <td>${item.nama_barang || ""}</td>
-                <td><p style="color:red;font-weight:bold">${item.qty_scan || ""}</p></td>
+                <td><p style="color:red;font-weight:bold">${item.qty_scan }</p></td>
                 <td>${item.lot || ""}</td>
                 <td>${formatDate(item.created)}</td>
             </tr>

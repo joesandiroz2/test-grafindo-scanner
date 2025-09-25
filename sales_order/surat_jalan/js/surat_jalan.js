@@ -81,6 +81,15 @@ function renderTableByDO(no_do_id, data) {
   });
 
   $("#no_do").text(no_do_id); // update judul di header
+
+
+    JsBarcode("#bar_code", no_do_id, {
+    format: "CODE128",
+    lineColor: "#000",
+    width: 2,
+    height: 50,
+    displayValue: true
+  });
 }
 
 
@@ -97,15 +106,7 @@ async function loadDetail_surat_jalan() {
     $("#loading").show();
     $("#detail-body").html(`<tr><td colspan="13" class="text-center">Loading...</td></tr>`);
 
-    let onlyNumber = no_do.includes("-") ? no_do.split("-")[1] : no_do;
-
-    JsBarcode("#bar_code", onlyNumber, {
-      format: "CODE128",
-      lineColor: "#000",
-      width: 2,
-      height: 50,
-      displayValue: true
-    });
+    
 
     try {
         // ambil semua record dengan no_do
@@ -126,7 +127,16 @@ async function loadDetail_surat_jalan() {
         const firstItem = records[0];
         $("#no_po").text(firstItem.no_po || "-");
         $("#salesman").text(firstItem.sales || "-");
-        $("#tgl_schedule").text(firstItem.tgl_schedule || "-");
+        $("#tgl_schedule").text(formatDateIndo(firstItem.tgl_schedule));
+
+        if (firstItem.is_batal && firstItem.is_batal.toLowerCase() === "batal") {
+          $("#is_batal_div")
+            .text("DiBATALKAN")
+            .css({ "color": "red", "font-weight": "bold" });
+        } else {
+          $("#is_batal_div").text(""); // kosongkan kalau null/undefined/"" 
+        }
+
 
         // ---- ambil data customer berdasarkan customer_id ----
         if (firstItem.customer_id) {
@@ -471,5 +481,20 @@ function renderAnakDO(existing, indukData, indukNoDo) {
   // render pertama kali → induk
   renderTableByDO(indukNoDo, indukData);
 }
+
+
+function formatDateIndo(dateString) {
+  if (!dateString) return "-";
+  const d = new Date(dateString);
+  const day = d.getDate();
+  const monthNames = [
+    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+  ];
+  const month = monthNames[d.getMonth()];
+  const year = d.getFullYear();
+  return `${day} ${month} ${year}`;
+}
+
 
 loginUser();

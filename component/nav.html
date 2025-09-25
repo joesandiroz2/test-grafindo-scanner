@@ -59,6 +59,15 @@
              href="/pages/honda.html"
              
               style="color:blue; font-weight:bold;background-color:white; border:2px solid blue; padding: 5px 10px; margin: 5px;">AHM</a>
+
+            
+
+            </li>
+            <li class="nav-item" id="dianscan-nav">
+            <a 
+             href="/dian_scan/dian_scan.html"
+             
+              style="color:black; font-weight:bold;background-color:white; border:2px solid green; padding: 5px 10px; margin: 5px;">Dian Scan</a>
             </li>
           
         </li>
@@ -166,6 +175,7 @@ function restrictMenu() {
         "yamaha-nav": document.getElementById("yamaha-nav"),
         "honda-nav": document.getElementById("honda-nav"),
         "sales-nav": document.getElementById("sales-nav"),
+        "dianscan-nav": document.getElementById("dianscan-nav"),
     };
 
     // Semua menu disembunyikan dulu
@@ -174,7 +184,7 @@ function restrictMenu() {
     });
 if (userEmail === "sopian@gmail.com") {
     // Hanya tampilkan menu tertentu untuk Sopian
-    let allowedMenus = ["honda-nav", "yamaha-nav", "buatlabel-nav", "reportlabel-nav","sales-nav"];
+    let allowedMenus = ["honda-nav", "yamaha-nav", "buatlabel-nav", "reportlabel-nav","sales-nav","dianscan-nav"];
     allowedMenus.forEach(menuId => {
         if (menuItems[menuId]) menuItems[menuId].style.display = "block";
     });

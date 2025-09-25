@@ -138,13 +138,16 @@ async function loadSalesData(page = 1) {
             // status batal / ok
             let statusCell = "";
             if (
-                item.is_batal === true || 
+                item.is_batal === true ||
                 (typeof item.is_batal === "string" && item.is_batal.toLowerCase() === "batal")
             ) {
-                statusCell = `<td style="background:red;color:white;">Batal</td>`;
+                statusCell = `<td><span class="badge bg-danger px-3 py-2 fs-6 badge-shadow">DiBatalin</span></td>`;
             } else {
-                statusCell = `<td style="background:green;color:white;">Ok</td>`;
+                statusCell = `<td><span class="badge bg-success px-3 py-2 fs-6 badge-shadow">Ok</span></td>`;
             }
+
+
+
              // ambil nama_pt sesuai customer_id
             const namaPt = customerMap[item.customer_id] || "";
 
@@ -152,14 +155,14 @@ async function loadSalesData(page = 1) {
                 <tr>
                     <td>${nomor}</td>
                     <td>${item.no_po || ""}</td>
-                    <td>${item.no_so || ""}</td>
-                 <td>${namaPt}</td>
+                    <td style="font-weight:bold">${item.no_so || ""}</td>
+                 <td style="font-weight:bold">${namaPt}</td>
                      ${deadCell}
                     <td>${item.sales || ""}</td>
                 <td style="${item.setujui_io 
                               ? 'color:green; font-weight:bold;' 
                               : 'color:red; font-weight:bold;'}">
-                  ${item.setujui_io || "Blm Aproved"}
+                  ${item.setujui_io || "Not Aproved"}
                 </td>
 
 

@@ -100,32 +100,63 @@ function renderPreview(data) {
 }
 
 // --- Generate Nomor SO ---
+// --- Generate Nomor SO Unik ---
 async function generateNoSO() {
-  const now = new Date();
-  const yy = String(now.getFullYear()).slice(-2);
-  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  // Ambil bulan dari input
+  const bulanInput = document.getElementById("bulan_do").value;
+  let year, month;
 
-  // Ambil data terakhir dari sales_order
+  if (bulanInput) {
+    [year, month] = bulanInput.split("-");
+  } else {
+    const now = new Date();
+    year = now.getFullYear();
+    month = String(now.getMonth() + 1).padStart(2, "0");
+  }
+
+  const yy = String(year).slice(-2);
+  const mm = String(month).padStart(2, "0");
+
+  // Ambil record terakhir untuk bulan tsb
   const records = await pb.collection("sales_order").getList(1, 1, {
-    sort: "-created"
+    sort: "-created",
+    filter: `no_so ~ "${yy}${mm}"`
   });
 
   let lastNumber = 0;
   if (records.items.length > 0) {
     const lastNoSo = records.items[0].no_so || "";
-    const match = lastNoSo.match(/SO-\d{4}(\d+)/);
+    const regex = new RegExp(`SO-${yy}${mm}(\\d+)`);
+    const match = lastNoSo.match(regex);
     if (match) {
       lastNumber = parseInt(match[1], 10);
     }
   }
 
-  const newNumber = String(lastNumber + 1).padStart(5, "0");
-  return `SO-${yy}${mm}${newNumber}`;
+  let newNumber = lastNumber + 1;
+  let candidate = "";
+
+  // LOOP sampai ketemu nomor yang belum ada
+  while (true) {
+    candidate = `SO-${yy}${mm}${String(newNumber).padStart(5, "0")}`;
+    const exists = await pb.collection("sales_order").getFirstListItem(`no_so="${candidate}"`).catch(() => null);
+    if (!exists) break; // kalau belum ada → aman dipakai
+    newNumber++; // kalau ada → tambah 1 lagi
+  }
+
+  return candidate;
 }
+
+
 
 // --- Upload ke PocketBase ---
 document.getElementById("uploadBtn").addEventListener("click", async () => {
   if (parsedData.length === 0) return;
+
+   // 🔒 Disable tombol upload biar tidak bisa dobel klik
+  const uploadBtn = document.getElementById("uploadBtn");
+  uploadBtn.disabled = true;
+  uploadBtn.textContent  = "sedang memproses....."
 
   // Login dulu
   try {
@@ -134,6 +165,8 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
     Swal.fire("Error", "Gagal login ke PocketBase", "error");
     return;
   }
+
+  uploadBtn.textContent  = "sedang mendapatkan nomor urut"
 
   // Generate nomor SO baru
   const noSOBaru = await generateNoSO();
@@ -160,14 +193,26 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
   }
 
   Swal.fire({
-    title: `Konfirmasi Upload , No SO anda ${noSOBaru}.`,
-    text: `No SO anda ${noSOBaru}. Anda yakin ingin mengupload ${parsedData.length} data ke PocketBase?`,
-    icon: "question",
-    showCancelButton: true,
-    confirmButtonText: "Ya, upload",
-    cancelButtonText: "Batal",
-  }).then(async (result) => {
-    // Tampilkan progress
+  title: `Konfirmasi Upload , No SO anda ${noSOBaru}.`,
+  text: `No SO anda ${noSOBaru}. Anda yakin ingin mengupload ${parsedData.length} data ke PocketBase?`,
+  icon: "question",
+  showCancelButton: true,
+  confirmButtonText: "Ya, upload",
+  cancelButtonText: "Batal",
+  allowOutsideClick: false,
+  allowEscapeKey: false,
+  showCloseButton: true
+}).then(async (result) => {
+  if (result.isDismissed) {
+    // Kalau user close (X) atau klik cancel → jangan upload sama sekali
+    console.log("❌ Upload dibatalkan atau modal ditutup.");
+      uploadBtn.disabled = false;
+    uploadBtn.textContent = "Upload Data ke database";
+    return;
+  }
+
+  if (result.isConfirmed) {
+    // ✅ hanya masuk sini kalau user klik "Ya, upload"
     document.querySelector(".progress").style.display = "block";
     const progressBar = document.getElementById("uploadProgress");
 
@@ -184,14 +229,14 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
         no_po: row.no_po,
         tgl_schedule: tglSchedule,
         no_so: noSOBaru,  
-       no_io: `IO-${noSOBaru.slice(3)}`, // pastikan SO- diganti IO-
-       no_do: `${kodeDepan}-${noSOBaru.slice(3)}`, // pastikan SO- diganti IO-
+        no_io: `IO-${noSOBaru.slice(3)}`,
+        no_do: `${kodeDepan}-${noSOBaru.slice(3)}`,
         shipped: "",
         back_order: "",
         sales: row.sales,
-        kode_depan: kodeDepan,   
-         customer_id: customerId || null,
-        is_batal: result.isConfirmed ? "" : "batal"
+        kode_depan: kodeDepan,
+        customer_id: customerId || null,
+        is_batal: ""   // default kosong, bukan "batal"
       };
 
       try {
@@ -212,6 +257,7 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
       text: `${successCount} dari ${parsedData.length} data berhasil diupload.`,
     });
 
+    // reset
     parsedData = [];
     document.querySelector("#previewTable tbody").innerHTML = "";
     document.getElementById("uploadBtn").disabled = true;
@@ -219,7 +265,11 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
     document.querySelector(".progress").style.display = "none";
     progressBar.style.width = "0%";
     progressBar.innerText = "0%";
-  });
+     uploadBtn.disabled = false;
+    uploadBtn.textContent = "Upload";
+  }
+});
+
 });
 
 

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aplikasi Yamaha</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+ 
+</head>
+<body>
+
+  <div id="navbar-container"></div>
+
+ <div class="container mt-5">
+  <h4>Aplikasi Bu Dian</h4>
+  <div class="row g-4">
+
+     <!-- Card 3: Scan -->
+    <div class="col-md-4 col-sm-12">
+      <div class="card text-center h-100 shadow-sm">
+        <div class="card-body d-flex flex-column justify-content-center">
+          <i class="bi bi-upc-scan display-1 mb-3 text-warning"></i>
+          <h5 class="card-title">Scan</h5>
+          <p class="card-text">Lakukan scanning data dengan barcode / QR.</p>
+          <a href="scan.html" class="btn btn-warning mt-auto text-dark">Masuk</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 1: Upload Excel -->
+    <div class="col-md-4 col-sm-12">
+      <div class="card text-center h-100 shadow-sm">
+        <div class="card-body d-flex flex-column justify-content-center">
+          <i class="bi bi-upload display-1 mb-3 text-primary"></i>
+          <h5 class="card-title">Upload Excel</h5>
+          <p class="card-text">Unggah data Excel ke sistem.</p>
+          <a href="/dian_scan/upload_excel_dian/upload_excel_dian.html" class="btn btn-primary mt-auto">Masuk</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Report -->
+    <div class="col-md-4 col-sm-12">
+      <div class="card text-center h-100 shadow-sm">
+        <div class="card-body d-flex flex-column justify-content-center">
+          <i class="bi bi-file-earmark-text display-1 mb-3 text-success"></i>
+          <h5 class="card-title">Report</h5>
+          <p class="card-text">Lihat laporan data yang telah diupload.</p>
+          <a href="report.html" class="btn btn-success mt-auto">Masuk</a>
+        </div>
+      </div>
+    </div>
+
+   
+
+  </div>
+</div>
+
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<script src="../../js/sdk/pocketbase.umd.js"></script>
+<script src="../../js/pocket_config.js"></script>
+
+  <!-- Load Navbar -->
+  <script>
+    $(document).ready(function () {
+      $("#navbar-container").load("../../component/nav.html", function () {
+        setTimeout(loginUser, 500);
+      });
+    });
+  </script>
+
+</body>
+</html>
