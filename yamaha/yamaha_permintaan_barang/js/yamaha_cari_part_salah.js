@@ -11,7 +11,7 @@ async function fetchData(partNumber, noLot) {
     try {
         // Tampilkan loading indicator
         Swal.fire({
-            title: 'Loading...',
+            title: 'sedang mengecek barang...',
             text: 'Mengambil data, harap tunggu...',
             allowOutsideClick: false,
             onBeforeOpen: () => {
@@ -80,7 +80,7 @@ async function displayResults(items, partNumber, noLot) {
                         <th>Part Number</th>
                         <th>Lot</th>
                         <th>Nama Barang</th>
-                        <th>Balance</th>
+                        <th>Balance terakhir</th>
                         <th>Terakhir Scan</th>
                     </tr>
                 </thead>

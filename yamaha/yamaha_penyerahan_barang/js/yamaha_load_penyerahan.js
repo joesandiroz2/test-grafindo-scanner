@@ -40,6 +40,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         <td>${item.lot}</td>
         <td>${item.qty_masuk}</td>
         <td><i>${updatedFormatted}</i></td>
+         <td>
+        <button class="btn btn-warning btn-ganti-lot" data-id="${item.id}" data-lot="${item.lot}">ganti lot</button>
+      </td>
       `;
         
 
@@ -96,5 +99,52 @@ document.addEventListener("DOMContentLoaded", async function () {
     menit = menit < 10 ? "0" + menit : menit;
 
     return `${tanggal} ${bulan} ${tahun} ${jam}:${menit}`;
+  }
+});
+
+
+document.addEventListener("click", function(e) {
+  if (e.target.classList.contains("btn-ganti-lot")) {
+    const id = e.target.getAttribute("data-id");
+    const lot = e.target.getAttribute("data-lot");
+
+    document.getElementById("recordId").value = id;
+    document.getElementById("lotBaru").value = lot;
+
+    const modal = new bootstrap.Modal(document.getElementById("modalGantiLot"));
+    modal.show();
+  }
+});
+
+document.getElementById("btnSimpanLot").addEventListener("click", async function() {
+  const id = document.getElementById("recordId").value;
+  const lotBaru = document.getElementById("lotBaru").value;
+  const btn = document.getElementById("btnSimpanLot");
+
+  if (!lotBaru) {
+    alert("Lot tidak boleh kosong!");
+    return;
+  }
+
+  // Ubah teks tombol jadi loading
+  const oldText = btn.innerHTML;
+  btn.innerHTML = "Sedang mengganti...";
+  btn.disabled = true;
+
+  try {
+    const updated = await pb.collection("yamaha_kartu_stok").update(id, {
+      lot: lotBaru
+    });
+
+    console.log("Update sukses:", updated);
+    alert("Lot berhasil diperbarui!");
+    location.reload(); // refresh tabel
+  } catch (err) {
+    console.error("Update error:", err);
+    alert("Gagal update lot!");
+  } finally {
+    // Balikin tombol (kalau tidak ada reload)
+    btn.innerHTML = oldText;
+    btn.disabled = false;
   }
 });

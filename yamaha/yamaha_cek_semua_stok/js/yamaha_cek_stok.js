@@ -33,6 +33,8 @@ async function getLastBalance(partNumber) {
 
     if (res.items.length > 0) {
       return {
+        kode_depan:res.items[0].kode_depan,
+        no_do:res.items[0].no_do,
         qty_masuk:res.items[0].qty_masuk || 0,
         qty_scan:res.items[0].qty_scan || 0,
         balance: res.items[0].balance || 0,
@@ -74,7 +76,7 @@ async function renderStock() {
     statusText.innerText = `Sedang mengambil part , Proses Ke ${count + 1} dari ${total}...`;
 
     // ambil balance + created
-    const { balance, created ,status,qty_scan,qty_masuk} = await getLastBalance(part.part_number);
+    const { balance, created ,status,qty_scan,qty_masuk,no_do,kode_depan} = await getLastBalance(part.part_number);
 
     // style balance
     const balanceStyle =
@@ -85,34 +87,46 @@ async function renderStock() {
     // tentukan style berdasarkan status
     let statusCell = "";
     if (status === "masuk") {
-      statusCell = `<td style="color:green; font-weight:bold;">${formatTanggal(created)} <br/> status Terakhir  : ${status} ${qty_masuk || qty_scan} Pcs </td>`;
+      statusCell = `<td style="color:green; font-weight:bold;">${formatTanggal(created)} <br/>  Terakhir  : ${status} ${qty_masuk || qty_scan} Pcs dari ${kode_depan} ${no_do}</td>`;
     } else {
-      statusCell = `<td style=" color:red; font-weight:bold;">${formatTanggal(created)} <br/> status Terakhir  :  ${status}  ${qty_masuk || qty_scan} Pcs</td>`;
+      statusCell = `<td style=" color:red; font-weight:bold;">${formatTanggal(created)} <br/> Terakhir  :  ${status}  ${qty_masuk || qty_scan} Pcs dari ${kode_depan} ${no_do}</td>`;
     }
 
 
     // render row
     const row = document.createElement("tr");
+
+     // cek localStorage
+  const currentUser = localStorage.getItem("user-grafindo");
+  const isSopian = currentUser === "sopian@gmail.com";
+
+
+     const actionButtons = isSopian
+      ? `
+        <td>
+          <button class="btn btn-warning btn-sm perbaiki-btn"
+            data-part="${part.part_number}"
+            data-nama="${part.nama_barang}">
+            <i class="bi bi-tools"></i> Perbaiki
+          </button>
+        </td>
+        <td>
+          <button class="btn btn-danger btn-sm hapus-btn"
+            data-part="${part.part_number}"
+            data-nama="${part.nama_barang}">
+            <i class="bi bi-trash"></i> Hapus
+          </button>
+        </td>`
+      : "<td></td><td></td>";
+
+
     row.innerHTML = `
       <td>${++count}</td>
-      <td>${part.part_number}</td>
+      <td><p style="font-weight:bold">${part.part_number}</p></td>
       <td>${part.nama_barang}</td>
       <td ${balanceStyle}>${balance}</td>
         ${statusCell}
-       <td>
-        <button class="btn btn-warning btn-sm perbaiki-btn"
-          data-part="${part.part_number}"
-          data-nama="${part.nama_barang}">
-          <i class="bi bi-tools"></i> Perbaiki
-        </button>
-      </td>
-    <td>
-      <button class="btn btn-danger btn-sm hapus-btn"
-        data-part="${part.part_number}"
-        data-nama="${part.nama_barang}">
-        <i class="bi bi-trash"></i> Hapus
-      </button>
-    </td>
+        ${actionButtons}
 
     `;
     tableBody.appendChild(row);
