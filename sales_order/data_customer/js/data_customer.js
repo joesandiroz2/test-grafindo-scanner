@@ -75,7 +75,7 @@ async function loadCustomers(page = 1) {
           <td>${cust.no_telp || ""}</td>
           <td>
             <button class="btn btn-sm btn-warning me-1" onclick="editCustomer('${cust.id}')"><i class="bi bi-pencil"></i></button>
-            <button class="btn btn-sm btn-danger" onclick="deleteCustomer('${cust.id}')"><i class="bi bi-trash"></i></button>
+          
           </td>
         </tr>
       `;
