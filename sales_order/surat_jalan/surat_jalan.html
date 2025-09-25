@@ -67,6 +67,7 @@
       <svg id="bar_code"></svg>
     </div>
   </div>
+
     <!-- Box kanan -->
     <div class="p-2 border rounded col-12 col-md-6" >
       <span>Delivery Order No : 
@@ -84,6 +85,7 @@
       </span>
 
         <div style="border:1px solid black; padding:10px; margin:5px;">
+          <h4>Ship To:</h4>
         <span>Customer : 
           <span style="font-weight:bold" id="cust_pt"></span>
         </span><br>
@@ -93,7 +95,23 @@
         <span>Telp : 
           <span style="font-weight:bold" id="cust_telp"></span>
         </span>
+
+         <div class="row"> 
+              <h4>Invoice To:</h4>
+            <span>Customer : 
+              <span style="font-weight:bold" id="inv_cust_pt"></span>
+            </span><br>
+            <span>Alamat : 
+              <span style="font-weight:bold" id="inv_cust_alamat"></span>
+            </span><br>
+            <span>Telp : 
+              <span style="font-weight:bold" id="inv_cust_telp"></span>
+            </span>
       </div>
+  
+      </div>
+
+   
     </div>
 
 
@@ -101,6 +119,15 @@
 </div>
 
   
+<div class="container"> 
+  <button id="buat_do_baru" class="btn btn-primary">Bikin Do Baru Lagi</button>
+</div>
+
+<!-- list anak do -->
+<div id="list_anak_do"> 
+
+</div>
+
 
  <table class="table table-bordered">
   <thead >

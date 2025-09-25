@@ -105,62 +105,75 @@ async function loadDetail_io() {
 function renderStatusBadge(isApproved, no_io) {
     const statusDiv = $("#status_io");
 
+    // cek localStorage user
+    const currentUser = localStorage.getItem("user-grafindo");
+
     if (isApproved) {
         statusDiv.html(`
-            <span class="badge bg-success" style="cursor:pointer;">
+            <span class="badge bg-success">
                 Io Approved 😄
             </span>
         `);
     } else {
-        statusDiv.html(`
-            <span class="badge bg-danger" style="cursor:pointer;">
-                Io belum disetujui 😞
-            </span>
-        `);
+        // kalau user = kamto@gmail.com → bisa klik, kalau bukan → disable
+        if (currentUser === "kamto@gmail.com") {
+            statusDiv.html(`
+                <span class="badge bg-danger" style="cursor:pointer;">
+                    Io belum disetujui 😞 (klik untuk approve)
+                </span>
+            `);
 
-        // klik untuk approve semua
-        statusDiv.find("span").off("click").on("click", async function () {
-            Swal.fire({
-                title: "Konfirmasi",
-                text: "Apakah Anda yakin ingin menyetujui semua record IO ini?",
-                icon: "question",
-                showCancelButton: true,
-                confirmButtonText: "Ya, Setujui",
-                cancelButtonText: "Batal"
-            }).then(async (result) => {
-                if (!result.isConfirmed) return;
+            // klik untuk approve semua
+            statusDiv.find("span").off("click").on("click", async function () {
+                Swal.fire({
+                    title: "Konfirmasi",
+                    text: "Apakah Anda yakin ingin menyetujui semua record IO ini?",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonText: "Ya, Setujui",
+                    cancelButtonText: "Batal"
+                }).then(async (result) => {
+                    if (!result.isConfirmed) return;
 
-                $("#loading").show();
+                    $("#loading").show();
 
-                try {
-                    const allRecords = await pb.collection("sales_order").getFullList({
-                        filter: `no_io="${no_io}"`,
-                        sort: "-created"
-                    });
+                    try {
+                        const allRecords = await pb.collection("sales_order").getFullList({
+                            filter: `no_io="${no_io}"`,
+                            sort: "-created"
+                        });
 
-                    let successCount = 0;
-                    for (const record of allRecords) {
-                        try {
-                            await pb.collection("sales_order").update(record.id, {
-                                setujui_io: "approved"
-                            });
-                            successCount++;
-                        } catch (err) {
-                            console.error("Gagal update:", record.id, err);
+                        let successCount = 0;
+                        for (const record of allRecords) {
+                            try {
+                                await pb.collection("sales_order").update(record.id, {
+                                    setujui_io: "approved"
+                                });
+                                successCount++;
+                            } catch (err) {
+                                console.error("Gagal update:", record.id, err);
+                            }
                         }
+
+                        renderStatusBadge(true, no_io);
+                        Swal.fire("Berhasil", `${successCount} record berhasil disetujui ✅`, "success");
+
+                    } catch (err) {
+                        console.error(err);
+                        Swal.fire("Error", "Gagal update status IO", "error");
+                    } finally {
+                        $("#loading").hide();
                     }
-
-                    renderStatusBadge(true, no_io);
-                    Swal.fire("Berhasil", `${successCount} record berhasil disetujui ✅`, "success");
-
-                } catch (err) {
-                    console.error(err);
-                    Swal.fire("Error", "Gagal update status IO", "error");
-                } finally {
-                    $("#loading").hide();
-                }
+                });
             });
-        });
+        } else {
+            // user bukan kamto → hanya tampil badge merah tanpa klik
+            statusDiv.html(`
+                <span class="badge bg-danger">
+                    Io belum disetujui 😞
+                </span>
+            `);
+        }
     }
 }
 
