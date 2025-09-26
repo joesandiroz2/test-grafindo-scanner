@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aplikasi Yamaha</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+ 
+</head>
+<body>
+
+  <div id="navbar-container"></div>
+<div class="container">
+  <h5>Scan Do Others</h5>
+
+  <input type="text" 
+         placeholder="scan do disini" 
+         style="font-size:20px;font-weight:bold;width:100%;padding:3px;border:2px solid black" 
+         id="scan_other"
+         autofocus />
+</div>
+
+  <div class="row mt-3">
+    <!-- Tabel pertama -->
+    <div class="col-sm-12 col-md-6 col-lg-6 mb-3">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          Hasil Pencarian DO
+        </div>
+        <div class="card-body p-2">
+          <table id="tbl_do_list" class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>No DO</th>
+              <th>Part Number</th>
+              <th>Nama Barang</th>
+              <th>Qty</th>
+              <th>Merk</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabel kedua -->
+    <div class="col-sm-12 col-md-6 col-lg-6 mb-3">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          Hasil Scan
+        </div>
+        <div class="card-body p-2">
+          <table id="tbl_scan" class="table table-bordered table-striped table-sm mb-0">
+            <thead>
+              <tr>
+                <th>Waktu</th>
+                <th>No DO</th>
+                <th>Part Number</th>
+                <th>Qty</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<script src="../../js/sdk/pocketbase.umd.js"></script>
+<script src="../../js/pocket_config.js"></script>
+
+<script src="./js/scan_dian.js"></script>
+  <!-- Load Navbar -->
+  <script>
+    $(document).ready(function () {
+      $("#navbar-container").load("../../component/nav.html", function () {
+        setTimeout(loginUser, 500);
+      });
+    });
+  </script>
+
+</body>
+</html>

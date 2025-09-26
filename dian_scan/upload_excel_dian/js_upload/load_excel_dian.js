@@ -12,20 +12,18 @@ async function loadDianScanData(page = 1) {
     const result = await pb.collection("dian_scan").getList(page, perPage, {
       sort: "-created",
     });
-
+    console.log(result)
     let tbody = $("#tbl_data_excel tbody");
-    tbody.empty();
 
     result.items.forEach(item => {
       let row = `
         <tr>
-          <td>${item.no_do || ""}</td>
-          <td>${item.part_number || ""}</td>
-          <td>${item.nama_barang || ""}</td>
-          <td>${item.qty || ""}</td>
-          <td>${item.po_no || ""}</td>
-          <td>${item.merk || ""}</td>
-          <td>${item.kode_depan || ""}</td>
+          <td>${item.kode_depan} ${item.no_do}</td>
+          <td>${item.part_number}</td>
+          <td>${item.nama_barang}</td>
+          <td>${item.qty}</td>
+          <td>${item.po_no}</td>
+          <td>${item.merk}</td>
         </tr>
       `;
       tbody.append(row);
@@ -51,15 +49,12 @@ function renderPagination(current, total) {
     </li>
   `);
 
-  // nomor halaman
-  for (let i = 1; i <= total; i++) {
-    let active = i === current ? "active" : "";
-    pagination.append(`
-      <li class="page-item ${active}">
-        <a class="page-link" href="#" data-page="${i}">${i}</a>
-      </li>
-    `);
-  }
+  // info halaman (tanpa tombol)
+  pagination.append(`
+    <li class="page-item disabled">
+      <a class="page-link">Halaman ${current} dari ${total}</a>
+    </li>
+  `);
 
   // tombol next
   let nextDisabled = current === total ? "disabled" : "";
@@ -73,11 +68,12 @@ function renderPagination(current, total) {
   $("#pagination a").click(function (e) {
     e.preventDefault();
     let page = parseInt($(this).data("page"));
-    if (!isNaN(page)) {
+    if (!isNaN(page) && page >= 1 && page <= total) {
       currentPage = page;
       loadDianScanData(page);
     }
   });
 }
+
 
   loadDianScanData(currentPage);
