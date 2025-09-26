@@ -175,9 +175,7 @@ async function loadSalesData(page = 1) {
          <a class="btn btn-warning" href="/sales_order/information_order/information_order_list.html?id=${encodeURIComponent(item.no_io || "")}">
                  IO
             </a>
-        <a class="btn btn-success" href="/sales_order/surat_jalan/surat_jalan.html?id=${encodeURIComponent(item.no_do || "")}">
-                 DO
-            </a>
+        
         <button class="btn btn-danger btn-edit" data-id="${item.no_so}">
           <i class="bi bi-wrench"></i>
         </button>

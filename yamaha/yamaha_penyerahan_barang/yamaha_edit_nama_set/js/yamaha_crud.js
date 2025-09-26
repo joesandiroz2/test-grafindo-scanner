@@ -210,8 +210,11 @@ async function updateData() {
     await pb.collection("yamaha_data_barang").update(id, formData);
     document.getElementById("edit-id").value = "";
     clearForm();
-    alert("Gagal update data: " + err.message);
-  } finally {
+    
+    Swal.fire("Berhasil!", "Data berhasil diperbarui.", "success");
+  } catch (err) {
+    Swal.fire("Gagal!", "Update data gagal: " + err.message, "error");
+  }finally {
     spinner.classList.add("d-none");
     btnSave.disabled = false;
     btnSave.textContent = "Simpan";
@@ -231,6 +234,77 @@ function clearForm() {
 }
 
 
+//cari partnumber
+let searchQuery = ""; // buat variabel global
+
+// Fungsi pencarian
+async function searchPartNumber() {
+  const input = document.getElementById("searchInput").value.trim();
+  searchQuery = input.toUpperCase(); // biar konsisten huruf besar
+  currentPage = 1; // reset ke halaman awal
+  await loadData(currentPage);
+}
+
+// Modifikasi loadData biar support filter
+async function loadData(page = 1) {
+  listContainer.innerHTML = "";
+  spinner.classList.remove("d-none");
+
+  try {
+    await authpw();
+    let filterOptions = {
+      sort: "-created",
+      autoCancel: true
+    };
+
+    // kalau ada pencarian, tambahin filter PocketBase
+    if (searchQuery) {
+      filterOptions.filter = `part_number ~ "${searchQuery}"`; 
+      // gunakan ~ biar support LIKE (contains)
+    }
+
+    const result = await pb.collection("yamaha_data_barang").getList(page, perPage, filterOptions);
+
+    const records = result.items;
+    totalPages = result.totalPages;
+    currentPage = result.page;
+
+    let no = (currentPage - 1) * perPage + 1;
+
+    records.forEach(item => {
+      const row = document.createElement("tr");
+      const imageUrl = `${pocketbaseUrl}/api/files/yamaha_data_barang/${item.id}/${item.gambar}`;
+
+      row.innerHTML = `
+        <td>${no}</td>
+        <td>
+          ${item.gambar ? `<img src="${imageUrl}" style="width:100px;height:80px" alt="gambar" />` : '<span class="text-muted">Tidak ada gambar</span>'}
+        </td>
+        <td>${item.nama_barang}</td>
+        <td style="font-weight:bold">${item.part_number}</td>
+        <td style="font-weight:bold">${item.ikut_set}</td>
+        <td>${item.dikalikan}</td>
+        <td>
+          <button class="btn btn-warning btn-sm" onclick="editData('${item.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteData('${item.id}')">Delete</button>
+        </td>
+      `;
+      listContainer.appendChild(row);
+      no++;
+    });
+
+    updatePaginationUI();
+    spinner.classList.add("d-none");
+
+  } catch (err) {
+    if (err.name === "AbortError") {
+      console.log("Request loadData dibatalkan");
+    } else {
+      alert("Gagal load data: " + err.message);
+    }
+    spinner.classList.add("d-none");
+  }
+}
 
 
 loadData()
