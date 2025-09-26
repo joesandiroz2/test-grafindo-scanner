@@ -124,6 +124,40 @@ style="font-weight: bold;color:red;font-size: 25px;"
 </div>
 
 
+<!-- modal edit -->
+<!-- Modal Edit Lot & PB -->
+<div class="modal fade" id="editLotPbModal" tabindex="-1" role="dialog" aria-labelledby="editLotPbModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Lot & No DO</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editLotPbForm">
+          <input type="hidden" id="edit-id">
+          <div class="form-group">
+            <label for="edit-no-do">No DO</label>
+            <input type="text" class="form-control" id="edit-no-do" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-lot">Lot</label>
+            <input type="text" class="form-control" id="edit-lot" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-primary" id="saveLotPbBtn">Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 <script src="../../js/sdk/pocketbase.umd.js"></script>
 <script src="../../js/pocket_config.js"></script>
 <script src="./js/yamaha_kesalahan_input.js"></script>
@@ -201,7 +235,7 @@ async function loadAllParts() {
     let totalItems = 0;
 
     while (page <= totalPages) {
-        const res = await fetch(`http://192.168.0.99:8090/api/collections/yamaha_unik_part_number/records?page=${page}&perPage=30`);
+        const res = await fetch(`${pocketbaseUrl}/api/collections/yamaha_unik_part_number/records?page=${page}&perPage=30`);
         const data = await res.json();
 
         totalPages = data.totalPages;

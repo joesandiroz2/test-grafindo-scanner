@@ -67,6 +67,14 @@ async function loadDetail_io() {
         $("#no_po").text(firstItem.no_po || "-");
         $("#salesman").text(firstItem.sales || "-");
 
+         if (firstItem.is_batal && firstItem.is_batal.toLowerCase() === "batal") {
+          $("#is_batal_div")
+            .text("DIBATALIN")
+            .css({ "color": "red", "font-weight": "bold" });
+        } else {
+          $("#is_batal_div").text(""); // kosongkan kalau null/undefined/"" 
+        }
+
 
          // 🔹 ambil data customer dari sales_customer
         if (firstItem.customer_id) {

@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         <td>${item.qty_masuk}</td>
         <td><i>${updatedFormatted}</i></td>
          <td>
-        <button class="btn btn-warning btn-ganti-lot" data-id="${item.id}" data-lot="${item.lot}">ganti lot</button>
+        <button class="btn btn-warning btn-ganti-lot" data-id="${item.id}" data-no-do="${item.no_do}" data-lot="${item.lot}">ganti lot Pb</button>
       </td>
       `;
         
@@ -107,9 +107,11 @@ document.addEventListener("click", function(e) {
   if (e.target.classList.contains("btn-ganti-lot")) {
     const id = e.target.getAttribute("data-id");
     const lot = e.target.getAttribute("data-lot");
+    const no_do = e.target.getAttribute("data-no-do");
 
     document.getElementById("recordId").value = id;
     document.getElementById("lotBaru").value = lot;
+    document.getElementById("nodoBaru").value = no_do;
 
     const modal = new bootstrap.Modal(document.getElementById("modalGantiLot"));
     modal.show();
@@ -119,6 +121,7 @@ document.addEventListener("click", function(e) {
 document.getElementById("btnSimpanLot").addEventListener("click", async function() {
   const id = document.getElementById("recordId").value;
   const lotBaru = document.getElementById("lotBaru").value;
+  const nodoBaru = document.getElementById("nodoBaru").value;
   const btn = document.getElementById("btnSimpanLot");
 
   if (!lotBaru) {
@@ -133,7 +136,8 @@ document.getElementById("btnSimpanLot").addEventListener("click", async function
 
   try {
     const updated = await pb.collection("yamaha_kartu_stok").update(id, {
-      lot: lotBaru
+      lot: lotBaru,
+      no_do:nodoBaru
     });
 
     console.log("Update sukses:", updated);
