@@ -4,13 +4,14 @@ const progressContainer = document.querySelector(".progress");
 const progressBar = document.getElementById("progressBar");
 
 
+
 // Kolom yang dibutuhkan
-const requiredColumns = ["no_do", "part_number", "nama_barang", "qty", "po_no"];
+const requiredColumns = ["no_do", "part_number", "nama_barang", "qty", "po_no","merk","kode_depan"];
 
 // Login user PocketBase
 async function loginPocketBase() {
     try {
-        await pb.admins.authWithPassword(username_pocket, user_pass_pocket);
+        await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
         console.log("Login sukses!");
     } catch (err) {
         console.error("Login gagal:", err);
