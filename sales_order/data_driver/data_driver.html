@@ -14,8 +14,58 @@
 
 <div id="navbar-container"></div>
 
-data driver
+<div class="container mt-4">
+    <h3>Data Driver</h3>
 
+    <!-- Form Tambah -->
+    <form id="formDriver" class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label for="nama" class="form-label">Nama Driver</label>
+        <input type="text" class="form-control" id="nama" required placeholder="input nama driver disini" />
+      </div>
+      <div class="col-md-6 align-self-end">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-plus-circle"></i> Tambah Driver
+        </button>
+      </div>
+    </form>
+
+    <!-- Tabel -->
+    <table class="table table-striped" id="tbl_driver">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nama</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Modal Edit -->
+  <div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="formEditDriver">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Driver</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="edit_id" />
+            <div class="mb-3">
+              <label for="edit_nama" class="form-label">Nama Driver</label>
+              <input type="text" class="form-control" id="edit_nama" required />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-warning">Update</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
 
 
@@ -29,6 +79,8 @@ data driver
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="../../js/sdk/pocketbase.umd.js"></script>
 <script src="../../js/pocket_config.js"></script>
+<script src="./js/data_driver.js"></script>
+
 <script>
   $(document).ready(function () {
     $("#navbar-container").load("../../component/nav.html", function () {

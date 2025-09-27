@@ -201,9 +201,31 @@ function cekSemuaBarangSudahSelesai(data) {
 
 
 
-function submitData() {
+async function submitData() {
+ let previewContainer = document.getElementById("preview_container");
 
-  // Tampilkan alert atau kirim ke server
+  try {
+    // Cari part_number di PocketBase
+    const result = await pb.collection("yamaha_data_barang").getFirstListItem(`part_number="${inputPartNo}"`);
+
+    if (result) {
+      if (result.gambar && result.gambar !== "") {
+        // Tampilkan gambar
+        previewContainer.innerHTML = `
+          <img src="${pocketbaseUrl}/api/files/yamaha_data_barang/${result.id}/${result.gambar}" 
+               alt="${result.nama_barang}" style="width:250px; height:200px; max-width:250px; max-height:200px;">
+        `;
+      } else {
+        // Tidak ada gambar
+        previewContainer.innerHTML = `<h5 style="color:red">Gambar belum ada</h5>`;
+      }
+    }
+  } catch (err) {
+    // Part number tidak ditemukan
+    previewContainer.innerHTML = `<h5 style="color:red">part ini ga ada gambar nya, salah partnumber</h5>`;
+  }
+
+
      simpanKeKartuDO(inputPartNo, inputQty,inputPo);
     document.getElementById('scannerInput').value = '';
   document.getElementById('scannerInput').focus();

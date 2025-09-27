@@ -104,24 +104,36 @@
     });
 
 document.getElementById("downloadExcel").addEventListener("click", function () {
-  // ambil tabel
   const table = document.querySelector("table");
-  
-  // convert ke worksheet
-  const wb = XLSX.utils.table_to_book(table, { sheet: "Stok Yamaha" });
-  
-  // download
+  const tableClone = table.cloneNode(true);
+
+  // hapus kolom terakhir (index 4) di thead
+  tableClone.querySelectorAll("thead tr").forEach(tr => {
+    if (tr.cells.length > 4) {
+      tr.deleteCell(4);
+    }
+  });
+
+  // hapus kolom terakhir (index 4) di tbody
+  tableClone.querySelectorAll("tbody tr").forEach(tr => {
+    if (tr.cells.length > 4) {
+      tr.deleteCell(4);
+    }
+  });
+
+  // export tanpa kolom terakhir
+  const wb = XLSX.utils.table_to_book(tableClone, { sheet: "Stok Yamaha" });
   XLSX.writeFile(wb, "stok_yamaha.xlsx");
 
-  // SweetAlert2 notifikasi sukses
   Swal.fire({
     icon: 'success',
     title: 'Berhasil!',
-    text: 'Data berhasil diunduh sebagai Excel.',
+    text: 'Data berhasil diunduh tanpa kolom Hapus/Tgl.',
     showConfirmButton: false,
     timer: 2000
   });
 });
+
 
 
   </script>
