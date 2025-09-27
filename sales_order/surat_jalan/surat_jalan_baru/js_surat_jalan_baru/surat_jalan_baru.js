@@ -1,3 +1,9 @@
+// fungsi untuk ambil parameter dari URL
+function getQueryParam(name) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(name);
+}
+
 
 async function generateNoDo() {
   const target = document.getElementById("no_do_generate");
