@@ -21,14 +21,47 @@ const pb = new PocketBase(pocketbaseUrl);
   <div id="navbar-container"></div>
 
    <div class="container mt-5">
-    <h3>Upload Excel Aplikasi Bu dian</h3>
+    <h3>Upload Excel Aplikasi Others</h3>
 
     <div>
-      <h6>Standar Kolom di excel : part_number , nama_barang , qty , po_no , merk , kode_depan , no_do</h6>
+      <h6>Standar Kolom di excel : part_number , nama_barang , qty , po_no </h6>
     </div>
 
-    <input type="file" id="excelFile" class="form-control mb-3" accept=".xlsx,.xls" />
-    <button id="uploadBtn" class="btn btn-primary">Upload</button>
+    <a target="_blank" href="https://docs.google.com/spreadsheets/d/1SxHgzk7LKC7yK1SVLoWsfcxRBXk4765lpzpw48fQqwY/edit?usp=sharing">Download Contoh Excel Upload</a>
+<div class="container mt-4">
+   <!-- Inputan -->
+    <div class="row mb-3">
+            <div class="col-md-4">
+                <label for="no_do_input" class="form-label">No DO</label>
+                <input type="text" id="no_do_input" class="form-control" placeholder="Masukkan No DO">
+            </div>
+
+            <div class="col-md-4">
+                <label for="kode_select" class="form-label">Kode Depan</label>
+                <select id="kode_select" class="form-select">
+                    <!-- JS akan isi A-Z -->
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label for="merk_select" class="form-label">Merk</label>
+                <select id="merk_select" class="form-select">
+                    <option value="">Pilih Merk</option>
+                    <option value="Honda">Honda</option>
+                    <option value="Yamaha">Yamaha</option>
+                </select>
+            </div>
+        </div>
+
+        <input type="file" id="excelFile" class="form-control mb-3" accept=".xlsx,.xls" />
+        <button id="uploadBtn" class="btn btn-primary">Upload</button>
+        <div class="progress mt-3" style="height: 25px; display:none;">
+            <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;">0%</div>
+        </div>
+
+</div>
+
+
 
     <div class="progress mt-3" style="height: 25px; display:none;">
       <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;">0%</div>
@@ -72,9 +105,27 @@ const pb = new PocketBase(pocketbaseUrl);
 
   <!-- Load Navbar -->
   <script>
+const start = ["G","X"];
+const rest = [];
+for(let i = 65; i <= 90; i++){ // ASCII A-Z
+    const letter = String.fromCharCode(i);
+    if(!start.includes(letter)) rest.push(letter);
+}
+
+const abjad = [...start, ...rest];
+const kodeSelect = document.getElementById("kode_select");
+kodeSelect.innerHTML = "";
+abjad.forEach(l => {
+    const option = document.createElement("option");
+    option.value = l;
+    option.text = l;
+    kodeSelect.appendChild(option);
+});
+
+
 
     $(document).ready(function () {
-      $("#navbar-container").load("../../../component/nav.html", function () {
+      $("#navbar-container").load("../../component/nav.html", function () {
         setTimeout(loginUser, 500);
       });
     });

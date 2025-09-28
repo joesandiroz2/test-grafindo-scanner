@@ -95,6 +95,17 @@ async function reduceStock(partNumber, lot, qtyScan, merk, doNumber = "", namaBa
         });
         jumlahBarangDo = partNumbers.size;
 
+        let qtyMinta = 0;
+        $("#tbl_do_list tbody tr").each(function () {
+            const tdDo = $(this).find("td:eq(2)").text().trim();       // no_do
+            const tdPart = $(this).find("td:eq(3)").text().trim();     // part_number
+            const tdQty = parseInt($(this).find("td:eq(5)").text().replace("Pcs","").trim(), 10); // qty DO
+
+            if (tdDo === doNumber && tdPart.toLowerCase() === partNumber.toLowerCase()) {
+                qtyMinta += tdQty;
+            }
+        });
+
 
         const newData = {
             part_number: partNumber,
@@ -105,6 +116,7 @@ async function reduceStock(partNumber, lot, qtyScan, merk, doNumber = "", namaBa
             no_dn: doNumber,
             jumlah_barang_do:jumlahBarangDo,
             nama_barang: namaBarang,
+            qty_minta:qtyMinta,
             tgl_pb: new Date().toISOString(),
             merk: merk,
             budian:"budian",

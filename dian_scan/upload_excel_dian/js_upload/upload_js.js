@@ -3,12 +3,8 @@ const excelFile = document.getElementById("excelFile");
 const progressContainer = document.querySelector(".progress");
 const progressBar = document.getElementById("progressBar");
 
+const requiredColumns = ["part_number", "nama_barang", "qty", "po_no"]; // Kolom Excel wajib
 
-
-// Kolom yang dibutuhkan
-const requiredColumns = ["no_do", "part_number", "nama_barang", "qty", "po_no","merk","kode_depan"];
-
-// Login user PocketBase
 async function loginPocketBase() {
     try {
         await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
@@ -21,8 +17,19 @@ async function loginPocketBase() {
 }
 
 uploadBtn.addEventListener("click", async () => {
-    if (!excelFile.files.length) {
-        Swal.fire("Peringatan", "Silakan pilih file Excel terlebih dahulu", "warning");
+    const noDoInput = document.getElementById("no_do_input").value.trim();
+    const kodeDepan = document.getElementById("kode_select").value;
+    const merk = document.getElementById("merk_select").value;
+
+    // Validasi semua input
+    let missingInputs = [];
+    if (!noDoInput) missingInputs.push("No DO");
+    if (!kodeDepan) missingInputs.push("Kode Depan");
+    if (!merk) missingInputs.push("Merk");
+    if (!excelFile.files.length) missingInputs.push("File Excel");
+
+    if (missingInputs.length) {
+        Swal.fire("Peringatan", `Harap isi / pilih: ${missingInputs.join(", ")}`, "warning");
         return;
     }
 
@@ -36,6 +43,15 @@ uploadBtn.addEventListener("click", async () => {
     try {
         await loginPocketBase();
         data = await readExcel(file);
+
+        // Tambahkan no_do, kode_depan, merk ke setiap baris
+        data = data.map(row => ({
+            ...row,
+            no_do: noDoInput,
+            kode_depan: kodeDepan,
+            merk: merk
+        }));
+
     } catch (err) {
         uploadBtn.disabled = false;
         uploadBtn.innerText = "Upload";
@@ -43,7 +59,7 @@ uploadBtn.addEventListener("click", async () => {
         return;
     }
 
-    // cek kolom yang kurang
+    // Cek kolom Excel
     const fileColumns = Object.keys(data[0] || {});
     const missingColumns = requiredColumns.filter(col => !fileColumns.includes(col));
     if (missingColumns.length) {
@@ -54,7 +70,7 @@ uploadBtn.addEventListener("click", async () => {
         return;
     }
 
-    // Mulai upload
+    // Upload ke PocketBase
     let successCount = 0;
     for (let i = 0; i < data.length; i++) {
         try {
