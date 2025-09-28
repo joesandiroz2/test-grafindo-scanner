@@ -13,34 +13,54 @@ function showMessage(msg, type = "info") {
     $("#showinfo").html(`<div style="color:${colors[type]};font-weight:bold;margin:5px 0">${msg}</div>`);
 }
 
-async function showScanTableByDo(noDo) {
+async function showScanTableByDo(noDo, merk) {
+    let collectionName, doColumn;
+
+    if (merk.toLowerCase() === "honda") {
+        collectionName = "kartu_stok";
+        doColumn = "no_dn";
+    } else if (merk.toLowerCase() === "yamaha") {
+        collectionName = "yamaha_kartu_stok";
+        doColumn = "no_do";
+    } else {
+        console.warn("Merk tidak dikenali:", merk);
+        return;
+    }
+
     try {
-        const result = await pb.collection("kartu_stok").getFullList({
-            filter: `no_dn="${noDo}"`,
+        const result = await pb.collection(collectionName).getFullList({
+            filter: `${doColumn}="${noDo}"`,
             sort: "-created"
         });
 
         const tbody = $("#tbl_scan tbody");
-        // jangan empty, biarkan append saja
+        tbody.empty();
 
-        result.forEach(item => {
-            const rowId = `${item.part_number}_${item.lot || ""}_${item.no_dn || ""}`;
+       result.forEach(item => {
+        console.log(item)
+            const rowId = `${item.part_number}_${item.lot || ""}_${item[doColumn] || ""}`;
             if (tbody.find(`tr[data-id="${rowId}"]`).length === 0) {
+                // pilih field qty sesuai merk
+                const qty = merk.toLowerCase() === "honda" ? item.qty_ambil || 0 : item.qty_scan || 0;
+
                 const row = `
                     <tr data-id="${rowId}">
                         <td>${new Date(item.tgl_pb).toLocaleString()}</td>
-                        <td>${item.no_dn || ""}</td>
-                        <td>${item.part_number}</td>
-                        <td>${item.qty_ambil}</td>
+                        <td>${item[doColumn] || ""}</td>
+                        <td>${item.part_number || ""}</td>
+                        <td>${qty}</td>
                     </tr>
                 `;
                 tbody.append(row);
             }
         });
+
     } catch (err) {
         console.error("Gagal menampilkan data scan by DO:", err);
+        showMessage("Gagal menampilkan data scan!", "error");
     }
 }
+
 
 async function searchByNoDo(no_do_value) {
     try {
@@ -64,60 +84,70 @@ async function searchByNoDo(no_do_value) {
             return;
         }
 
-         // ambil semua scan untuk DO ini
-        const scanResult = await pb.collection("kartu_stok").getFullList({
-            filter: `no_dn="${no_do_value}"`,
+        const merk = result[0].merk?.toLowerCase() || "honda"; // default honda
+
+        // tentukan collection & kolom filter berdasarkan merk
+        let collectionName, doColumn, qtyField;
+        if (merk === "honda") {
+            collectionName = "kartu_stok";
+            doColumn = "no_dn";
+            qtyField = "qty_ambil";
+        } else if (merk === "yamaha") {
+            collectionName = "yamaha_kartu_stok";
+            doColumn = "no_do";
+            qtyField = "qty_scan";
+        } else {
+            console.warn("Merk tidak dikenali:", merk);
+            return;
+        }
+
+        // ambil semua scan untuk DO ini sesuai merk
+        const scanResult = await pb.collection(collectionName).getFullList({
+            filter: `${doColumn}="${no_do_value}"`,
             sort: "-created"
         });
 
-         // buat map total scan per part_number
+        // buat map total scan per part_number
         const scanMap = {};
         scanResult.forEach(item => {
             const pn = item.part_number;
-            const qty = parseInt(item.qty_ambil || 0, 10);
+            const qty = parseInt(item[qtyField] || 0, 10);
             if (!scanMap[pn]) scanMap[pn] = 0;
             scanMap[pn] += qty;
         });
 
-        // tampilkan DO
-        // tampilkan DO
+        // tampilkan DO list
         result.forEach((item, i) => {
-             const totalScan = scanMap[item.part_number] || 0;
-             const tdQty = Number(String(item.qty || "0").trim()); // pastikan number
+            const totalScan = scanMap[item.part_number] || 0;
+            const tdQty = Number(String(item.qty || "0").trim());
 
-              let bgcolor = "white"; // default
-            let color = "black";   // default teks
-
+            let bgcolor = "white", color = "black";
             if (totalScan < tdQty) {
-                bgcolor = "orange";
-                color = "black";
+                bgcolor = "orange"; color = "black";
             } else if (totalScan === tdQty) {
-                bgcolor = "green";
-                color = "white"; // teks putih agar terbaca
+                bgcolor = "green"; color = "white";
             } else if (totalScan > tdQty) {
-                bgcolor = "red";
-                color = "white"; // teks putih agar terbaca
+                bgcolor = "red"; color = "white";
             }
-                console.log(tdQty,totalScan)
+
             const row = `
-                <tr >
-                    <td style="font-weight:bold;background-color:${bgcolor};color:${color}"">${i + 1}</td>
-                    <td style="font-weight:bold;background-color:${bgcolor};color:${color}"">${item.kode_depan}</td>
-                    <td style="font-weight:bold;background-color:${bgcolor};color:${color}"">${item.no_do}</td>
-                    <td style="font-weight:bold;background-color:${bgcolor};color:${color}"">${item.part_number || ""}</td>
+                <tr>
+                    <td style="font-weight:bold;background-color:${bgcolor};color:${color}">${i + 1}</td>
+                    <td style="font-weight:bold;background-color:${bgcolor};color:${color}">${item.kode_depan}</td>
+                    <td style="font-weight:bold;background-color:${bgcolor};color:${color}">${item.no_do}</td>
+                    <td style="font-weight:bold;background-color:${bgcolor};color:${color}">${item.part_number || ""}</td>
                     <td style="font-weight:bold;background-color:${bgcolor};color:${color}">${item.nama_barang || ""}</td>
                     <td style="font-weight:bold;background-color:${bgcolor};color:${color}">${tdQty} Pcs -> Scan: ${totalScan}</td>
-                    <td style="font-weight:bold;background-color:${bgcolor};color:${color}"">${item.merk || ""}</td>
+                    <td style="font-weight:bold;background-color:${bgcolor};color:${color}">${item.merk || ""}</td>
                 </tr>
             `;
             tbodyDO.append(row);
         });
 
-
         showMessage("DO berhasil ditemukan", "success");
 
-        // tampilkan scan kartu_stok untuk DO ini
-        await showScanTableByDo(no_do_value);
+        // tampilkan tabel scan detail
+        await showScanTableByDo(no_do_value, merk);
 
     } catch (err) {
         console.error("Error saat cari data:", err);
