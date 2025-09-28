@@ -1,500 +1,146 @@
-let pb;
+const pb = new PocketBase(pocketbaseUrl);
 
-function formatDate(dateString) {
-    if (!dateString) return "";
-    const d = new Date(dateString);
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const year = d.getFullYear();
-    return `${day}/${month}/${year}`;
-}
-
-// login dulu sebelum query
-async function loginUser() {
+$(document).ready(function () {
+  $("#navbar-container").load("../../component/nav.html", async function () {
     try {
-        pb = new PocketBase(pocketbaseUrl);
+      // login dulu
+      await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
 
-        // auth password
-        const authData = await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
-        console.log("Login sukses", authData);
+      // ambil id dari query string
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get("id");
 
-        // setelah login → load detail
-        loadDetail_surat_jalan();
-    } catch (err) {
-        console.error(err);
-        Swal.fire("Error", "Gagal login ke PocketBase", "error");
-    }
-}
-
-// 🔹 Render ulang tabel utama dengan data DO tertentu
-function renderTableByDO(no_do_id, data) {
-  const tbody = $("#detail-body");
-  tbody.empty();
-
-  if (!data || data.length === 0) {
-    tbody.append(`<tr><td colspan="13" class="text-center">Data tidak ditemukan</td></tr>`);
-    return;
-  }
-
-  data.forEach((item, index) => {
-    const shippedVal = parseInt(item.shipped) || 0;
-    const backOrderVal = item.back_order || (item.qty - shippedVal);
-
-    const qtyVal = parseInt(item.qty) || 0;
-    
-    const isFull = qtyVal === shippedVal;
-
-    const qtyStyle = isFull ? "color:green; font-weight:bold;" : "";
-    const shippedStyle = isFull ? "color:green; font-weight:bold;" : "";
-    const fullText = isFull
-      ? `<span style="color:green; font-weight:bold;">Full</span>`
-      : `<span style="color:red; font-weight:bold;">Blm</span>`;
-    const updatedFormatted = formatDate(item.updated);
-
-    const row = `
-   <tr data-id="${item.id || item.uid}" data-qty="${item.qty}">
-          <td>${index + 1}</td>
-          <td>${item.nama_barang || ""}</td>
-          <td>${item.part_number || ""}</td>
-          <td style="${qtyStyle}">${item.qty ? item.qty.toLocaleString('id-ID') : ""}</td>
-          
-          <td style="${shippedStyle}">
-            <input type="number" class="form-control form-control-sm shipped-input" 
-                   value="${shippedVal}" min="0" max="${item.qty}">
-            <div class="text-danger small error-message" style="display:none;">
-              anda input shipped melebihi qty
-            </div>
-          </td>
-          
-          <td>
-            <input type="number" class="form-control form-control-sm backorder-input" 
-                   value="${backOrderVal}"
-                   style="color:red;font-weight:bold" readonly>
-          </td>
-          <td>${updatedFormatted || "-"}</td>
-          <td class="full-status">${fullText}</td>
-          <td>
-            <button class="btn btn-info btn-update">Perbarui</button>
-          </td>
-      </tr>`;
-    tbody.append(row);
-  });
-
-  $("#no_do").text(no_do_id); // update judul di header
-
-
-    JsBarcode("#bar_code", no_do_id, {
-    format: "CODE128",
-    lineColor: "#000",
-    width: 2,
-    height: 50,
-    displayValue: true
-  });
-}
-
-
-async function loadDetail_surat_jalan() {
-    const params = new URLSearchParams(window.location.search);
-    const no_do = params.get("id");
-
-    if (!no_do) {
-        Swal.fire("Error", "Parameter no_do tidak ditemukan di URL", "error");
+      if (!id) {
+        Swal.fire("Error", "Parameter ?id tidak ditemukan!", "error");
         return;
-    }
+      }
 
-    $("#no_do").text(no_do);
-    $("#loading").show();
-    $("#detail-body").html(`<tr><td colspan="13" class="text-center">Loading...</td></tr>`);
+      // tampilkan preloader
 
-    
+      const records = await pb.collection("sales_order_do").getFullList({
+        filter: `no_do="${id}"`
+      });
 
-    try {
-        // ambil semua record dengan no_do
-        const records = await pb.collection("sales_order").getFullList({
-            filter: `no_do="${no_do}"`,
-            sort: "-created"
+     
+      if (!records || records.length === 0) {
+        Swal.fire("Not Found", `Sales Order dengan no_do ${id} tidak ditemukan`, "warning");
+        return;
+      }
+
+      // ambil record pertama
+      const record = records[0];
+
+      // === generate barcode dari no_do ===
+      $("#bar_code_do").html(`<svg id="barcodeDO"></svg>`);
+      JsBarcode("#barcodeDO", record.no_do, {
+        format: "CODE128",
+        lineColor: "#000",
+        width: 2,
+        height: 60,
+        displayValue: true
+      });
+
+      // default sementara
+      let driverName = "menunggu data driver...";
+      let alamatText = "menunggu data alamat...";
+
+      // tampilkan header awal
+      $("#soHeader").html(`
+        <div style="display:flex; gap:10px; margin:10px 0;">
+          <!-- Kotak 1 -->
+          <div style="flex:1; border:1px solid black;padding:5px">
+            <p> 
+              <strong>Tgl Schedule:</strong> ${record.tgl_schedule} <br/>
+              <strong>Driver:</strong> <span id="driver_name">${driverName}</span><br/>
+              <strong>Ship to:</strong> ${record.customer_name} <br/>
+              <span id="customer_alamat">${alamatText}</span>
+            </p>
+          </div>
+
+          <!-- Kotak 2 -->
+          <div style="flex:1; border:1px solid black;padding:5px ">
+            <p><strong>No PO:</strong> ${record.no_po}</p>
+            <p><b>Sales :</b> ${record.sales}</p>
+            <p><strong>Invoice to:</strong> <br/> ${record.customer_name}</p>
+          </div>
+
+          <!-- Kotak 3 -->
+          <div style="flex:1; border:1px solid black; ">
+            <h5 style="text-align:center"><strong>Delivery Order: <br/> ${record.kode_depan} ${record.no_do}</strong></h5>
+          </div>
+        </div>
+      `);
+
+      // disable tombol print
+      $("#btnPrint").prop("disabled", true);
+
+      // === ambil driver ===
+      try {
+        const driverRecord = await pb.collection("sales_order_driver").getOne(record.driver);
+        if (driverRecord && driverRecord.nama) {
+          driverName = driverRecord.nama;
+          $("#driver_name").text(driverName);
+        }
+      } catch (err) {
+        console.error("Gagal load driver:", err);
+      }
+
+      // === ambil alamat customer ===
+      try {
+        const customerRecords = await pb.collection("sales_customer").getFullList({
+          filter: `nama_pt="${record.customer_name}"`
         });
 
-        const tbody = $("#detail-body");
-        tbody.empty();
-
-        if (records.length === 0) {
-            tbody.append(`<tr><td colspan="13" class="text-center">Data tidak ditemukan</td></tr>`);
-            return;
-        }
-
-        // tampilkan no_po dan salesman dari record pertama
-        const firstItem = records[0];
-        $("#no_po").text(firstItem.no_po || "-");
-        $("#salesman").text(firstItem.sales || "-");
-        $("#tgl_schedule").text(formatDateIndo(firstItem.tgl_schedule));
-
-        if (firstItem.is_batal && firstItem.is_batal.toLowerCase() === "batal") {
-          $("#is_batal_div")
-            .text("DIBATALIN")
-            .css({ "color": "red", "font-weight": "bold" });
+        if (customerRecords && customerRecords.length > 0) {
+          const customer = customerRecords[0];
+          alamatText = `${customer.alamat} ${customer.no_telp ? "Telp: " + customer.no_telp : ""}`;
+          $("#customer_alamat").html(alamatText);
         } else {
-          $("#is_batal_div").text(""); // kosongkan kalau null/undefined/"" 
+          $("#customer_alamat").html("<em>Alamat tidak ditemukan</em>");
         }
+      } catch (err) {
+        console.error("Gagal load alamat customer:", err);
+        $("#customer_alamat").html("<em>Error load alamat</em>");
+      }
 
+      // aktifkan tombol print setelah driver & alamat selesai
+      $("#btnPrint").prop("disabled", false);
 
-        // ---- ambil data customer berdasarkan customer_id ----
-        if (firstItem.customer_id) {
-          try {
-            const customer = await pb.collection("sales_customer").getOne(firstItem.customer_id);
-            $("#cust_pt").text(customer.nama_pt || "-");
-            $("#cust_alamat").text(customer.alamat || "-");
-            $("#cust_telp").text(customer.no_telp || "-");
+      // tampilkan data_barang di tabel
+      let rows = "";
+      let dataBarang = record.data_barang;
 
-            $("#inv_cust_pt").text(customer.nama_pt || "-");
-            $("#inv_cust_alamat").text(customer.alamat || "-");
-            $("#inv_cust_telp").text(customer.no_telp || "-");
-          } catch (err) {
-            console.error("Gagal ambil customer:", err);
-            $("#cust_pt").text("-");
-            $("#cust_alamat").text("-");
-            $("#cust_telp").text("-");
-          }
+      // jika masih string, parse JSON
+      if (typeof dataBarang === "string") {
+        try {
+          dataBarang = JSON.parse(dataBarang);
+        } catch (e) {
+          console.error("Gagal parse data_barang:", e);
+          Swal.fire("Error", "Format data_barang tidak valid", "error");
+          return;
         }
+      }
 
-        // render tabel
-        records.forEach((item, index) => {
-            const shippedVal = item.shipped || 0;
-            const backOrderVal = item.back_order || (item.qty - shippedVal);
+      dataBarang.forEach((item, index) => {
+        rows += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${item.part_number}</td>
+            <td>${item.nama_barang}</td>
+            <td>${item.qty}</td>
+            <td>${item.shipped}</td>
+            <td>${item.backorder}</td>
+          </tr>
+        `;
+      });
 
-            const isFull = item.qty === shippedVal;
-            const qtyStyle = isFull ? "color:green; font-weight:bold;" : "";
-            const shippedStyle = isFull ? "color:green; font-weight:bold;" : "";
-            const fullText = isFull
-                ? `<span style="color:green; font-weight:bold;">Full</span>`
-                : `<span style="color:red; font-weight:bold;">Blm</span>`;
-             const updatedFormatted = formatDate(item.updated);
-
-            const row = `
-                <tr data-id="${item.id}" data-qty="${item.qty}">
-                    <td>${index + 1}</td>
-                    <td>${item.nama_barang || ""}</td>
-                    <td>${item.part_number || ""}</td>
-                    <td style="${qtyStyle}">${item.qty ? item.qty.toLocaleString('id-ID') : ""}</td>
-                    
-                    <!-- Input shipped + error -->
-                    <td style="${shippedStyle}">
-                      <input type="number" class="form-control form-control-sm shipped-input" 
-                             value="${shippedVal}" min="0" max="${item.qty}">
-                      <div class="text-danger small error-message" style="display:none;">
-                        anda input shipped melebihi qty
-                      </div>
-                    </td>
-                    
-                    <!-- Back order otomatis -->
-                    <td>
-                      <input type="number" class="form-control form-control-sm backorder-input" 
-                             value="${backOrderVal}"
-                    style="color:red;font-weight:bold"
-                              readonly>
-                    </td>
-                    <td>${updatedFormatted}</td>
-
-                    <!-- Kolom Full -->
-                    <td class="full-status">${fullText}</td>
-                    
-                    <td>
-                      <button class="btn btn-info btn-update">Perbarui</button>
-                    </td>
-                </tr>`;
-            tbody.append(row);
-        });
-
-        // event listener untuk hitung back_order otomatis + validasi + update kolom Full
-        $("#detail-body").on("input", ".shipped-input", function () {
-            const row = $(this).closest("tr");
-            const qty = parseInt(row.data("qty")) || 0;
-            let shipped = parseInt($(this).val()) || 0;
-            const errorMsg = row.find(".error-message");
-
-            if (shipped > qty) {
-                shipped = qty;
-                $(this).val(qty);
-                errorMsg.show();
-            } else {
-                errorMsg.hide();
-            }
-
-            const backOrder = qty - shipped;
-            row.find(".backorder-input").val(backOrder >= 0 ? backOrder : 0);
-
-            // update style dan kolom Full
-            if (shipped === qty) {
-                row.find("td:eq(3)").css({"color":"green","font-weight":"bold"});
-                row.find(".shipped-input").css({"color":"green","font-weight":"bold"});
-                row.find(".full-status").html(`<span style="color:green; font-weight:bold;">Full</span>`);
-            } else {
-                row.find("td:eq(3)").css({"color":"","font-weight":""});
-                row.find(".shipped-input").css({"color":"","font-weight":""});
-                row.find(".full-status").html(`<span style="color:red; font-weight:bold;">Blm</span>`);
-            }
-        });
-
-        // event listener tombol perbarui
-        // event listener tombol perbarui
-        $("#detail-body").on("click", ".btn-update", async function () {
-            const row = $(this).closest("tr");
-            const shipped = parseInt(row.find(".shipped-input").val()) || 0;
-            const backOrder = parseInt(row.find(".backorder-input").val()) || 0;
-
-            // cek tab aktif
-            const activeNoDo = document.querySelector("#list_anak_do .nav-link.active").dataset.nodo;
-            const params = new URLSearchParams(window.location.search);
-            const no_do_induk = params.get("id");
-
-            try {
-                if (activeNoDo === no_do_induk) {
-                    // === INDUK ===
-                    const id = row.data("id");
-                    await pb.collection("sales_order").update(id, {
-                        shipped: shipped,
-                        back_order: backOrder
-                    });
-                } else {
-                    // === ANAK ===
-                    // ambil record induk
-                    const records = await pb.collection("sales_order").getFullList({
-                        filter: `no_do="${no_do_induk}"`,
-                        sort: "-created"
-                    });
-
-                    if (records.length === 0) {
-                        Swal.fire("Error", "Record induk tidak ditemukan", "error");
-                        return;
-                    }
-
-                    const indukRecord = records[0];
-                    let do_kiriman_ulang = Array.isArray(indukRecord.do_kiriman_ulang) ? indukRecord.do_kiriman_ulang : [];
-
-                    // cari group anak sesuai no_do_id aktif
-                    const groupIndex = do_kiriman_ulang.findIndex(g => g.no_do_id === activeNoDo);
-                    if (groupIndex === -1) {
-                        Swal.fire("Error", "Data anak DO tidak ditemukan", "error");
-                        return;
-                    }
-
-                    // update data di dalam group.data sesuai part_number
-                    const partNumber = row.find("td:eq(2)").text().trim();
-                    const uid = row.data("id");
-                    const itemIndex = do_kiriman_ulang[groupIndex].data.findIndex(d => d.uid === uid);
-
-
-
-                    if (itemIndex !== -1) {
-                      do_kiriman_ulang[groupIndex].data[itemIndex].shipped = shipped;
-                      do_kiriman_ulang[groupIndex].data[itemIndex].back_order = backOrder;
-                      // 🔹 tambahkan timestamp manual
-                      do_kiriman_ulang[groupIndex].data[itemIndex].updated = new Date().toISOString();
-                    }
-
-
-                    // simpan kembali ke record induk
-                    await pb.collection("sales_order").update(indukRecord.id, {
-                        do_kiriman_ulang: do_kiriman_ulang
-                    });
-                }
-
-                Swal.fire("Sukses", "Data berhasil diperbarui", "success");
-            } catch (err) {
-                console.error(err);
-                Swal.fire("Error", "Gagal update data", "error");
-            }
-        });
-
-      // di loadDetail_surat_jalan
-    renderAnakDO(records[0].do_kiriman_ulang || [], records, no_do);
+      $("#dataBarangBody").html(rows);
+       // sembunyikan preloader setelah data didapat
+      $("#preloader").hide();
 
     } catch (err) {
-        console.error(err);
-        Swal.fire("Error", "Gagal mengambil detail data", "error");
-    } finally {
-        $("#loading").hide();
+      console.error("Error load detail:", err);
+      Swal.fire("Error", "Gagal memuat data", "error");
     }
-}
-
-
-//buat do baru
-// Event tombol buat DO baru lagi
-// Event tombol buat DO baru lagi
-document.getElementById("buat_do_baru").addEventListener("click", async (e) => {
-  const btn = e.target;
-  const params = new URLSearchParams(window.location.search);
-  const no_do = params.get("id");
-
-
-
-    btn.disabled = true;
-    const oldText = btn.innerHTML;
-    btn.innerHTML = `sedang membuat nomor do .....`;
-
-
-
-  if (!no_do) {
-    Swal.fire("Error", "Nomor DO tidak ditemukan di URL", "error");
-    return;
-  }
-
-  try {
-    const records = await pb.collection("sales_order").getFullList({
-      filter: `no_do="${no_do}"`,
-      sort: "-created"
-    });
-
-    if (records.length === 0) {
-      Swal.fire("Error", "Tidak ada data untuk DO ini", "error");
-      return;
-    }
-
-    const idPertama = records[0].id;
-    const existing = Array.isArray(records[0].do_kiriman_ulang) 
-      ? records[0].do_kiriman_ulang 
-      : [];
-
-    // Tentukan sumber data
-    let sourceData;
-    if (existing.length > 0) {
-      // 🔹 ada anak DO → ambil data anak DO terakhir
-      sourceData = existing[existing.length - 1].data;
-    } else {
-      // 🔹 belum ada anak DO → pakai data induk
-      sourceData = records;
-    }
-
-    // nomor DO baru
-    const urut = existing.length + 1;
-    const newNoDoId = `${no_do}D${urut}`;
-
-    btn.innerHTML = `Sedang membuat DO baru ${newNoDoId}...`;
-
-    
-    function generateUUID() {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        const r = Math.random() * 16 | 0;
-        const v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-      });
-    }
-
-    // bentuk data array
-    const detailData = sourceData.map(item => ({
-      uid: generateUUID(),
-      part_number: item.part_number,
-      nama_barang: item.nama_barang,
-      qty: item.qty,
-      unit_price: item.unit_price,
-      tgl_schedule: item.tgl_schedule,
-      no_po: item.no_po,
-      no_so: item.no_so,
-      no_io: item.no_io,
-      shipped: item.shipped,
-      back_order: item.back_order,
-      sales: item.sales,
-      is_batal: item.is_batal,
-      no_do: item.no_do,
-      setujui_io: item.setujui_io,
-      customer_id: item.customer_id,
-      kode_depan: item.kode_depan,
-       created: new Date().toISOString(),  // 🔹 tambahkan created
-  updated: new Date().toISOString()   // 🔹 tambahkan updated
-    }));
-
-    // objek baru
-    const newDoGroup = {
-      no_do_id: newNoDoId,
-      data: detailData
-    };
-
-    // simpan
-    const updated = await pb.collection("sales_order").update(idPertama, {
-      do_kiriman_ulang: [...existing, newDoGroup]
-    });
-
-    renderAnakDO(updated.do_kiriman_ulang || [], records, no_do);
-
-    Swal.fire("Sukses", `DO baru (${newNoDoId}) berhasil ditambahkan`, "success");
-  } catch (err) {
-    console.error(err);
-    Swal.fire("Error", "Gagal membuat DO baru", "error");
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = "Buat DO Baru";
-  }
+  });
 });
-
-
-
-//render anak do
-
-// --- fungsi render anak DO ---
-function renderAnakDO(existing, indukData, indukNoDo) {
-  const container = document.getElementById("list_anak_do");
-  container.innerHTML = "";
-
-  // selalu buat tab list (induk + anak)
-  const list = document.createElement("ul");
-  list.className = "nav nav-tabs mt-3";
-
-  // Tab induk utama
-  let firstActive = "active"; // default aktif di induk
-  const liInduk = document.createElement("li");
-  liInduk.className = "nav-item";
-  liInduk.innerHTML = `
-    <button class="nav-link ${firstActive}" data-nodo="${indukNoDo}" type="button">
-      ${indukNoDo}
-    </button>`;
-  list.appendChild(liInduk);
-
-  // Tab anak-anak DO
-  existing.forEach((doGroup) => {
-    const li = document.createElement("li");
-    li.className = "nav-item";
-    li.innerHTML = `
-      <button class="nav-link" data-nodo="${doGroup.no_do_id}" type="button">
-        ${doGroup.no_do_id}
-      </button>`;
-    list.appendChild(li);
-  });
-
-  container.appendChild(list);
-
-  // event klik tab
-  container.querySelectorAll(".nav-link").forEach(btn => {
-    btn.addEventListener("click", () => {
-      container.querySelectorAll(".nav-link").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-
-      const no_do_id = btn.dataset.nodo;
-      if (no_do_id === indukNoDo) {
-        renderTableByDO(no_do_id, indukData);
-      } else {
-        const doGroup = existing.find(d => d.no_do_id === no_do_id);
-        renderTableByDO(no_do_id, doGroup.data);
-      }
-    });
-  });
-
-  // render pertama kali → induk
-  renderTableByDO(indukNoDo, indukData);
-}
-
-
-function formatDateIndo(dateString) {
-  if (!dateString) return "-";
-  const d = new Date(dateString);
-  const day = d.getDate();
-  const monthNames = [
-    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-  ];
-  const month = monthNames[d.getMonth()];
-  const year = d.getFullYear();
-  return `${day} ${month} ${year}`;
-}
-
-
-loginUser();

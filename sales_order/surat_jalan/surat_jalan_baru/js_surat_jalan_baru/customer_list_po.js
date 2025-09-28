@@ -43,6 +43,10 @@ $("#search_customer").on("change", async function () {
       $poSelect.append(`<option value="">Belum ada PO</option>`);
       return;
     }
+  
+   // --- tambahkan default option ---
+    $poSelect.append(`<option value="">Pilih No PO</option>`);
+
 
     // filter PO unik
     let uniquePo = [...new Set(result.map(item => item.no_po))];
@@ -84,6 +88,18 @@ $("#select_po_list").on("change", async function () {
   }
 
   try {
+
+     // --- tampilkan preloader dulu ---
+  $table.html(`
+    <tr>
+      <td colspan="7" class="text-center">
+         <div class="spinner-border text-primary" role="status" ></div>
+        <br/>
+        <h5>Sedang mengambil data tabel...</h5>
+      </td>
+    </tr>
+  `);
+
     await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
 
     // ambil semua part berdasarkan no_po

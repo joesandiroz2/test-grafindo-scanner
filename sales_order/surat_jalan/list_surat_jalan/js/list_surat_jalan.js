@@ -53,11 +53,13 @@ async function loadSalesOrders(page = 1) {
           <td>${item.tgl_schedule || "-"}</td>
           <td>${statusBadge}</td>
           <td>
-              <button class="btn btn-warning" onclick="editOrder('${item.no_do}')">Edit Brg</button>
-              <button class="btn btn-danger" onclick="batalOrder('${item.no_do}')">Batalin</button>
-        <button class="btn btn-success" onclick="buatDoBaru()">DO Baru</button>
+              <button class="btn btn-warning" onclick="editOrder('${item.no_do}', this)">Edit Brg</button>
 
-            <button class="btn btn-info">Lihat</button>
+              <button class="btn btn-danger" onclick="batalOrder('${item.no_do}')">Batalin</button>
+        <button class="btn btn-success" onclick="buatDoBaru('${item.no_do}')">DO Baru</button>
+
+        <button class="btn btn-info" onclick="lihatOrder('${item.no_do}')">Lihat</button>
+      
            ${btnHapus}
           </td>
         </tr>
@@ -76,10 +78,11 @@ async function loadSalesOrders(page = 1) {
   }
 }
 
-// fungsi redirect edit
-function editOrder(no_do) {
-  window.location.href = `/sales_order/surat_jalan/surat_jalan_baru/surat_jalan_baru.html?id=${encodeURIComponent(no_do)}`;
+
+function lihatOrder(no_do) {
+  window.location.href = `/sales_order/surat_jalan/surat_jalan.html?id=${encodeURIComponent(no_do)}`;
 }
+
 
 
 function renderPagination(page, totalPages) {
@@ -169,8 +172,13 @@ let currentEditId = null;   // simpan id record PB
 let currentBarangData = []; // simpan array barang
 
 // ganti editOrder jadi buka modal
-async function editOrder(no_do) {
+async function editOrder(no_do, btnElement) {
   try {
+    // disable tombol & ubah teks
+    const $btn = $(btnElement);
+    const originalText = $btn.text();
+    $btn.prop("disabled", true).text("Mengambil...");
+
     // login
     await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
 
@@ -208,11 +216,9 @@ async function editOrder(no_do) {
       const shippedVal = parseInt($(this).val()) || 0;
       const qty = currentBarangData[idx].qty;
 
-      // update shipped & backorder
       currentBarangData[idx].shipped = shippedVal;
       currentBarangData[idx].backorder = qty - shippedVal;
 
-      // update UI backorder
       $(this).closest("tr").find(".backorder-cell").text(qty - shippedVal);
     });
 
@@ -223,8 +229,13 @@ async function editOrder(no_do) {
   } catch (err) {
     console.error("Gagal load data barang:", err);
     Swal.fire("Error", "Tidak bisa load data barang", "error");
+  } finally {
+    // kembalikan tombol ke normal
+    $(btnElement).prop("disabled", false).text("Edit brg");
+
   }
 }
+
 
 // simpan hasil edit
 // simpan hasil edit
@@ -310,8 +321,7 @@ async function hapusOrder(no_do) {
 //buat do baru
 // tombol DO baru
 // tombol DO baru
-async function buatDoBaru() {
-  // konfirmasi password dulu
+async function buatDoBaru(targetNoDo) {
   const { value: password } = await Swal.fire({
     title: "Konfirmasi DO Baru",
     text: "Masukkan password untuk membuat DO baru:",
@@ -322,54 +332,47 @@ async function buatDoBaru() {
     cancelButtonText: "Batal"
   });
 
-  if (!password) return; // batal
+  if (!password) return;
   if (password !== "sp102103") {
     Swal.fire("Error", "Password salah!", "error");
     return;
   }
 
   try {
-    // loading banner
     Swal.fire({
       title: "Proses...",
       text: "Sedang membuat DO baru...",
       allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
+      didOpen: () => Swal.showLoading()
     });
 
-    // login
     await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
 
-    // ambil DO terakhir berdasarkan no_do
-    const lastRecord = await pb.collection("sales_order_do").getList(1, 1, {
-      sort: "-no_do"   // urut dari terbesar
-    });
-
-    if (!lastRecord.items.length) {
-      Swal.fire("Error", "Belum ada DO untuk diclone", "error");
+    // ambil record berdasarkan DO yang diklik
+    const record = await pb.collection("sales_order_do").getFirstListItem(`no_do="${targetNoDo}"`);
+    if (!record) {
+      Swal.fire("Error", `DO ${targetNoDo} tidak ditemukan`, "error");
       return;
     }
 
-    const lastDo = lastRecord.items[0];
-    const lastNoDo = parseInt(lastDo.no_do, 10);
+    // buat no_do baru (increment dari DO terakhir)
+    const lastRecord = await pb.collection("sales_order_do").getList(1, 1, { sort: "-no_do" });
+    const lastNoDo = lastRecord.items.length ? parseInt(lastRecord.items[0].no_do, 10) : 0;
     const newNoDo = (lastNoDo + 1).toString();
 
-    // clone data kecuali id & created
+    // clone data
     const newData = {
-      kode_depan: lastDo.kode_depan,
+      kode_depan: record.kode_depan,
       no_do: newNoDo,
-      customer_name: lastDo.customer_name,
-      no_po: lastDo.no_po,
-      sales: lastDo.sales,
-      driver: lastDo.driver,
-      tgl_schedule: lastDo.tgl_schedule,
-      data_barang: lastDo.data_barang || [],
-      is_batal: "" // default baru
+      customer_name: record.customer_name,
+      no_po: record.no_po,
+      sales: record.sales,
+      driver: record.driver,
+      tgl_schedule: record.tgl_schedule,
+      data_barang: record.data_barang || [],
+      is_batal: ""
     };
 
-    // simpan ke PB
     await pb.collection("sales_order_do").create(newData);
 
     Swal.fire("Berhasil", `DO baru ${newNoDo} berhasil dibuat.`, "success");

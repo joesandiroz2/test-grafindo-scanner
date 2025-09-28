@@ -63,11 +63,6 @@ document.addEventListener("DOMContentLoaded", function () {
                   -webkit-print-color-adjust: exact !important;
                   print-color-adjust: exact !important;
                 }
-                /* Sembunyikan kolom terakhir (Aksi) */
-                table th:last-child,
-                table td:last-child {
-                  display: none !important;
-                }
               }
             </style>
           </head>

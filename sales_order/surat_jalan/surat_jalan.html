@@ -8,178 +8,70 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
-  <style>
 
-/* Tab default */
-#list_anak_do .nav-tabs .nav-link {
-  background-color: #f8f9fa; /* abu muda */
-  color: #333;
-  font-weight: normal;
-  border: 1px solid #dee2e6;
-  margin-right: 2px;
-  transition: all 0.2s ease-in-out;
-}
-
-/* Hover efek */
-#list_anak_do .nav-tabs .nav-link:hover {
-  background-color: #e9f5ff; /* biru muda */
-  color: #007bff; /* biru */
-  font-weight: bold;
-}
-
-/* Aktif tab */
-#list_anak_do .nav-tabs .nav-link.active {
-  background-color: #007bff;
-  color: white;
-  font-weight: bold;
-  border-color: #007bff #007bff #fff;
-}
-
-
-.gold-badge {
-  display: inline-block;
-  font-size: 1rem;
-  font-weight: bold;
-  padding: 0.3rem 0.8rem;
-  border-radius: 0.25rem;
-  color: #fff;
-  background: linear-gradient(90deg, #d4af37, #fffacd, #d4af37);
-  background-size: 200% auto;
-  animation: gold-shimmer 2s linear infinite;
-  text-shadow: 0 0 5px #ffd700;
-}
-
-
-</style>
 
 
 </head>
 <body>
 <div id="navbar-container"></div>
 
-<div class="container mt-4">
+<div class="container"> 
 
-   <div class="row mb-3">
-    <div class="col-12 col-md-6">
-
-      <a href="/sales_order/sales_order_list/sales_order_list.html"
-      class="btn btn-info"
-      >Kembali</a>
-
+  <a href="/sales_order/surat_jalan/list_surat_jalan/list_surat_jalan.html" 
+  class="btn btn-info"
+  >kembali</a>
   <button id="btnPrint" class="btn btn-success">
     <i class="bi bi-printer"></i> Print
   </button>
-    </div>
-
-  </div>
-
   
-  <div id="loading" class="text-center" style="display:none;">
-    <div class="spinner-border text-primary" role="status"></div>
-    <p>Loading data...</p>
-  </div>
-
-
-<div id="print_page">
- <div class="row my-3 p-3">
-  <div class="col-12 d-flex justify-content-between align-items-start flex-wrap">
-      <div class="row ">
-    <div class="col-12">
-      <!-- Judul -->
-      <h3 class="mb-2">DELIVERY ORDER</h3>
-
-      <!-- Barcode -->
-      <svg id="bar_code"></svg>
-    </div>
-    <h4 id="is_batal_div"></h4>
-  </div>
-
-    <!-- Box kanan -->
-    <div class="p-2 border rounded col-12 col-md-6" >
-      <span>Delivery Order No : 
-        <span style="font-weight:bold" id="no_do"></span>
-      </span>
-      <br>
-      <span>Tgl Schedule: </span>
-      <span style="font-weight:bold" id="tgl_schedule"></span>
-      <br>
-      <span>No PO : 
-        <span style="font-weight:bold" id="no_po"></span>
-      </span>
-      <br>
-      <span>Salesman : 
-        <span style="font-weight:bold" id="salesman"></span>
-      </span>
-
-        <div style="border:1px solid black; padding:10px; margin:5px;">
-          <h4>Ship To:</h4>
-        <span>Customer : 
-          <span style="font-weight:bold" id="cust_pt"></span>
-        </span><br>
-        <span>Alamat : 
-          <span style="font-weight:bold" id="cust_alamat"></span>
-        </span><br>
-        <span>Telp : 
-          <span style="font-weight:bold" id="cust_telp"></span>
-        </span>
-
-         <div class="row"> 
-              <h4>Invoice To:</h4>
-            <span>Customer : 
-              <span style="font-weight:bold" id="inv_cust_pt"></span>
-            </span><br>
-            <span>Alamat : 
-              <span style="font-weight:bold" id="inv_cust_alamat"></span>
-            </span><br>
-            <span>Telp : 
-              <span style="font-weight:bold" id="inv_cust_telp"></span>
-            </span>
-      </div>
-  
-      </div>
-
-   
-    </div>
-
-
-  </div>
-</div>
-
-  
-<div class="container"> 
-  <button id="buat_do_baru" class="btn btn-primary">Bikin Do Baru Lagi</button>
-</div>
-
-<!-- list anak do -->
-<div id="list_anak_do"> 
-
 </div>
 
 
- <table class="table table-bordered">
-  <thead >
-       <tr>
+<div id="preloader" class="text-center my-4" >
+  <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  <p class="mt-2"><b>Sedang mencari data DO...</b></p>
+</div>
+
+
+<div id="print_page"> 
+  <div style="display:flex;justify-content:space-around"> 
+
+  <div> 
+    <h3 style="font-weight:bold">PT. Grafindo Mitrasemesta</h3>
+    <p>Kawasan Industri jababeka Blok u8D Cikarang Bekasi - 17530 indonesia.
+    </p>
+  </div>
+    <div> 
+      <h5 style="font-weight:bold">Delivery Order</h5>
+    <div id="bar_code_do"></div>
+  </div>
+  </div>
+  <div id="soHeader"></div>
+
+
+
+
+  <table border="1" cellspacing="0" cellpadding="5" width="100%" >
+    <thead>
+      <tr>
         <th>No</th>
-        <th>Nama Barang</th>
         <th>Part Number</th>
-        <th>Qty</th>
-        <th>shipped</th>
-        <th>Back Order</th>
-        <th>Diperbarui</th>
-        <th>Full</th>
-        <th>Aksi</th>
-       
-        
+        <th>Nama Barang</th>
+        <th>Order</th>
+        <th>Shipped</th>
+        <th>Backorder</th>
       </tr>
     </thead>
-    <tbody id="detail-body">
-      <tr><td colspan="13" class="text-center">Belum ada data</td></tr>
-    </tbody>
+    <tbody id="dataBarangBody"></tbody>
   </table>
+
+  <div class="row"> 
+      <div id="tanda_tangan"></div>
+  </div>
 </div>
 
-
-</div>
 
 <!-- Bootstrap & jQuery -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -200,6 +92,27 @@
     $("#navbar-container").load("../../component/nav.html", function () {
       setTimeout(loginUser, 500); // login dulu sebelum load detail
     });
+
+    $("#tanda_tangan").html(`
+        <div style="display:flex; justify-content:space-around; margin-top:80px; text-align:center;">
+          <div style="flex:1;">
+            <p><strong>Warehouse</strong></p>
+            <br/><br/><br/>
+            <p>(__________________)</p>
+          </div>
+          <div style="flex:1;">
+            <p><strong>Driver</strong></p>
+            <br/><br/><br/>
+            <p>(__________________)</p>
+          </div>
+          <div style="flex:1;">
+            <p><strong>Received By</strong></p>
+            <br/><br/><br/>
+            <p>(__________________)</p>
+          </div>
+        </div>
+      `);
+
   });
 </script>
 </body>

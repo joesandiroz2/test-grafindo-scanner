@@ -19,7 +19,7 @@
 
 
 <div class="container mt-4">
-  <a href="/sales_order/surat_jalan/list_surat_jalan/list_surat_jalan.html">List Semua DO</a>
+  <a  class="btn btn-success" href="/sales_order/surat_jalan/list_surat_jalan/list_surat_jalan.html">List Semua DO</a>
   <div class="card shadow p-4" style="border-top:10px solid blue">
     <div class="card-body">
       <div class="row mb-3">
@@ -41,13 +41,17 @@
         <div class="col-sm-12 col-md-3 col-xl-3">
           <label for="search_customer" class="form-label fw-bold">Pilih Customer</label>
           <p id="loading_customer" class="text-muted small mb-1">Memuat data customer...</p>
-          <select id="search_customer" class="form-select" style="width:100%"></select>
+          <select id="search_customer" class="form-select" style="width:100%"> 
+               <option value="">Pilih Customer</option>
+          </select>
         </div>
 
         <!-- Kolom PO -->
         <div class="col-sm-12 col-md-3 col-xl-3">
           <label for="select_po_list" class="form-label fw-bold">Pilih No PO</label>
-          <select id="select_po_list" class="form-select"></select>
+          <select id="select_po_list" class="form-select"> 
+               <option value="">Pilih No po</option>
+          </select>
         </div>
 
         <div class="col-sm-12 col-md-3 col-xl-3">
