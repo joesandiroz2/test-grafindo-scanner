@@ -50,8 +50,6 @@ $(document).ready(function () {
           <!-- Kotak 1 -->
           <div style="flex:1; border:1px solid black;padding:5px">
             <p> 
-              <strong>Tgl Schedule:</strong> ${record.tgl_schedule} <br/>
-              <strong>Driver:</strong> <span id="driver_name">${driverName}</span><br/>
               <strong>Ship to:</strong> ${record.customer_name} <br/>
               <span id="customer_alamat">${alamatText}</span>
             </p>
@@ -67,6 +65,9 @@ $(document).ready(function () {
           <!-- Kotak 3 -->
           <div style="flex:1; border:1px solid black; ">
             <h5 style="text-align:center"><strong>Delivery Order: <br/> ${record.kode_depan} ${record.no_do}</strong></h5>
+          <strong>Tgl Schedule:</strong> ${record.tgl_schedule} <br/>
+              <strong>Driver:</strong> <span id="driver_name">${driverName}</span><br/>
+              
           </div>
         </div>
       `);
