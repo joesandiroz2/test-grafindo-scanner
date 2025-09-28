@@ -1,25 +1,22 @@
-let currentPage = 1;
-const perPage = 15;
+let currentPageHonda = 1;
+const perPageHonda = 15;
 
 async function loadHondaOthers(page = 1) {
     try {
-        await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
 
         const container = $("#honda_others");
         container.empty();
 
-        // Progress bar
-        const progressBar = $("#progress_bar");
+        const progressBar = $("#progress_bar_honda");
         progressBar.css("width", "0%").text("0%");
 
-        // Ambil DO unik per page
-        const doList = await pb.collection("kartu_stok").getList(page, perPage, {
+        const doList = await pb.collection("kartu_stok").getList(page, perPageHonda, {
             filter: `budian="budian"`,
             sort: "-created"
         });
 
         const totalPages = doList.totalPages;
-        $("#page_info").text(`Halaman ${page} dari ${totalPages}`);
+        $("#page_info_honda").text(`Halaman ${page} dari ${totalPages}`);
 
         const doNumbers = [...new Set(doList.items.map(item => item.no_dn || "unknown"))];
 
@@ -31,7 +28,7 @@ async function loadHondaOthers(page = 1) {
                 sort: "-created"
             });
 
-            // Kelompokkan per part_number
+            // grouping per part_number
             const groupedData = {};
             doData.forEach(item => {
                 const part = item.part_number || "unknown";
@@ -49,12 +46,8 @@ async function loadHondaOthers(page = 1) {
                 }
             });
 
-            // Hitung jumlah barang unik
-            const jumlahBarangDo = Object.keys(groupedData).length;
-
             container.append(`<div class="card shadow mb-3 p-2">
                                 <h5 style="font-weight:bold">DO: ${doNumber}</h5>
-                                <p>Jumlah Barang DO: <strong>${jumlahBarangDo}</strong></p>
                               </div>`);
 
             let table = `<table class="table table-bordered table-striped">
@@ -69,6 +62,7 @@ async function loadHondaOthers(page = 1) {
                                 </tr>
                             </thead>
                             <tbody>`;
+
             let no = 1;
             for (const part in groupedData) {
                 const item = groupedData[part];
@@ -91,30 +85,30 @@ async function loadHondaOthers(page = 1) {
             table += `</tbody></table>`;
             container.append(table);
 
-            // Update progress bar
             const percent = Math.round(((i + 1) / doNumbers.length) * 100);
             progressBar.css("width", percent + "%").text(percent + "%");
         }
 
-        // Update tombol pagination
-        $("#prev_page").prop("disabled", page <= 1);
-        $("#next_page").prop("disabled", page >= totalPages);
+        $("#prev_page_honda").prop("disabled", page <= 1);
+        $("#next_page_honda").prop("disabled", page >= totalPages);
 
-        currentPage = page;
+        currentPageHonda = page;
 
     } catch (err) {
         console.error("Gagal load Honda others:", err);
     }
 }
 
-// Event tombol pagination
-$("#prev_page").click(() => {
-    if (currentPage > 1) loadHondaOthers(currentPage - 1);
+// tombol Honda
+$("#prev_page_honda").click(() => {
+    if (currentPageHonda > 1) loadHondaOthers(currentPageHonda - 1);
 });
-$("#next_page").click(() => {
-    loadHondaOthers(currentPage + 1);
+$("#next_page_honda").click(() => {
+    loadHondaOthers(currentPageHonda + 1);
 });
 
-$(document).ready(function () {
-    loadHondaOthers(currentPage);
+$(document).ready(async function () {
+        await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
+    
+    loadHondaOthers(currentPageHonda);
 });

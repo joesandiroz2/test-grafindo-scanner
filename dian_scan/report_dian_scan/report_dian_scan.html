@@ -21,27 +21,41 @@ const pb = new PocketBase(pocketbaseUrl);
   <div id="navbar-container"></div>
  <div style="margin:30px"> 
      <div class="row"> 
-      <div class="col-md-6 col-lg-6 col-sm-12"> 
-        <h5 style="font-weight:bold">Report Others Honda</h5>
-        <div id="honda_others_pagination" class="my-2 text-center">
-            <button id="prev_page" class="btn btn-primary btn-sm">Previous</button>
-            <span id="page_info">Halaman 1 dari 1</span>
-            <button id="next_page" class="btn btn-primary btn-sm">Next</button>
-        </div>
-
-        <div id="honda_others_progress" class="mb-3">
-            <div class="progress">
-                <div id="progress_bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width:0%">0%</div>
+          <div class="col-md-6 col-lg-6 col-sm-12"> 
+            <h5 style="font-weight:bold">Report Others Honda</h5>
+            
+            <div id="honda_others_pagination" class="my-2 text-center">
+                <button id="prev_page_honda" class="btn btn-primary btn-sm">Previous</button>
+                <span id="page_info_honda">Halaman 1 dari 1</span>
+                <button id="next_page_honda" class="btn btn-primary btn-sm">Next</button>
             </div>
-        </div>
 
+            <div id="honda_others_progress" class="mb-3">
+                <div class="progress">
+                    <div id="progress_bar_honda" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width:0%">0%</div>
+                </div>
+            </div>
 
-        <div id="honda_others"></div>
-      </div>
-       <div class="col-md-6 col-lg-6 col-sm-12"> 
-        <h5 style="font-weight:bold">Report Others Yamaha</h5>
-        <div id="yamaha_others"></div>
-      </div>
+            <div id="honda_others"></div>
+          </div>
+
+         <div class="col-md-6 col-lg-6 col-sm-12"> 
+            <h5 style="font-weight:bold">Report Others Yamaha</h5>
+            
+            <div id="yamaha_others_pagination" class="my-2 text-center">
+                <button id="prev_page_yamaha" class="btn btn-primary btn-sm">Previous</button>
+                <span id="page_info_yamaha">Halaman 1 dari 1</span>
+                <button id="next_page_yamaha" class="btn btn-primary btn-sm">Next</button>
+            </div>
+
+            <div id="yamaha_others_progress" class="mb-3">
+                <div class="progress">
+                    <div id="progress_bar_yamaha" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width:0%">0%</div>
+                </div>
+            </div>
+
+            <div id="yamaha_others"></div>
+          </div>
   </div>
  </div>
 
