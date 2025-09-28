@@ -18,10 +18,19 @@ async function loginPocketBase() {
 
 uploadBtn.addEventListener("click", async () => {
     const noDoInput = document.getElementById("no_do_input").value.trim();
-    const kodeDepan = document.getElementById("kode_select").value;
+
+    // ambil nilai kode depan
+    let kodeDepan;
+    const manualChecked = document.getElementById("manual_kode").checked;
+    if (manualChecked) {
+        kodeDepan = document.getElementById("kode_manual").value.trim();
+    } else {
+        kodeDepan = document.getElementById("kode_select").value;
+    }
+
     const merk = document.getElementById("merk_select").value;
 
-    // Validasi semua input
+    // Validasi input
     let missingInputs = [];
     if (!noDoInput) missingInputs.push("No DO");
     if (!kodeDepan) missingInputs.push("Kode Depan");
@@ -52,48 +61,34 @@ uploadBtn.addEventListener("click", async () => {
             merk: merk
         }));
 
-    } catch (err) {
-        uploadBtn.disabled = false;
-        uploadBtn.innerText = "Upload";
-        progressContainer.style.display = "none";
-        return;
-    }
+        // ---- proses upload per baris ----
+        const total = data.length;
+        let successCount = 0;
 
-    // Cek kolom Excel
-    const fileColumns = Object.keys(data[0] || {});
-    const missingColumns = requiredColumns.filter(col => !fileColumns.includes(col));
-    if (missingColumns.length) {
-        Swal.fire("Kolom Hilang", `Kolom berikut tidak ada: ${missingColumns.join(", ")}`, "error");
-        uploadBtn.disabled = false;
-        uploadBtn.innerText = "Upload";
-        progressContainer.style.display = "none";
-        return;
-    }
+        for (let i = 0; i < total; i++) {
+            try {
+                await pb.collection("dian_scan").create(data[i]);
+                successCount++;
+            } catch (err) {
+                console.error("Gagal upload:", data[i], err);
+            }
 
-    // Upload ke PocketBase
-    let successCount = 0;
-    for (let i = 0; i < data.length; i++) {
-        try {
-            await pb.collection("dian_scan").create(data[i]);
-            successCount++;
-        } catch (err) {
-            console.error("Gagal upload:", err);
+            // update progress
+            let percent = Math.round(((i + 1) / total) * 100);
+            progressBar.style.width = percent + "%";
+            progressBar.innerText = percent + "%";
         }
 
-        // Update progress bar
-        const percent = Math.round(((i + 1) / data.length) * 100);
-        progressBar.style.width = percent + "%";
-        progressBar.innerText = `${percent}%`;
+        Swal.fire("Sukses", `${successCount} data berhasil diupload!`, "success");
+        location.reload()
+    } catch (err) {
+        console.error("Error upload:", err);
+        Swal.fire("Error", "Terjadi kesalahan saat upload", "error");
     }
 
     uploadBtn.disabled = false;
     uploadBtn.innerText = "Upload";
-
-    if (successCount === data.length) {
-        Swal.fire("Sukses", "Semua data berhasil diupload", "success");
-    } else {
-        Swal.fire("Gagal", `${data.length - successCount} data gagal diupload`, "error");
-    }
+    progressContainer.style.display = "none";
 });
 
 // Fungsi membaca Excel
