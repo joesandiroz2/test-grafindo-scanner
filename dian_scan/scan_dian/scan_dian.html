@@ -13,6 +13,10 @@
 <body>
 
   <div id="navbar-container"></div>
+
+<audio id="scanAudio" src="" preload="auto"></audio>
+
+
 <div class="container">
   <h5>Scan Do Others</h5>
 
@@ -22,6 +26,12 @@
          id="scan_other"
          autofocus />
 </div>
+  
+  <div class="container"> 
+      <div id="showinfo"></div>
+
+  </div>
+
 
   <div class="row mt-3">
     <!-- Tabel pertama -->
@@ -35,9 +45,10 @@
           <thead>
             <tr>
               <th>No.</th>
+              <th>Kode</th>
               <th>No DO</th>
-              <th>Part Number</th>
-              <th>Nama Barang</th>
+              <th>Part no</th>
+              <th>Nama</th>
               <th>Qty</th>
               <th>Merk</th>
             </tr>
@@ -82,13 +93,24 @@
 <script src="../../js/pocket_config.js"></script>
 
 <script src="./js/scan_dian.js"></script>
+<script src="./js/scan_dian_pengurangan_stok.js"></script>
   <!-- Load Navbar -->
   <script>
+const pb = new PocketBase(pocketbaseUrl);
+
     $(document).ready(function () {
       $("#navbar-container").load("../../component/nav.html", function () {
         setTimeout(loginUser, 500);
       });
     });
+
+function playSound(src) {
+  const audio = document.getElementById("scanAudio");
+  audio.src = src;        // set src
+  audio.play().catch(err => console.warn("Audio gagal diputar:", err));
+}
+
+
   </script>
 
 </body>

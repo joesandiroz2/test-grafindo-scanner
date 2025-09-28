@@ -7,8 +7,15 @@ function generateUID() {
 }
 
 $(document).ready(function () {
-  $(".btn-info").on("click", async function () {
+  $("#buatdo").on("click", async function () {
+
+     const $btn = $(this);
+    const originalText = $btn.text();
+
     try {
+        // disable tombol & ubah teks
+      $btn.prop("disabled", true).text("Sedang membuat DO...");
+
       let kodeDepan = $("#pilih_kode_depan").val();
       let noDo = $("#no_do_generate").text().trim();
       let customerId = $("#search_customer").val();
@@ -80,6 +87,9 @@ $(document).ready(function () {
     } catch (err) {
       console.error("Gagal buat DO:", err);
       Swal.fire("Error", "Tidak bisa membuat Delivery Order", "error");
+    }finally {
+      // kembalikan tombol ke normal
+      $btn.prop("disabled", false).text(originalText);
     }
   });
 });
