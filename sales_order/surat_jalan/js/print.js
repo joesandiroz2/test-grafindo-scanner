@@ -22,6 +22,8 @@ document.addEventListener("DOMContentLoaded", function () {
                   margin: 5mm;
                 }
                 body {
+                font-family: "Arial", "Tahoma", sans-serif;
+               
                   -webkit-print-color-adjust: exact !important;
                   print-color-adjust: exact !important;
                 }
