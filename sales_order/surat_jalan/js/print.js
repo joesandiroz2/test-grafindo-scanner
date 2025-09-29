@@ -22,15 +22,15 @@ document.addEventListener("DOMContentLoaded", function () {
                   margin: 5mm;
                 }
                 body {
-                font-family: "Arial", "Tahoma", sans-serif;
-               
-                  -webkit-print-color-adjust: exact !important;
-                  print-color-adjust: exact !important;
-                }
-                table th, table td {
-                  -webkit-print-color-adjust: exact !important;
-                  print-color-adjust: exact !important;
-                }
+                    font-family: "Tahoma", "Verdana", sans-serif;
+                    font-size: 12px; 
+                  }
+                  table th, table td {
+                    font-weight:normal;
+                    font-family: "Tahoma", "Verdana", sans-serif;
+                    font-size: 12px;
+                  }
+
               }
             </style>
           </head>

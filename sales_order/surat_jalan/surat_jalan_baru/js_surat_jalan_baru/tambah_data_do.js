@@ -22,6 +22,7 @@ $(document).ready(function () {
       let noPo = $("#select_po_list").val();
       let driver = $("#select_driver_list").val();
       let sales = $("#input_sales").val().trim();
+      let remarks = $("#remarks").val().trim();
       let tglSchedule = $("#tgl_schedule_div").text().trim();
 
       // ✅ Validasi field wajib
@@ -59,6 +60,7 @@ $(document).ready(function () {
           part_number: row.find("td:eq(2)").text().trim(),
           nama_barang: row.find("td:eq(3)").text().trim(),
           qty: qty,
+          remarks:remarks,
           shipped: shipped,
           backorder: backorder || (qty - shipped),
         };
@@ -72,6 +74,7 @@ $(document).ready(function () {
         customer_name: $("#search_customer option:selected").text(),
         no_po: noPo,
         sales: sales,
+        remarks: remarks,
         driver: driver,
         tgl_schedule: tglSchedule,
         data_barang: JSON.stringify(dataBarang),

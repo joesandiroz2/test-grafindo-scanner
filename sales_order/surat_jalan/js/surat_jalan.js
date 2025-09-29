@@ -64,7 +64,7 @@ $(document).ready(function () {
 
           <!-- Kotak 3 -->
           <div style="flex:1; border:1px solid black; ">
-            <h5 style="text-align:center"><strong>Delivery Order: <br/> ${record.kode_depan} ${record.no_do}</strong></h5>
+            <h2 style="text-align:center"><strong>Delivery Order: <br/> ${record.kode_depan} ${record.no_do}</strong></h2>
           <strong>Tgl Schedule:</strong> ${record.tgl_schedule} <br/>
               <strong>Driver:</strong> <span id="driver_name">${driverName}</span><br/>
               
@@ -131,7 +131,7 @@ $(document).ready(function () {
             <td>${item.qty}</td>
             <td>${item.shipped}</td>
             <td>${item.backorder}</td>
-            <td></td>
+            <td>${item.remarks}</td>
           </tr>
         `;
       });
