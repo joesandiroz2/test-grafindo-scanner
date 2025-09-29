@@ -52,8 +52,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
               @media print {
                 @page {
-                  size: A4 portrait;
-                  margin: 10mm;
+                  size: auto;
+                  margin: 5mm;
                 }
                 body {
                   -webkit-print-color-adjust: exact !important;
