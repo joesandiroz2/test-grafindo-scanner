@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (btnPrint) {
     btnPrint.addEventListener("click", function () {
-      // update value input agar sinkron dengan isi terbaru
+      // update value input agar ewqwqsinkron dengan isi terbaru
       document.querySelectorAll("#print_page input").forEach(input => {
         input.setAttribute("value", input.value);
       });
