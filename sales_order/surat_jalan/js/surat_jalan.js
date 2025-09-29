@@ -131,6 +131,7 @@ $(document).ready(function () {
             <td>${item.qty}</td>
             <td>${item.shipped}</td>
             <td>${item.backorder}</td>
+            <td></td>
           </tr>
         `;
       });
