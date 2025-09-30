@@ -46,7 +46,7 @@ async function loadData(page = 1) {
       row.innerHTML = `
         <td>${no}</td>
         <td>
-          ${item.gambar ? `<img src="${imageUrl}" style="width:100px;height:80px" alt="gambar" />` : '<span class="text-muted">Tidak ada gambar</span>'}
+          ${item.gambar ? `<img src="${imageUrl}"  style="max-width:300px; height:auto;" alt="gambar" />` : '<span class="text-muted">Tidak ada gambar</span>'}
         </td>
         <td>${item.nama_barang}</td>
         <td style="font-weight:bold">${item.part_number}</td>
@@ -278,7 +278,7 @@ async function loadData(page = 1) {
       row.innerHTML = `
         <td>${no}</td>
         <td>
-          ${item.gambar ? `<img src="${imageUrl}" style="width:100px;height:80px" alt="gambar" />` : '<span class="text-muted">Tidak ada gambar</span>'}
+          ${item.gambar ? `<img src="${imageUrl}" style="max-width:300px;" alt="gambar" />` : '<span class="text-muted">Tidak ada gambar</span>'}
         </td>
         <td>${item.nama_barang}</td>
         <td style="font-weight:bold">${item.part_number}</td>
