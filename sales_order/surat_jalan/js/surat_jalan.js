@@ -50,7 +50,7 @@ $(document).ready(function () {
           <!-- Kotak 1 -->
           <div style="flex:1; border:1px solid black;padding:5px">
             <p> 
-              <strong>Ship to:</strong> ${record.customer_name} <br/>
+              <strong>Ship to:</strong> <br/><b>${record.customer_name}</b> <br/>
               <span id="customer_alamat">${alamatText}</span>
             </p>
           </div>
