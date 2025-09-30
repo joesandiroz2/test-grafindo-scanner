@@ -44,9 +44,42 @@ $(document).ready(function () {
       let driverName = "menunggu data driver...";
       let alamatText = "menunggu data alamat...";
 
+            // tampilkan header awal
+      $("#soCustomer").html(`
+        <div style="display:flex;">
+          <!-- Kotak 1 -->
+          <div style="flex:1; border:1px solid black;padding:5px">
+            <p> 
+              <strong>Customer Order no. Regular</strong> <br/> ${record.no_po}
+              
+            </p>
+          </div>
+
+          <!-- Kotak 2 -->
+          <div style="flex:1; border:1px solid black;padding:5px ">
+            <p><strong>Order Date: <br/> ${record.tgl_schedule} </strong></p>
+          </div>
+
+          <!-- Kotak 3 -->
+          <div style="flex:1; border:1px solid black; ">
+            <p style="text-align:center"><strong>Back Order Form<br/> </strong></p>
+          </div>
+         <div style="flex:1; border:1px solid black; ">
+            <p style="text-align:center"><strong>Shiped By<br/> <span id="driver_name"></span>  </strong></p>
+          </div>
+         <div style="flex:1; border:1px solid black; ">
+            <p style="text-align:center"><strong>Sales Rep No<br/> Sales Rep Name </strong></p>
+          </div>
+         <div style="flex:1; border:1px solid black; ">
+            <p style="text-align:center"><strong>${record.sales} </strong></p>
+          </div>
+        </div>
+      `);
+
+
       // tampilkan header awal
       $("#soHeader").html(`
-        <div style="display:flex; gap:10px; margin:10px 0;">
+        <div style="display:flex;">
           <!-- Kotak 1 -->
           <div style="flex:1; border:1px solid black;padding:5px">
             <p> 
@@ -57,18 +90,17 @@ $(document).ready(function () {
 
           <!-- Kotak 2 -->
           <div style="flex:1; border:1px solid black;padding:5px ">
-            <p><strong>No PO:</strong> ${record.no_po}</p>
-            <p><b>Sales :</b> ${record.sales}</p>
-            <p><strong>Invoice to:</strong> <br/> ${record.customer_name}</p>
+            <p>Invoice to: <br/><h4><b>${record.customer_name}</b></h4></p>
           </div>
 
           <!-- Kotak 3 -->
-          <div style="flex:1; border:1px solid black; ">
-            <h2 style="text-align:center"><strong>Delivery Order: <br/> ${record.kode_depan} ${record.no_do}</strong></h2>
-          <strong>Tgl Schedule:</strong> ${record.tgl_schedule} <br/>
-              <strong>Driver:</strong> <span id="driver_name">${driverName}</span><br/>
-              
+          <div style="flex:1; border:1px solid black;">
+            <div style="text-align:center"> 
+              <span>Delivery Order No</span>
+              <h2 style="margin:0"><strong>${record.kode_depan} ${record.no_do}</strong></h2>
+            </div>
           </div>
+
         </div>
       `);
 

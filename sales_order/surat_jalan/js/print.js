@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (btnPrint) {
     btnPrint.addEventListener("click", function () {
-      // update value input agar ewqwqsinkron dengan isi terbaru
+      // update value input agar sinkron dengan isi terbaru
       document.querySelectorAll("#print_page input").forEach(input => {
         input.setAttribute("value", input.value);
       });
@@ -22,15 +22,14 @@ document.addEventListener("DOMContentLoaded", function () {
                   margin: 5mm;
                 }
                 body {
-                    font-family: "Tahoma", "Verdana", sans-serif;
-                    font-size: 12px; 
-                  }
-                  table th, table td {
-                    font-weight:normal;
-                    font-family: "Tahoma", "Verdana", sans-serif;
-                    font-size: 12px;
-                  }
-
+                  font-family: "Tahoma", "Verdana", sans-serif;
+                  font-size: 12px; 
+                }
+                table th, table td {
+                  font-weight: normal;
+                  font-family: "Tahoma", "Verdana", sans-serif;
+                  font-size: 12px;
+                }
               }
             </style>
           </head>
@@ -39,10 +38,15 @@ document.addEventListener("DOMContentLoaded", function () {
           </body>
         </html>
       `);
+
       printWindow.document.close();
-      printWindow.focus();
-      printWindow.print();
-      printWindow.close();
+
+      // ✅ Tunggu semua gambar/konten di window print selesai load
+      printWindow.onload = function () {
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+      };
     });
   }
 });
