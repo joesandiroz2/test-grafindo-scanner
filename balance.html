@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Yamaha Kartu Stok</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"/>
+  <style>
+    body {
+      margin: 20px;
+    }
+    h4 {
+      margin-bottom: 20px;
+    }
+    table {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h4>Form Balance Yamaha Kartu Stok</h4>
+    <div class="row"> 
+         <form id="stokForm" class="card-panel">
+      <div class="input-field">
+        <input type="text" id="part_number" name="part_number" required>
+        <label for="part_number">Part Number</label>
+      </div>
+
+      <div class="input-field">
+        <input type="number" id="balance" name="balance" required>
+        <label for="balance">Balance</label>
+      </div>
+
+      <button class="btn waves-effect waves-light blue" type="submit">Simpan
+      </button>
+    </form>
+    </div>
+   
+
+    <div class="row"> 
+      <div class="col-md-6 col-lg-6 col-sm-12"> 
+        <h5>Data Balance Akhir Bulan</h5>
+    <table class="highlight responsive-table">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Part Number</th>
+          <th>Balance</th>
+          <th>Tanggal</th>
+        </tr>
+      </thead>
+      <tbody id="dataTable"></tbody>
+    </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="./js/sdk/pocketbase.umd.js"></script>
+  <script src="./js/pocket_config.js"></script>
+
+  <script>
+    const pb = new PocketBase(pocketbaseUrl);
+
+    // format tanggal
+    function formatTanggal(dateStr) {
+      const date = new Date(dateStr);
+      const options = { day: '2-digit', month: 'long', year: 'numeric', hour: "2-digit", minute: "2-digit" };
+      return date.toLocaleDateString("id-ID", options);
+    }
+
+    // load data terbaru
+    async function loadData() {
+      try {
+        await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
+
+        const records = await pb.collection("yamaha_kartu_stok").getFullList({
+          filter: 'no_do="balance akhir bulan"',
+          sort: "-created", // terbaru duluan
+          limit: 20
+        });
+
+        const tbody = document.getElementById("dataTable");
+        tbody.innerHTML = "";
+
+        records.forEach((rec, i) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${i + 1}</td>
+            <td>${rec.part_number || "-"}</td>
+            <td>${rec.balance || "0"}</td>
+            <td>${formatTanggal(rec.created)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+      } catch (err) {
+        console.error("Gagal load data:", err);
+      }
+    }
+
+    // simpan form
+    document.getElementById("stokForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      try {
+        await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
+
+        let partNumber = document.getElementById("part_number").value.trim().toUpperCase();
+        let balance = document.getElementById("balance").value.trim();
+
+        const data = {
+          "kode_depan": "",
+          "no_do": "balance akhir bulan",
+          "part_number": partNumber,
+          "nama_barang": "",
+          "qty_scan": "",
+          "qty_do": "",
+          "status": "",
+          "remarks": "",
+          "balance": balance,
+          "qty_masuk": "",
+          "tgl_pb": "",
+          "lot": "",
+          "jumlah_barang": "",
+          "tgl_do": "",
+          "budian": ""
+        };
+
+        await pb.collection("yamaha_kartu_stok").create(data);
+
+        M.toast({html: '✅ Data berhasil disimpan!', classes: 'green darken-1'});
+        document.getElementById("stokForm").reset();
+
+        loadData(); // reload tabel
+
+      } catch (err) {
+        console.error("Error:", err);
+        M.toast({html: '❌ Gagal menyimpan data', classes: 'red darken-1'});
+      }
+    });
+
+    // load pertama kali
+    loadData();
+  </script>
+</body>
+</html>
