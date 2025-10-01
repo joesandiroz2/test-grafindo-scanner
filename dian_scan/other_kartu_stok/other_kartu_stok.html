@@ -20,9 +20,19 @@
   <h4>Kartu Stok Others</h4>
 
    <div class="mb-3">
-      <label for="partSelect" class="form-label">Cari Part Number</label>
-      <select id="partSelect" class="form-control" style="width:100%"></select>
-    </div>
+  <label for="partSelect" class="form-label">Cari Part Number</label>
+  <select id="partSelect" class="form-control" style="width:100%"></select>
+  <p id="loadingText" style="font-weight:bold;color:purple">Sedang memuat partnumber...</p>
+
+    <label for="limitSelect" class="form-label mt-2">Jumlah data terakhir</label>
+  <select id="limitSelect" class="form-control" style="width:100%">
+    <option value="">Pilih data terakhir</option>
+    <option value="30">30 data terakhir</option>
+    <option value="100">100 data terakhir</option>
+    <option value="500">500 data terakhir</option>
+  </select>
+
+</div>
 
   <div class="mt-4">
   <table class="table table-bordered table-striped" id="resultTable">
