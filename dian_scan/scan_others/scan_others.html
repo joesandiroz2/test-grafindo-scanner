@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRUD Data Barang</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+</head>
+<body>
+<div id="navbar-container"></div>
+
+<div class="container"> 
+    <h5 style="color:white;background-color:red;margin-top:5px;padding:5px">Scan Other selain Honda dan Yamaha</h5>
+
+    <input type="text" id="scan_part" class="form-control" autofocus placeholder="scan Do part disini"/>
+
+    <span id="showmessage"></span>
+
+
+</div>
+
+<div class="row"> 
+    <div class="col-md-8 col-lg-8 col-sm-12"> 
+        <h5>Tabel Do</h5>
+        <table border="1" id="tbl_do"></table>
+    </div>
+    <div class="col-md-4 col-lg-4 col-sm-12"> 
+        <h5>Part Sudah Scan dan dikurangi</h5>
+        <table border="1" id="tbl_sudah_scan"></table>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="../../js/sdk/pocketbase.umd.js"></script>
+<script src="../../js/pocket_config.js"></script>
+
+<script src="./js/scan_others.js"></script>
+<script src="./js/proses_kartu_stok.js"></script>
+</body>
+<script>
+$(document).ready(function() {
+    $("#navbar-container").load("../../component/nav.html",function(){
+        setTimeout(loginUser, 500);
+    });
+})
+</script>
+</html>
