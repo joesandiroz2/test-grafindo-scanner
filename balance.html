@@ -106,7 +106,7 @@
       try {
         await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
 
-        let partNumber = document.getElementById("part_number").value.trim().toUpperCase();
+        let partNumber = document.getElementById("part_number").value.replace(/\s+/g, "").trim().toUpperCase();
         let balance = document.getElementById("balance").value.trim();
 
         const data = {
