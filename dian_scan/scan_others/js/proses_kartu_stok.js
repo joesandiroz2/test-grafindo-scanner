@@ -102,6 +102,7 @@ async function prosesKartuStok(part_number, qty, lot) {
             lot: lot,
             kode_depan: doRecord.kode_depan,
             balance: balanceBaru,
+            no_po: doRecord.po_no,   // 🔥 tambahkan ini
             status: "keluar"
         });
 
