@@ -1,8 +1,13 @@
 $(document).ready(async function () {
   const apiUrl = `${pocketbaseUrl}/api/collections/other_unik_partnumber/records`;
   const pb = new PocketBase(pocketbaseUrl);
+  
+  let currentPage = 1;
+  let totalPages = 1;
+  let lastPartNumber = "";
+  let perPage = 150;
 
-  // fungsi fetch semua halaman untuk select2
+  // fetch semua parts untuk select2
   async function fetchAllParts() {
     let allItems = [];
     let page = 1;
@@ -15,45 +20,33 @@ $(document).ready(async function () {
       allItems = allItems.concat(data.items);
       totalPages = data.totalPages;
 
-       // update loading text
-      $("#loadingText").text(`Sedang memuat partnumber... ${allItems.length} dari ${data.totalItems}`);
+      $("#loadingText").text(
+        `Sedang memuat partnumber... ${allItems.length} dari ${data.totalItems}`
+      );
 
       page++;
     } while (page <= totalPages);
-     $("#loadingText").hide(); // atau .remove();
+    $("#loadingText").hide();
 
     return allItems;
   }
 
   // render select2
   const items = await fetchAllParts();
- const formattedData = [
-  { id: "", text: "Pilih part nomor" }, // default
-  ...items.map(item => ({
-    id: item.part_number,
-    text: `${item.part_number} - ${item.nama_barang}`
-  }))
-];
+  const formattedData = [
+    { id: "", text: "Pilih part nomor" }, // default
+    ...items.map((item) => ({
+      id: item.part_number,
+      text: `${item.part_number} - ${item.nama_barang}`,
+    })),
+  ];
 
-
-  // inisialisasi select2
   $("#partSelect").select2({
     placeholder: "Cari part number...",
     data: formattedData,
     allowClear: true,
-    width: "100%"
+    width: "100%",
   });
-
-  // ✅ pilih default part_number pertama (kalau ada)
-  if (formattedData.length > 0) {
-    const defaultPart = formattedData[0].id;
-
-    // set val + trigger supaya select2 bener-bener update tampilan
-    $("#partSelect")
-      .val(defaultPart)
-      .trigger("change")          // untuk event kita
-      .trigger("change.select2"); // untuk tampilan select2
-  }
 
   // event ketika select berubah
   $("#partSelect").on("change", async function () {
@@ -63,61 +56,111 @@ $(document).ready(async function () {
       return;
     }
 
-      const perPage = parseInt($("#limitSelect").val()) || 50; // ambil limit dari select
-  
+    lastPartNumber = partNumber;
 
     try {
-      // ambil data dari others_kartu_stok dengan filter part_number
-     // ambil data dari others_kartu_stok dengan filter part_number
-      const records = await pb.collection("others_kartu_stok").getList(1,perPage, {
-        filter: `part_number="${partNumber}"`,
-        sort: "-created"
+      Swal.fire({
+        title: "Sedang mengecek stok...",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
       });
 
+      // Ambil dulu totalPages untuk partNumber ini
+      const firstPage = await pb.collection("others_kartu_stok").getList(1, perPage, {
+        filter: `part_number="${partNumber}"`,
+      });
 
-      // render ke tabel
+      totalPages = firstPage.totalPages;
+      currentPage = totalPages; // langsung lompat ke page terakhir
+
+      const records = await pb.collection("others_kartu_stok").getList(currentPage, perPage, {
+        filter: `part_number="${partNumber}"`,
+      });
+
       renderTable(records);
+      Swal.close();
+    } catch (err) {
+      console.error("Error ambil data kartu stok:", err);
+    }
+  });
+
+  // Tombol sebelumnya
+  $("#prevBtn").on("click", async function () {
+    if (!lastPartNumber) return;
+    if (currentPage <= 1) return; // sudah di page 1, tidak bisa mundur lagi
+
+    currentPage--;
+
+    try {
+      Swal.fire({
+        title: "Sedang memuat data...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      const records = await pb.collection("others_kartu_stok").getList(currentPage, perPage, {
+        filter: `part_number="${lastPartNumber}"`,
+      });
+
+      renderTable(records);
+      Swal.close();
     } catch (err) {
       console.error("Error ambil data kartu stok:", err);
     }
   });
 
   function renderTable(records) {
-    const tbody = $("#resultTable tbody");
-    tbody.empty();
+  const tbody = $("#resultTable tbody");
+  tbody.empty();
 
-    if (records.length === 0) {
-      tbody.append(`<tr><td colspan="8" class="text-center text-muted">Tidak ada data</td></tr>`);
-      return;
+  if (records.items.length === 0) {
+    tbody.append(
+      `<tr><td colspan="8" class="text-center text-muted">Tidak ada data</td></tr>`
+    );
+    return;
+  }
+
+  records.items.forEach((rec, i) => {
+    let statusClass = "";
+    if (rec.status?.toLowerCase() === "keluar") {
+      statusClass = 'style="color:red;font-weight:bold"';
+    } else if (rec.status?.toLowerCase() === "masuk") {
+      statusClass = 'style="color:green;font-weight:bold"';
     }
 
-    records.items.forEach((rec, i) => {
-      // 🎨 style untuk status
-      let statusClass = "";
-      if (rec.status?.toLowerCase() === "keluar") {
-        statusClass = 'style="color:red;font-weight:bold"';
-      } else if (rec.status?.toLowerCase() === "masuk") {
-        statusClass = 'style="color:green;font-weight:bold"';
-      }
+    let balanceClass = "";
+    if (parseFloat(rec.balance) < 0) {
+      balanceClass = 'style="color:red;font-weight:bold"';
+    }
 
-      // 🎨 style untuk balance
-      let balanceClass = "";
-      if (parseFloat(rec.balance) < 0) {
-        balanceClass = 'style="color:red;font-weight:bold"';
-      }
-
-      tbody.append(`
-        <tr>
-          <td>${i + 1}</td>
-          <td ${statusClass}>${rec.status} ${rec.qty}</td>
-          <td ${balanceClass}>${rec.balance}</td>
-          <td>${rec.part_number}</td>
-          <td>${rec.nama_barang}</td>
-          <td>${rec.lot}</td>
-          <td>${rec.no_po}</td>
-          <td>${rec.kode_depan + rec.no_do}</td>
-        </tr>
-      `);
+    // Format created → "22 Mei 2025 09:50"
+    const createdDate = new Date(rec.created);
+    const formattedDate = createdDate.toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
     });
-  }
+    const formattedTime = createdDate.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    tbody.append(`
+      <tr>
+        <td>${i + 1}</td>
+        <td ${statusClass}>${rec.status} ${rec.qty}</td>
+        <td ${balanceClass}>${rec.balance}</td>
+        <td>${rec.part_number}</td>
+        <td>${rec.nama_barang}</td>
+        <td>${rec.lot}</td>
+        <td>${rec.no_po}</td>
+        <td>${rec.kode_depan + rec.no_do}</td>
+        <td>${formattedDate} ${formattedTime}</td>
+      </tr>
+    `);
+  });
+}
+
 });
