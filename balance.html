@@ -81,9 +81,7 @@
         await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
 
         const records = await pb.collection("yamaha_kartu_stok").getFullList({
-          filter: 'no_do="balance akhir bulan"',
           sort: "-created", // terbaru duluan
-          limit: 20
         });
 
         const tbody = document.getElementById("dataTable");
