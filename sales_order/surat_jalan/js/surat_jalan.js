@@ -96,8 +96,8 @@ $(document).ready(function () {
           <!-- Kotak 3 -->
           <div style="flex:1; border:1px solid black;">
             <div style="text-align:center"> 
-              <span>Delivery Order No</span>
-              <h2 style="margin:0"><strong>${record.kode_depan} ${record.no_do}</strong></h2>
+              <span >Delivery Order No</span>
+              <h2 style="margin-top:20px"><strong>${record.kode_depan} ${record.no_do}</strong></h2>
             </div>
           </div>
 
