@@ -76,33 +76,35 @@
     }
 
     // load data terbaru
-    async function loadData() {
-      try {
-        await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
+    // load data terbaru
+async function loadData() {
+  try {
+    await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
 
-        const records = await pb.collection("yamaha_kartu_stok").getFullList({
-          sort: "-created", // terbaru duluan,
-          limit:100
-        });
+    // ✅ Ambil hanya 100 data terbaru
+    const result = await pb.collection("yamaha_kartu_stok").getList(1, 100, {
+      sort: "-created"
+    });
 
-        const tbody = document.getElementById("dataTable");
-        tbody.innerHTML = "";
+    const tbody = document.getElementById("dataTable");
+    tbody.innerHTML = "";
 
-        records.forEach((rec, i) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${i + 1}</td>
-            <td>${rec.part_number || "-"}</td>
-            <td>${rec.balance || "0"}</td>
-            <td>${formatTanggal(rec.created)}</td>
-          `;
-          tbody.appendChild(tr);
-        });
+    result.items.forEach((rec, i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${i + 1}</td>
+        <td>${rec.part_number || "-"}</td>
+        <td>${rec.balance || "0"}</td>
+        <td>${formatTanggal(rec.created)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
 
-      } catch (err) {
-        console.error("Gagal load data:", err);
-      }
-    }
+  } catch (err) {
+    console.error("Gagal load data:", err);
+  }
+}
+
 
     // simpan form
     document.getElementById("stokForm").addEventListener("submit", async function (e) {
