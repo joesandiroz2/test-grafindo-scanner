@@ -31,6 +31,12 @@
         <label for="balance">Balance</label>
       </div>
 
+      <div class="input-field">
+      <input type="text" id="no_do" name="no_do" value="balance akhir bulan" required>
+      <label for="no_do" class="active">No DO</label>
+    </div>
+
+
       <button class="btn waves-effect waves-light blue" type="submit">Simpan
       </button>
     </form>
@@ -107,11 +113,11 @@
         await pb.collection("users").authWithPassword(username_pocket, user_pass_pocket);
 
         let partNumber = document.getElementById("part_number").value.replace(/\s+/g, "").trim().toUpperCase();
+        let no_do = document.getElementById("no_do").value.trim();
         let balance = document.getElementById("balance").value.trim();
-
         const data = {
           "kode_depan": "",
-          "no_do": "balance akhir bulan",
+          "no_do": no_do,
           "part_number": partNumber,
           "nama_barang": "",
           "qty_scan": "",
