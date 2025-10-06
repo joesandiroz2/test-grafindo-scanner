@@ -222,7 +222,7 @@ async function submitData() {
     }
   } catch (err) {
     // Part number tidak ditemukan
-    previewContainer.innerHTML = `<h5 style="color:red">part ini ga ada gambar nya, salah partnumber</h5>`;
+    previewContainer.innerHTML = `<h5 style="color:red">part ini belum ada gambar nya</h5>`;
   }
 
 
