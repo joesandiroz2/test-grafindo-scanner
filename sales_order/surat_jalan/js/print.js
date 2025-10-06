@@ -26,8 +26,8 @@ document.addEventListener("DOMContentLoaded", function () {
                   font-size: 12px; 
                 }
                 table th, table td {
-                  font-weight: normal;
-                  font-family: "Tahoma", "Verdana", sans-serif;
+                  font-weight: bold;
+                  font-family: Consolas, monospace;
                   font-size: 12px;
                 }
               }
