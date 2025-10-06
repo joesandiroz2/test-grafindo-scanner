@@ -23,6 +23,8 @@ async function showScanTableByDo(noDo, merk) {
         collectionName = "yamaha_kartu_stok";
         doColumn = "no_do";
     } else {
+        showMessage(`Merk Ga Sesuai : ${merk}`, "danger");
+        
         console.warn("Merk tidak dikenali:", merk);
         return;
     }
@@ -97,6 +99,8 @@ async function searchByNoDo(no_do_value) {
             doColumn = "no_do";
             qtyField = "qty_scan";
         } else {
+        showMessage(`Merk Ga Sesuai : ${merk}`, "danger");
+
             console.warn("Merk tidak dikenali:", merk);
             return;
         }

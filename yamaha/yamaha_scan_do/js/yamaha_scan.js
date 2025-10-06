@@ -213,7 +213,7 @@ async function submitData() {
         // Tampilkan gambar
         previewContainer.innerHTML = `
           <img src="${pocketbaseUrl}/api/files/yamaha_data_barang/${result.id}/${result.gambar}" 
-               alt="${result.nama_barang}" style="width:250px; height:200px; max-width:250px; max-height:200px;">
+               alt="${result.nama_barang}" style="width:100%; height:300px; max-width:250px; max-height:200px;">
         `;
       } else {
         // Tidak ada gambar
