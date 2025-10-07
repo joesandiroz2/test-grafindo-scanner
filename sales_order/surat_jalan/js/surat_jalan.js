@@ -21,7 +21,7 @@ $(document).ready(function () {
         filter: `no_do="${id}"`
       });
 
-     
+     console.log(records)
       if (!records || records.length === 0) {
         Swal.fire("Not Found", `Sales Order dengan no_do ${id} tidak ditemukan`, "warning");
         return;
@@ -30,6 +30,13 @@ $(document).ready(function () {
       // ambil record pertama
       const record = records[0];
 
+       // === tampilkan status batal ===
+      if (record.is_batal === "batal") {
+        $("#batalkan").show(); // tampilkan elemen
+      } else {
+        $("#batalkan").hide(); // sembunyikan kalau tidak batal
+      }
+      
       // === generate barcode dari no_do ===
       $("#bar_code_do").html(`<svg id="barcodeDO"></svg>`);
       JsBarcode("#barcodeDO", record.no_do, {
