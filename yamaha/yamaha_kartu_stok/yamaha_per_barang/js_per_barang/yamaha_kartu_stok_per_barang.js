@@ -126,7 +126,59 @@ document.getElementById('tampilkan-stok-terakhir').addEventListener('click', asy
     renderDetailBarang(query); // Render detail barang
 });
 
+
+//update cek tanda stok 
+async function updatePenandaStok(recordId) {
+  try {
+    await authenticate(); // pastikan user login
+    await pb.collection('yamaha_kartu_stok').update(recordId, {
+      penanda_stok: "ok"
+    });
+
+    Swal.fire({
+      title: "Berhasil!",
+      text: "Penanda stok telah diset menjadi OK.",
+      icon: "success",
+      timer: 1500,
+      showConfirmButton: false
+    });
+  } catch (error) {
+    console.error("Gagal update penanda_stok:", error);
+    Swal.fire("Gagal!", "Tidak bisa mengupdate penanda_stok.", "error");
+  }
+}
+
+
+// fungsi modal untuk konfirmasi penanda stok
+function showPenandaModal(recordId, balanceValue) {
+  Swal.fire({
+    title: "Beri Penanda Stok",
+    html: `
+      <p><strong>Balance:</strong> ${balanceValue}</p>
+      <label><input type="checkbox" id="cekOperator"> Sudah cek by operator</label>
+    `,
+    confirmButtonText: "Simpan",
+    showCancelButton: true,
+    cancelButtonText: "Batal",
+    preConfirm: () => {
+      const checked = document.getElementById('cekOperator').checked;
+      if (!checked) {
+        Swal.showValidationMessage("Harap centang terlebih dahulu");
+        return false;
+      }
+      return checked;
+    }
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      await updatePenandaStok(recordId);
+    }
+  });
+}
+
+
 function renderTable(data) {
+     const userGrafindo = localStorage.getItem("user-grafindo");
+  
     const tableBody = document.getElementById('data-table-body');
     tableBody.innerHTML = ''; // Hapus data sebelumnya
 
@@ -139,11 +191,27 @@ function renderTable(data) {
         // Menentukan warna background berdasarkan status
         const bgColor = item.status.toLowerCase() === "keluar" ? "red" : "green";
         const balanceColor = Number(item.balance) < 0 ? 'red' : 'black';
-    
+      const penandaOk = item.penanda_stok === "ok";
+
+    // kalau penanda sudah ok, beri warna hijau muda
+    const highlightStyle = penandaOk ? "background-color:#81c784" : "";
+
+         // kalau user pika@gmail.com, kolom balance bisa diklik
+        const balanceEmoji = item.penanda_stok === "ok" ? " ✔️" : "";
+
+        const balanceCell = userGrafindo === "pika@gmail.com"
+          ? `<td style="font-weight:bold;text-align:center;color:${balanceColor};cursor:pointer;${highlightStyle}" 
+               onclick="showPenandaModal('${item.id}', '${item.balance}')">
+               ${item.balance}${balanceEmoji}
+             </td>`
+          : `<td style="font-weight:bold;text-align:center;color:${balanceColor};${highlightStyle}">
+               ${item.balance}${balanceEmoji}
+             </td>`;
+
         const row = `<tr >
             <td style="background-color: ${bgColor}; color: white;font-weight:bold; text-align: center;">${index + 1}</td> 
             <td style="font-weight:bold;text-align:center;color:blue">${item.qty_masuk}</td>
-            <td style="font-weight:bold;text-align:center;color:${balanceColor}">${item.balance}</td>
+           ${balanceCell}
             <td style="font-weight:bold;text-align:center;color:red">${item.qty_scan}</td>
             <td>${item.lot}</td>
             <td style="font-weight:bold;text-align:center">${item.kode_depan} ${item.no_do.toUpperCase()}</td>
