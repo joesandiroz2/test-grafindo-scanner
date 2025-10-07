@@ -128,12 +128,37 @@ document.getElementById('tampilkan-stok-terakhir').addEventListener('click', asy
 
 
 //update cek tanda stok 
+// update cek tanda stok 
 async function updatePenandaStok(recordId) {
   try {
     await authenticate(); // pastikan user login
     await pb.collection('yamaha_kartu_stok').update(recordId, {
       penanda_stok: "ok"
     });
+
+    // ambil ulang data dari database biar real
+    const updatedRecord = await pb.collection('yamaha_kartu_stok').getOne(recordId);
+
+    // Ambil user untuk cek apakah yang login pika
+    const userGrafindo = localStorage.getItem("user-grafindo");
+
+    // Cari baris tabel yang sesuai dengan recordId
+    const row = document.querySelector(`#data-table-body tr td[onclick*="${recordId}"]`)?.parentElement;
+
+    if (row && updatedRecord) {
+      // Ambil sel balance (kolom ke-3 dari tabel kamu)
+      const balanceCell = row.children[2];
+
+      // Update nilainya langsung dari database
+      balanceCell.textContent = updatedRecord.balance;
+
+      // Jika penanda_stok "ok", tampilkan emoji bulat centang hijau 🟢✅
+      if (updatedRecord.penanda_stok === "ok") {
+        balanceCell.innerHTML += " ✔️";
+        balanceCell.style.backgroundColor = "#81c784"; // hijau lembut
+        balanceCell.style.borderRadius = "8px";
+      }
+    }
 
     Swal.fire({
       title: "Berhasil!",
@@ -147,6 +172,7 @@ async function updatePenandaStok(recordId) {
     Swal.fire("Gagal!", "Tidak bisa mengupdate penanda_stok.", "error");
   }
 }
+
 
 
 // fungsi modal untuk konfirmasi penanda stok
@@ -177,7 +203,6 @@ function showPenandaModal(recordId, balanceValue) {
 
 
 function renderTable(data) {
-     const userGrafindo = localStorage.getItem("user-grafindo");
   
     const tableBody = document.getElementById('data-table-body');
     tableBody.innerHTML = ''; // Hapus data sebelumnya
@@ -189,15 +214,19 @@ function renderTable(data) {
 
     data.forEach((item,index) => {
         // Menentukan warna background berdasarkan status
+     const userGrafindo = localStorage.getItem("user-grafindo");
         const bgColor = item.status.toLowerCase() === "keluar" ? "red" : "green";
         const balanceColor = Number(item.balance) < 0 ? 'red' : 'black';
       const penandaOk = item.penanda_stok === "ok";
 
-    // kalau penanda sudah ok, beri warna hijau muda
-    const highlightStyle = penandaOk ? "background-color:#81c784" : "";
+    // hanya tampilkan emoji dan highlight kalau user-nya pika@gmail.com
+        const showHighlight = userGrafindo === "pika@gmail.com" && penandaOk;
+
+        // gaya background hanya untuk pika + penanda ok
+        const highlightStyle = showHighlight ? "background-color:#81c784" : "";
 
          // kalau user pika@gmail.com, kolom balance bisa diklik
-        const balanceEmoji = item.penanda_stok === "ok" ? " ✔️" : "";
+        const balanceEmoji = showHighlight  ? " ✔️" : "";
 
         const balanceCell = userGrafindo === "pika@gmail.com"
           ? `<td style="font-weight:bold;text-align:center;color:${balanceColor};cursor:pointer;${highlightStyle}" 
