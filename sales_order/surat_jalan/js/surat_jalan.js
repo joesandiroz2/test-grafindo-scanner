@@ -62,7 +62,7 @@ $(document).ready(function () {
 
           <!-- Kotak 3 -->
           <div style="flex:1; border:1px solid black; ">
-            <p style="text-align:center"><strong>Back Order Form<br/> </strong></p>
+            <p style="text-align:center"><strong>Back Order <br/> Form </strong></p>
           </div>
          <div style="flex:1; border:1px solid black; ">
             <p style="text-align:center"><strong>Shiped By<br/> <span id="driver_name"></span>  </strong></p>
@@ -90,7 +90,7 @@ $(document).ready(function () {
 
           <!-- Kotak 2 -->
           <div style="flex:1; border:1px solid black;padding:5px ">
-            <p>Invoice to: <br/><h4><b>${record.customer_name}</b></h4></p>
+            <p><b>Invoice to: </b><br/><h4><b>${record.customer_name}</b></h4></p>
           </div>
 
           <!-- Kotak 3 -->
