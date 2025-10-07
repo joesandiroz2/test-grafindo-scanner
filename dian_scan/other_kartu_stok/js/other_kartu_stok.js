@@ -133,6 +133,9 @@ $(document).ready(async function () {
     let balanceClass = "";
     if (parseFloat(rec.balance) < 0) {
       balanceClass = 'style="color:red;font-weight:bold"';
+    }else{
+      balanceClass = 'style="color:black;font-weight:bold"';
+
     }
 
     // Format created → "22 Mei 2025 09:50"
@@ -150,7 +153,8 @@ $(document).ready(async function () {
     tbody.append(`
       <tr>
         <td>${i + 1}</td>
-        <td ${statusClass}>${rec.status} ${rec.qty}</td>
+        <td ${statusClass}>${rec.status}</td>
+        <td ${statusClass}>${rec.qty_masuk} Pcs</td>
         <td ${balanceClass}>${rec.balance}</td>
         <td>${rec.part_number}</td>
         <td>${rec.nama_barang}</td>
