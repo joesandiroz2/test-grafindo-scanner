@@ -92,6 +92,11 @@ async function loadBarang() {
         <div class="card h-100 shadow-sm">
           <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
             <b>${setName}</b>
+
+        <button class="btn btn-danger btn-sm btn-kurangi-pb" data-set="${setName}">
+              Kurangi Stok
+        </button> 
+
             <button class="btn btn-success btn-sm btn-add-pb" data-set="${setName}">
               Tambah PB
             </button>
@@ -333,3 +338,111 @@ $(document).on("click", ".btn-add-pb", async function () {
   }
 });
 
+
+
+// === KURANGI STOK UNTUK SEMUA BARANG DALAM SET ===
+$(document).on("click", ".btn-kurangi-pb", async function () {
+  const setName = $(this).data("set");
+
+  // Ambil semua part dari set yang diklik
+  const records = await pb.collection("dian_scan_barang").getFullList({
+    filter: `ikut_set="${setName}"`,
+  });
+
+  if (records.length === 0) {
+    return Swal.fire("Tidak ada barang di set ini!", "", "info");
+  }
+
+  // === INPUT SEKALI UNTUK SEMUA BARANG DALAM SET ===
+  const { value: formValues } = await Swal.fire({
+    title: `Kurangi Stok untuk SET: ${setName}`,
+    html: `
+      <div class="text-start">
+        <label>No DO / Referensi</label>
+        <input id="swal-no-do" placeholder="Masukkan No DO / Referensi"><br/>
+        <label>Qty Keluar</label>
+        <input id="swal-qty" type="number" placeholder="Masukkan Qty Keluar"><br/>
+        <label>Keterangan / Lot</label>
+        <input id="swal-lot" placeholder="Masukkan Keterangan / Lot"><br/>
+        <label>Tanggal Keluar</label>
+        <input id="swal-tgl" type="date">
+      </div>
+    `,
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: "Simpan Semua",
+    cancelButtonText: "Batal",
+    didOpen: () => {
+      // ubah warna header title jadi merah
+      const title = Swal.getTitle();
+      if (title) {
+        title.style.backgroundColor = "#d32f2f";
+        title.style.color = "white";
+        title.style.padding = "10px";
+        title.style.borderRadius = "5px";
+      }
+    },
+    preConfirm: () => {
+      return {
+        no_do: document.getElementById("swal-no-do").value.trim(),
+        qty_keluar: parseInt(document.getElementById("swal-qty").value) || 0,
+        lot: document.getElementById("swal-lot").value.trim(),
+        tgl_pb: document.getElementById("swal-tgl").value,
+      };
+    },
+  });
+
+  if (!formValues) return;
+
+  const { no_do, qty_keluar, lot, tgl_pb } = formValues;
+
+  Swal.fire({
+    title: "Sedang memproses...",
+    html: `Mengurangi stok untuk semua part di SET: <b>${setName}</b>`,
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading(),
+  });
+
+  try {
+    for (const item of records) {
+      const part_number = item.part_number;
+      const nama_barang = item.nama_barang;
+
+      // Ambil balance terakhir
+      const existing = await pb.collection("others_kartu_stok").getList(1, 1, {
+        filter: `part_number="${part_number}"`,
+        sort: "-created",
+      });
+
+      let lastBalance = 0;
+      if (existing.items.length > 0) {
+        lastBalance = parseInt(existing.items[0].balance) || 0;
+      }
+
+      let newBalance = lastBalance - qty_keluar;
+
+      const data = {
+        no_do,
+        part_number,
+        nama_barang,
+        qty_keluar,
+        lot,
+        tgl_pb,
+        status: "KELUAR",
+        balance: newBalance,
+        qty: qty_keluar, // ✅ qty ikut dari input qty keluar
+        kode_depan: "",
+        qty_minta: "",
+        no_po: "",
+      };
+
+      await pb.collection("others_kartu_stok").create(data);
+      console.log(`✅ ${part_number} stok dikurangi (${qty_keluar})`);
+    }
+
+    Swal.fire("✅ Semua data stok berhasil dikurangi!", "", "success");
+  } catch (err) {
+    console.error("❌ Gagal mengurangi stok:", err);
+    Swal.fire("❌ Gagal mengurangi stok!", "", "error");
+  }
+});
