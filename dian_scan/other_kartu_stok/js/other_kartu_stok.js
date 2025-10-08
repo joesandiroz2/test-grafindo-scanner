@@ -153,15 +153,16 @@ $(document).ready(async function () {
     tbody.append(`
       <tr>
         <td>${i + 1}</td>
-        <td ${statusClass}>${rec.status}</td>
-        <td ${statusClass}>${rec.qty_masuk} Pcs</td>
+        <td style="font-weight:bold;color:purple">${rec.qty_masuk || 0}</td>
         <td ${balanceClass}>${rec.balance}</td>
+        <td style="font-weight:bold;color:red">${rec.qty || 0} </td>
         <td>${rec.part_number}</td>
         <td>${rec.nama_barang}</td>
         <td>${rec.lot}</td>
         <td>${rec.no_po}</td>
         <td>${rec.kode_depan + rec.no_do}</td>
         <td>${formattedDate} ${formattedTime}</td>
+        <td ${statusClass}>${rec.status}</td>
       </tr>
     `);
   });

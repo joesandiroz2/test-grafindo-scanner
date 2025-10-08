@@ -78,7 +78,7 @@ async function loadReportOther(page = 1, perPage = 50) {
                   <th>Nama Barang</th>
                   <th>Lot</th>
                   <th>Qty DO</th>
-                  <th>Total Qty Keluar</th>
+                  <th>Total Qty</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -98,7 +98,8 @@ async function loadReportOther(page = 1, perPage = 50) {
             qty_minta: parseInt(item.qty_minta, 10) || 0
           };
         }
-        mapParts[key].total_qty += parseInt(item.qty, 10) || 0;
+  mapParts[key].total_qty += parseInt(item.qty && item.qty !== "" ? item.qty : item.qty_masuk, 10) || 0;
+
       });
 
       let i = 1;
@@ -111,7 +112,19 @@ async function loadReportOther(page = 1, perPage = 50) {
             <td>${p.lot}</td>
             <td>${p.qty_minta}</td>
             <td class="fw-bold">${p.total_qty}</td>
-            <td>${p.status}</td>
+           <td style="${
+            p.status
+              ? p.status.toLowerCase() === 'masuk'
+                ? 'background-color:green;color:white;font-weight:bold'
+                : p.status.toLowerCase() === 'keluar'
+                  ? 'background-color:red;color:white;font-weight:bold'
+                  : ''
+              : ''
+          }">
+            Barang ${p.status || ''}
+          </td>
+
+
           </tr>
         `;
       });

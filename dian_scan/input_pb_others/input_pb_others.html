@@ -22,8 +22,18 @@
   </div>
 
    <div class="row m-3"> 
-      <div class="col-md-6 col-lg-6 col-sm-12" style="border:1px solid black"> 
-           <h3>Input Penyerahan Barang Others</h3>
+      <div  id="formContainer" class="col-md-6 col-lg-6 col-sm-12" style="border:1px solid black"> 
+           <!-- Tambahan select di atas form -->
+      <div class="mb-3 mt-2">
+        <label for="jenisTransaksi" class="form-label fw-bold">Pilih Jenis Transaksi</label>
+        <select id="jenisTransaksi" class="form-select">
+          <option value="masuk" selected>Penyerahan Barang (Masuk)</option>
+          <option value="keluar">Pengeluaran Barang</option>
+        </select>
+      </div>
+
+
+           <h3  id="judulForm">Input Penyerahan Barang Others</h3>
             <form id="penyerahanForm" class="mt-3">
             <span id="loadingInfo" style="color:purple;font-weight:bold">Sedang mencari part...</span>
             <select id="pencarian_part"></select>
@@ -39,19 +49,31 @@
               </div>
 
 
+
+              <div class="mb-3">
+                <label for="no_pb" class="form-label">No PB</label>
+                <input type="text" class="form-control" id="no_pb" required>
+              </div>
+
               <div class="mb-3">
                 <label for="lot" class="form-label">Lot</label>
                 <input type="text" class="form-control" id="lot" required>
               </div>
 
               <div class="mb-3">
-                <label for="qtyMasuk" class="form-label">Qty Masuk</label>
+                <label for="qtyMasuk" class="form-label">Qty</label>
                 <input type="number"  class="form-control" id="qtyMasuk" required>
               </div>
 
-              <button type="submit" class="btn btn-primary">
+              <button  id="btnMasuk" type="submit" class="btn btn-primary">
                 <i class="bi bi-save"></i> Masukkan
               </button>
+
+               <!-- Tombol KELUAR -->
+        <button id="btnKeluar" type="button" class="btn btn-danger d-none">
+          <i class="bi bi-box-arrow-up"></i> Keluarkan
+        </button>
+
             </form>
 
             <div id="resultMessage" class="mt-3"></div>
@@ -145,5 +167,41 @@ $(document).ready(async function () {
 });
 
   </script>
+
+<script>
+  $(document).ready(function() {
+    // --- FUNGSI UBAH WARNA DAN TOMBOL ---
+    $("#jenisTransaksi").on("change", function() {
+      const val = $(this).val();
+      const formContainer = $("#formContainer"); // ✅ ini sudah benar sekarang
+      const judulForm = $("#judulForm");
+      const btnMasuk = $("#btnMasuk");
+      const btnKeluar = $("#btnKeluar");
+
+      if (val === "keluar") {
+        // Mode Pengeluaran
+        formContainer.css({
+          backgroundColor: "red",
+          color: "white",
+          transition: "0.3s"
+        });
+        judulForm.text("Input Pengeluaran Barang Others");
+        btnMasuk.addClass("d-none");
+        btnKeluar.removeClass("d-none");
+      } else {
+        // Mode Pemasukan
+        formContainer.css({
+          backgroundColor: "white",
+          color: "black",
+          transition: "0.3s"
+        });
+        judulForm.text("Input Penyerahan Barang Others");
+        btnMasuk.removeClass("d-none");
+        btnKeluar.addClass("d-none");
+      }
+    });
+  });
+</script>
+
 </body>
 </html>

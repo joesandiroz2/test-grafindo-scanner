@@ -4,7 +4,6 @@ $(document).ready(async function () {
   async function loadDataMasuk() {
     try {
       const records = await pb.collection("others_kartu_stok").getList(1, 50, {
-        filter: `status="masuk"`,
         sort: "-created",
       });
 
@@ -24,7 +23,7 @@ $(document).ready(async function () {
             <th>Part Number</th>
             <th>Nama Barang</th>
             <th>Lot</th>
-            <th>Qty Masuk</th>
+            <th>Qty </th>
             <th>Tanggal</th>
           </tr>
         </thead>
@@ -42,7 +41,7 @@ $(document).ready(async function () {
           <th>Part Number</th>
           <th>Nama Barang</th>
           <th>Lot</th>
-          <th>Qty Masuk</th>
+          <th>Qty </th>
           <th>Tanggal</th>
         </tr>
       </thead>
@@ -50,13 +49,26 @@ $(document).ready(async function () {
     `;
 
     items.forEach((rec, i) => {
+       // Normalisasi status biar aman (huruf kecil)
+    const status = (rec.status || "").toLowerCase();
+
+    // Warna background sesuai status
+    let bgColor = "";
+    let textColor = "white";
+    if (status === "masuk") {
+      bgColor = "green";
+    } else if (status === "keluar") {
+      bgColor = "red";
+    }
       html += `
         <tr>
           <td>${i + 1}</td>
           <td style="font-weight:bold">${rec.part_number}</td>
-          <td>${rec.nama_barang || "-"}</td>
+          <td style="font-weight:bold">${rec.nama_barang || "-"}</td>
           <td>${rec.lot || "-"}</td>
-          <td style="font-weight:bold">${rec.qty_masuk || rec.qty}</td>
+     <td style="font-weight:bold; background-color:${bgColor}; color:${textColor}; text-align:center;">
+          ${rec.qty_masuk || rec.qty} ${rec.status}
+        </td>
           <td>${new Date(rec.created).toLocaleString("id-ID")}</td>
         </tr>
       `;
