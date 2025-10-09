@@ -63,7 +63,9 @@ $(document).ready(async function () {
       html += `
         <tr>
           <td>${i + 1}</td>
-          <td style="font-weight:bold">${rec.part_number}</td>
+          <td style="font-weight:bold">${rec.part_number} <br/> 
+          <span style="font-weight:bold;color:green">${rec.no_do}</span>
+          </td>
           <td style="font-weight:bold">${rec.nama_barang || "-"}</td>
           <td>${rec.lot || "-"}</td>
      <td style="font-weight:bold; background-color:${bgColor}; color:${textColor}; text-align:center;">

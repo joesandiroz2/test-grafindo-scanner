@@ -168,4 +168,52 @@ $(document).ready(async function () {
   });
 }
 
+
+// === DOWNLOAD EXCEL ===
+// === DOWNLOAD EXCEL ===
+$("#downloadExcel").on("click", function () {
+  const table = document.getElementById("resultTable");
+  if (!table) {
+    Swal.fire({
+      icon: "error",
+      title: "Tabel tidak ditemukan!",
+      text: "Pastikan data sudah ditampilkan sebelum mengekspor.",
+    });
+    return;
+  }
+
+  const wb = XLSX.utils.table_to_book(table, { sheet: "Kartu Stok" });
+
+  // Format nama file dengan tanggal & waktu
+  const now = new Date();
+  const formatted = now
+    .toLocaleString("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+    .replace(/[^\w\s]/gi, "_")
+    .replace(/\s+/g, "_");
+
+  const filename = `Report_Kartu_Stok_${formatted}.xlsx`;
+
+  // Tulis file Excel
+  XLSX.writeFile(wb, filename);
+
+  // Tampilkan SweetAlert sukses
+  Swal.fire({
+    icon: "success",
+    title: "Berhasil!",
+    text: `File "${filename}" berhasil diunduh.`,
+    showConfirmButton: false,
+    timer: 2000,
+  });
 });
+
+
+
+});
+
+

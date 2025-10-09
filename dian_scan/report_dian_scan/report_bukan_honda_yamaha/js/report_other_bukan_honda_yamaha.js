@@ -10,6 +10,29 @@ async function loginUser() {
   }
 }
 
+
+// Format tanggal ke gaya Indonesia: 22 Mei 2025 05:40
+function formatTanggalIndo(isoString) {
+  if (!isoString) return "-";
+  const date = new Date(isoString);
+
+  // Nama bulan dalam bahasa Indonesia
+  const bulanIndo = [
+    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+  ];
+
+  const hari = String(date.getDate()).padStart(2, "0");
+  const bulan = bulanIndo[date.getMonth()];
+  const tahun = date.getFullYear();
+
+  const jam = String(date.getHours()).padStart(2, "0");
+  const menit = String(date.getMinutes()).padStart(2, "0");
+
+  return `${hari} ${bulan} ${tahun} ${jam}:${menit}`;
+}
+
+
 // ambil data dari others_kartu_stok
 async function loadReportOther(page = 1, perPage = 50) {
   try {
@@ -79,6 +102,7 @@ async function loadReportOther(page = 1, perPage = 50) {
                   <th>Lot</th>
                   <th>Qty DO</th>
                   <th>Total Qty</th>
+                  <th>created</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -95,6 +119,7 @@ async function loadReportOther(page = 1, perPage = 50) {
             lot: item.lot || "-",
             total_qty: 0,
             status: item.status,
+            created:item.created,
             qty_minta: parseInt(item.qty_minta, 10) || 0
           };
         }
@@ -104,6 +129,7 @@ async function loadReportOther(page = 1, perPage = 50) {
 
       let i = 1;
       Object.values(mapParts).forEach(p => {
+        console.log(p)
         html += `
           <tr>
             <td>${i++}</td>
@@ -112,6 +138,8 @@ async function loadReportOther(page = 1, perPage = 50) {
             <td>${p.lot}</td>
             <td>${p.qty_minta}</td>
             <td class="fw-bold">${p.total_qty}</td>
+          <td class="fw-italic">${formatTanggalIndo(p.created)}</td>
+
            <td style="${
             p.status
               ? p.status.toLowerCase() === 'masuk'
@@ -142,6 +170,36 @@ async function loadReportOther(page = 1, perPage = 50) {
     // hide progress setelah selesai
     setTimeout(() => progressBar.fadeOut(), 800);
 
+
+    // === pagination ===
+    let paginationHtml = `
+      <div class="d-flex justify-content-center align-items-center my-3">
+        <button class="btn btn-outline-primary me-2" id="prevPage" ${list.page === 1 ? "disabled" : ""}>
+          <i class="bi bi-arrow-left"></i> Sebelumnya
+        </button>
+        <span>Halaman ${list.page} dari ${list.totalPages}</span>
+        <button class="btn btn-outline-primary ms-2" id="nextPage" ${list.page === list.totalPages ? "disabled" : ""}>
+          Selanjutnya <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
+    `;
+
+
+
+    // Gabungkan pagination + tabel (pagination di atas)
+    $("#list_report_other").html(paginationHtml + html);
+
+    $("#prevPage").off("click").on("click", function () {
+      if (list.page > 1) {
+        loadReportOther(list.page - 1, list.perPage);
+      }
+    });
+
+    $("#nextPage").off("click").on("click", function () {
+      if (list.page < list.totalPages) {
+        loadReportOther(list.page + 1, list.perPage);
+      }
+    });
   } catch (err) {
     console.error("Error load report:", err);
     Swal.fire("Error", "Gagal load report", "error");
