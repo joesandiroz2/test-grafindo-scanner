@@ -38,6 +38,7 @@ async function loadReportOther(page = 1, perPage = 50) {
   try {
     const progressBar = $("#progress_bar");
     const progressInner = $("#progress_bar_inner");
+ const preloader = $("#preloader_stok");
 
     // reset progress bar
     progressBar.show();
@@ -49,6 +50,7 @@ async function loadReportOther(page = 1, perPage = 50) {
     const list = await pb.collection("others_kartu_stok").getList(page, perPage, {
       sort: "-created"
     });
+  
 
     if (list.items.length === 0) {
       $("#list_report_other").html(
@@ -129,7 +131,6 @@ async function loadReportOther(page = 1, perPage = 50) {
 
       let i = 1;
       Object.values(mapParts).forEach(p => {
-        console.log(p)
         html += `
           <tr>
             <td>${i++}</td>
@@ -170,6 +171,7 @@ async function loadReportOther(page = 1, perPage = 50) {
     // hide progress setelah selesai
     setTimeout(() => progressBar.fadeOut(), 800);
 
+    preloader.fadeOut(300);
 
     // === pagination ===
     let paginationHtml = `
@@ -204,6 +206,8 @@ async function loadReportOther(page = 1, perPage = 50) {
     console.error("Error load report:", err);
     Swal.fire("Error", "Gagal load report", "error");
     $("#progress_bar").hide();
+  }finally{
+    $("#preloader").hide();
   }
 }
 

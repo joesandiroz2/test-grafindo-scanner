@@ -2,6 +2,8 @@ $(document).ready(async function () {
   const pb = new PocketBase(pocketbaseUrl);
 
   async function loadDataMasuk() {
+     $("#preloader").show(); // ⏳ tampilkan preloader sebelum fetch
+   
     try {
       const records = await pb.collection("others_kartu_stok").getList(1, 50, {
         sort: "-created",
@@ -11,6 +13,9 @@ $(document).ready(async function () {
     } catch (err) {
       console.error("Error load data masuk:", err);
       $("#tbl_data_masuk").html(`<tr><td colspan="8" class="text-danger">Gagal load data.</td></tr>`);
+    } finally {
+      $("#preloader").hide(); // ✅ sembunyikan preloader setelah selesai
+      $("#tbl_data_masuk").show(); // tampilkan tabel
     }
   }
 
