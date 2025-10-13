@@ -269,29 +269,69 @@ function formatDate(dateString) {
 }
 
 async function loadPartNumbers() {
-    document.getElementById('loadpart').style.display = 'block';
+    const loader = document.getElementById('loadpart');
+    const progressContainer = document.getElementById('progress-container');
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+
+    loader.style.display = 'block';
+    progressContainer.style.display = 'block';
 
     try {
-         const res = await fetch(pocketbaseUrl + '/api/collections/yamaha_unik_part_number/records?page=1&perPage=2000&sort=-created');
-        const data = await res.json();
+        let allItems = [];
+        let page = 1;
+        let totalPages = 1; // default sementara
 
-        // Mapping data dari response API ke format Select2
-        const uniqueData = data.items.map(item => ({
+        // Ambil dulu halaman pertama untuk tahu total halamannya
+        const firstRes = await fetch(`${pocketbaseUrl}/api/collections/yamaha_unik_part_number/records?page=1&perPage=100&sort=-created`);
+        const firstData = await firstRes.json();
+        totalPages = firstData.totalPages;
+        allItems = allItems.concat(firstData.items);
+
+        // Update progress bar pertama kali
+        progressBar.style.width = `${(page / totalPages) * 100}%`;
+        progressText.textContent = `Memuat Part ${page} dari ${totalPages}`;
+
+        // Lanjutkan ke halaman berikutnya
+        for (page = 2; page <= totalPages; page++) {
+            const res = await fetch(`${pocketbaseUrl}/api/collections/yamaha_unik_part_number/records?page=${page}&perPage=100&sort=-created`);
+            const data = await res.json();
+
+            allItems = allItems.concat(data.items);
+
+            // Update progress bar
+            const percent = Math.round((page / totalPages) * 100);
+            progressBar.style.width = `${percent}%`;
+            progressText.textContent = `Memuat data Part stok : proses ${page} dari ${totalPages} (${percent}%)`;
+
+            // jeda 100ms biar smooth
+            await new Promise(r => setTimeout(r, 100));
+        }
+
+        // Setelah selesai ambil semua
+        const uniqueData = allItems.map(item => ({
             id: item.part_number,
-             text: `${item.part_number} - ${item.nama_barang}` 
+            text: `${item.part_number} - ${item.nama_barang}`
         }));
 
-        // Inisialisasi Select2 dengan data yang sudah diformat
         $('#part-number').select2({
             data: uniqueData,
             placeholder: 'Cari Part Number...',
             allowClear: true
-        })
+        });
+
+        console.log("Total part number loaded:", uniqueData.length);
+
+        progressBar.style.background = '#4caf50'; // ganti hijau kalau selesai
+        progressText.textContent = `Selesai! Total ${uniqueData.length} part number dimuat.`;
+
     } catch (error) {
         console.error("Error loading part numbers:", error);
-    }finally {
-        // Sembunyikan elemen loading
-        document.getElementById('loadpart').style.display = 'none';
+        Swal.fire("Gagal!", "Gagal memuat daftar part number.", "error");
+    } finally {
+        // Sembunyikan loading text dan progress bar setelah selesai
+            loader.style.display = 'none';
+            progressContainer.style.display = 'none';
     }
 }
 

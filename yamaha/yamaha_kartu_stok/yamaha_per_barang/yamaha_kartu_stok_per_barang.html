@@ -49,7 +49,14 @@
                 <div class="col-12">
             <div class="form-group">
             <label for="part-number">Part Number:</label>
-            <p class="loadingpart" id="loadpart">Sedang Loading Part number....</p>
+          <p class="loadingpart" id="loadpart" style="display:none; text-align:center; font-weight:bold;">
+              Sedang Loading Part number....
+            </p>
+            <div id="progress-container" style="width:80%;margin:auto;display:none;">
+              <div id="progress-bar" style="height:20px;background:#2196f3;width:0%;border-radius:8px;"></div>
+              <p id="progress-text" style="text-align:center;margin-top:5px;font-weight:bold;"></p>
+            </div>
+
             <select class="form-control" id="part-number" required></select>
         </div>
 
