@@ -171,31 +171,75 @@ function formatDate(dateString) {
     return date.toLocaleString('id-ID', options).replace(',', '').replace(' ', ' '); // Format date
 }
 
+
 async function loadPartNumbers() {
-    document.getElementById('loadpart').style.display = 'block';
+  const loadPart = document.getElementById('loadpart');
+  const loadText = document.getElementById('loadtext');
+  const progressBar = document.getElementById('progressbar');
+  loadPart.style.display = 'block';
 
-    try {
-         const res = await fetch(pocketbaseUrl + '/api/collections/unik_partnumber_kartu_stok/records?page=1&perPage=1000&sort=-created');
-        const data = await res.json();
+  try {
+    await authenticate(); // kalau pakai login PocketBase
 
-        // Mapping data dari response API ke format Select2
-        const uniqueData = data.items.map(item => ({
-            id: item.part_number,
-             text: `${item.part_number} - ${item.nama_barang}` 
-        }));
+    let allItems = [];
+    let page = 1;
+    const perPage = 100;
 
-        // Inisialisasi Select2 dengan data yang sudah diformat
-        $('#part-number').select2({
-            data: uniqueData,
-            placeholder: 'Cari Part Number...',
-            allowClear: true
-        })
-    } catch (error) {
-        console.error("Error loading part numbers:", error);
-    }finally {
-        // Sembunyikan elemen loading
-        document.getElementById('loadpart').style.display = 'none';
+    // 🔹 Ambil halaman pertama
+    const firstRes = await fetch(`${pocketbaseUrl}/api/collections/unik_partnumber_kartu_stok/records?page=${page}&perPage=${perPage}&sort=-created`);
+    const firstData = await firstRes.json();
+
+    const totalPages = firstData.totalPages || 1;
+    const totalItems = firstData.totalItems || firstData.items.length;
+
+    allItems.push(...firstData.items);
+
+    // 🔹 Update progress
+    loadText.textContent = `Memuat data part AHM dari: 1 dari ${totalPages}`;
+    progressBar.style.width = `${(1 / totalPages) * 100}%`;
+    await new Promise(r => requestAnimationFrame(r)); // biar browser render dulu
+
+    // 🔁 Loop ambil halaman berikutnya
+    for (page = 2; page <= totalPages; page++) {
+      const res = await fetch(`${pocketbaseUrl}/api/collections/unik_partnumber_kartu_stok/records?page=${page}&perPage=${perPage}&sort=-created`);
+      const data = await res.json();
+
+      allItems.push(...data.items);
+
+      // 🔹 Update progress bar dan teks
+      const percent = Math.min((page / totalPages) * 100, 100);
+      loadText.textContent = `Memuat data part AHM dari: ${page} dari ${totalPages} (${percent.toFixed(0)}%)`;
+      progressBar.style.width = `${percent}%`;
+
+      // ⏸️ Force browser untuk update DOM sebelum lanjut
+      await new Promise(r => requestAnimationFrame(r));
     }
+
+    // 🧩 Format data ke Select2
+    const formattedData = allItems.map(item => ({
+      id: item.part_number,
+      text: `${item.part_number} - ${item.nama_barang}`
+    }));
+
+    // 🚀 Inisialisasi Select2
+    $('#part-number').select2({
+      data: formattedData,
+      placeholder: 'Cari Part Number...',
+      allowClear: true
+    });
+
+    loadText.textContent = `✅ Selesai memuat ${totalItems} data part AHM`;
+    progressBar.style.width = `100%`;
+    progressBar.classList.remove('blue');
+    progressBar.classList.add('green');
+
+  } catch (err) {
+    console.error('Error:', err);
+    loadText.textContent = '❌ Gagal memuat data part number.';
+    progressBar.classList.remove('blue');
+    progressBar.classList.add('red');
+    progressBar.style.width = '100%';
+  }
 }
 
 async function fetchLastBalance(partNumber) {

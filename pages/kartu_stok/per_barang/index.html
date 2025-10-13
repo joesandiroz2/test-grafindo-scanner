@@ -46,8 +46,14 @@
                 <div class="col-12">
             <div class="form-group">
             <label for="part-number">Part Number:</label>
-            <p class="loadingpart" id="loadpart">Sedang Loading Part number....</p>
-            <select class="form-control" id="part-number" required></select>
+    
+        <p class="loadingpart" id="loadpart" style="display:none;">
+          <strong id="loadtext">Sedang memuat data part number...</strong>
+          <div class="progress blue lighten-4" style="height:10px; border-radius:8px; margin-top:5px;">
+            <div id="progressbar" class="determinate blue" style="width:0%"></div>
+          </div>
+        </p>
+        <select class="form-control" id="part-number" required></select>
         </div>
 
                 </div>
