@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const today = new Date();
     const twoWeeksAgo = new Date();
-    twoWeeksAgo.setDate(today.getDate() - 5); // 5 hari ke belakang
+    twoWeeksAgo.setDate(today.getDate() - 2); // 5 hari ke belakang
 
     const formatDate = (date) => date.toISOString().split("T")[0];
 
