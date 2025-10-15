@@ -206,6 +206,15 @@ $(document).ready(async function () {
     const input = $("#scan_other");
     keepFocus();
 
+     // 🆕 Tambahan: otomatis ubah ke huruf besar & hapus spasi saat mengetik
+  input.on("input", function () {
+    const currentValue = $(this).val();
+    const formattedValue = currentValue.toUpperCase().replace(/\s+/g, "");
+    if (formattedValue !== currentValue) {
+      $(this).val(formattedValue);
+    }
+  });
+  
     input.on("input", function () {
         clearTimeout(typingTimer);
         const value = $(this).val().trim();

@@ -54,12 +54,17 @@ uploadBtn.addEventListener("click", async () => {
         data = await readExcel(file);
 
         // Tambahkan no_do, kode_depan, merk ke setiap baris
-        data = data.map(row => ({
-            ...row,
-            no_do: noDoInput,
-            kode_depan: kodeDepan,
-            merk: merk
-        }));
+        data = data.map(row => {
+            let part = (row.part_number || "").toString();
+            part = part.replace(/\s+/g, "").toUpperCase(); // hilangkan spasi & jadikan huruf besar
+            return {
+                ...row,
+                part_number: part,
+                no_do: noDoInput,
+                kode_depan: kodeDepan,
+                merk: merk
+            };
+        });
 
         // ---- proses upload per baris ----
         const total = data.length;

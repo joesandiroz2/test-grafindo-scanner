@@ -94,7 +94,6 @@ async function reduceStock(partNumber, lot, qtyScan, merk, doNumber = "", namaBa
                 status: "keluar",
                 balance: newBalance,
                 [doColumn]: doNumber,
-                jumlah_barang_do: jumlahBarangDo,
                 nama_barang: namaBarang,
                 tgl_pb: new Date().toISOString(),
                 merk: merk,
@@ -104,11 +103,13 @@ async function reduceStock(partNumber, lot, qtyScan, merk, doNumber = "", namaBa
             // untuk Honda
             if (merk.toLowerCase() === "honda") {
                 newData.qty_ambil = qtyScan;
+                newData.jumlah_barang_do = jumlahBarangDo;
                 newData.qty_minta = qtyMinta;
                 newData.id = Math.random().toString(36).substr(2, 6);
             }
             // untuk Yamaha
             else if (merk.toLowerCase() === "yamaha") {
+                  newData.jumlah_barang = jumlahBarangDo;
                 newData.qty_scan = qtyScan;
                 newData.qty_do = qtyMinta;
             }

@@ -91,6 +91,15 @@ function renderReport(data,order) {
     const kodeDepan = firstItem.kode_depan || '';
     const tgl_do = firstItem.tgl_do || '';
     
+    const budian = firstItem.budian && firstItem.budian.trim() !== "" 
+    ? `<div class="text-center mt-1">
+         <b style="color:white;background-color:blue;padding:3px 10px;border-radius:30px;display:inline-block;">
+           Barang Others - ${firstItem.budian}
+         </b>
+       </div>`
+    : "";
+
+
     // Hitung status
     let countOk = 0;
     partno.forEach(key => {
@@ -117,6 +126,7 @@ function renderReport(data,order) {
             </div>
             <div class="col-md-3 col-xl-3 col-sm-12 fw-bold ${statusColor}">
               <h4 style="font-weight:bold">${statusDo}</h4>
+      ${budian}
             </div>
           </div>
         </div>

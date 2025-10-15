@@ -155,6 +155,16 @@ function renderTable(data) {
 
                     </div>
                 <div class="col-sm-12 col-md-2 col-lg-2">
+               ${dataHead.budian && dataHead.budian.trim() !== ""
+                  ? `<div class="text-center">
+                       <b style="color:white;background-color:blue;padding:3px 10px;border-radius:30px;display:inline-block;">
+                         Barang Others
+                       </b>
+                     </div>`
+                  : ""
+                }
+
+
                     <h5 style="font-weight:bold">Status</h5>
                       <h5 style="font-weight:bold">
             ${totalItemsOk === Number(dataHead.jumlah_barang_do) 

@@ -32,17 +32,17 @@ const pb = new PocketBase(pocketbaseUrl);
    <!-- Inputan -->
     <div class="row mb-3">
             <div class="col-md-4">
-                <label for="no_do_input" class="form-label">No DO</label>
+                <label for="no_do_input" class="form-label fw-bold">No DO ( input angka Do doang )</label>
                 <input type="text" id="no_do_input" class="form-control" placeholder="Masukkan No DO">
             </div>
 
             <div class="col-md-4">
-                  <label for="kode_select" class="form-label">Kode Depan</label>
+                  <label for="kode_select" class="form-label fw-bold">Kode Depan</label>
 
                   <!-- Checkbox Manual -->
                   <div class="form-check mb-2">
                     <input class="form-check-input" type="checkbox" id="manual_kode">
-                    <label class="form-check-label" for="manual_kode">Input Manual</label>
+                    <label class="form-check-label fw-bold" for="manual_kode">Input Manual</label>
                   </div>
 
                   <!-- Select default -->
@@ -178,6 +178,21 @@ const pb = new PocketBase(pocketbaseUrl);
 
 <script src="./js_upload/load_excel_dian.js"></script>
   <script src="./js_upload/upload_js.js"></script>
+
+<script>
+$(document).ready(function () {
+  // Setiap kali user mengetik di input No DO
+  $("#no_do_input").on("input", function () {
+    let val = $(this).val();
+
+    // Hapus semua spasi dan ubah ke huruf besar
+    val = val.replace(/\s+/g, "").toUpperCase();
+
+    // Update kembali ke input
+    $(this).val(val);
+  });
+});
+</script>
 
 
   <!-- Load Navbar -->
