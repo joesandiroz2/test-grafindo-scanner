@@ -1,45 +1,9 @@
 const pb = new PocketBase(pocketbaseUrl);
 
-document.addEventListener("DOMContentLoaded", function () {
+let currentPage = 0;
+let totalPages = 0;
+let currentQuery = "";
 
-    const today = new Date();
-    const twoWeeksAgo = new Date();
-    twoWeeksAgo.setDate(today.getDate() - 2); // 5 hari ke belakang
-
-    const formatDate = (date) => date.toISOString().split("T")[0];
-
-    document.getElementById("start-date").value = formatDate(twoWeeksAgo);
-    document.getElementById("end-date").value = formatDate(today);
-      const startDateInput = document.getElementById("start-date");
-    const endDateInput = document.getElementById("end-date");
-    const tgldariSpan = document.getElementById("tgldari");
-    const tglsampaiSpan = document.getElementById("tglsampai");
-
-      // Fungsi untuk memformat tanggal ke format '22 January 2025'
-    function formatDateIndo(dateString) {
-        const date = new Date(dateString);
-        const options = { day: '2-digit', month: 'long', year: 'numeric' };
-        return date.toLocaleDateString('en-GB', options);
-    }
-
-    // Fungsi untuk mengupdate teks pada span
-    function updateDateDisplay() {
-        if (startDateInput.value) {
-            tgldariSpan.textContent = formatDateIndo(startDateInput.value);
-        }
-        if (endDateInput.value) {
-            tglsampaiSpan.textContent = formatDateIndo(endDateInput.value);
-        }
-    }
-        startDateInput.value = twoWeeksAgo.toISOString().split("T")[0];
-    endDateInput.value = today.toISOString().split("T")[0];
-
-    updateDateDisplay(); // Perbarui tampilan span saat halaman dimuat
-
-    // Tambahkan event listener saat input tanggal berubah
-    startDateInput.addEventListener("change", updateDateDisplay);
-    endDateInput.addEventListener("change", updateDateDisplay);
-});
 
 
 async function authenticate() {
@@ -51,80 +15,170 @@ async function authenticate() {
     }
 }
 
-async function fetchData(query, startDate, endDate,fetchsemua) {
-    Swal.fire({
-        title: 'Sedang mengecek Stok...',
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
-    let resultList = [];
-    try {
-        if (fetchsemua) {
-            const resultList = await pb.collection('yamaha_kartu_stok').getFullList({
-                filter: `(part_number ~ "${query}" ) && created >= "${startDate}" && created <= "${endDate}"`,
+async function fetchData(query, fetchSemua, page = null) {
+  Swal.fire({
+    title: 'Sedang memuat data...',
+    didOpen: () => Swal.showLoading()
+  });
+
+  try {
+    await authenticate();
+    currentQuery = query;
+
+    if (fetchSemua) {
+      // --- Ambil halaman terakhir dulu kalau page belum ditentukan ---
+        if (page === null) {
+          // hanya ambil totalPages kalau belum pernah diambil
+          if (totalPages === 0) {
+            const firstResult = await pb.collection('yamaha_kartu_stok').getList(1, 100, {
+              filter: `part_number = "${query}"`,
             });
-             document.getElementById("keteranganstok").textContent = "Semua Stok detail";
-            Swal.close();
-            return resultList
-        }else {
-            // Fetch only the last entry
-            resultList = await pb.collection('yamaha_kartu_stok').getList(1, 1, {
-                filter: `(part_number ~ "${query}" )`,
-                sort: '-created', // Sort by most recent
-            });
-            document.getElementById("keteranganstok").textContent = "Stok terakhir Saja Barang itu";
-             Swal.close();
-            return resultList.items
+            totalPages = firstResult.totalPages || 1;
+          }
+          page = totalPages;
         }
-    } catch (error) {
-        console.error("Failed to fetch data:", error);
-        Swal.close();
-    }
-}
 
+      currentPage = page;
 
+      // Ambil halaman sesuai currentPage
+      const resultList = await pb.collection('yamaha_kartu_stok').getList(currentPage, 100, {
+        filter: `part_number = "${query}"`,
+      });
 
-function convertToTimestamp(dateString, isEndDate = false) {
-    const date = new Date(dateString);
-    
-    // Jika endDate, set waktu ke 23:59:59 agar mencakup seluruh hari
-    if (isEndDate) {
-        date.setHours(23, 59, 59, 999);
+      const jumlahData = currentPage === totalPages
+        ? 100
+        : (totalPages - currentPage + 1) * 100;
+
+      document.getElementById("keteranganstok").textContent =
+        `${jumlahData} Transaksi Terakhir (Page ${currentPage} dari ${totalPages})`;
+
+      // Munculkan tombol “Lihat Stok Sebelumnya” hanya kalau masih ada halaman sebelumnya
+      const btnPrev = document.getElementById("lihat-stok-sebelumnya");
+      if (currentPage > 1) {
+        btnPrev.style.display = "inline-block";
+      } else {
+        btnPrev.style.display = "none";
+      }
+
+      Swal.close();
+      return resultList.items;
+
     } else {
-        date.setHours(0, 0, 0, 0);
+      // --- Ambil hanya 1 data terakhir ---
+      const resultList = await pb.collection('yamaha_kartu_stok').getList(1, 1, {
+        filter: `part_number = "${query}"`,
+        sort: '-created',
+      });
+      document.getElementById("keteranganstok").textContent = "Stok Terakhir Saja";
+      Swal.close();
+      return resultList.items;
     }
 
-    return date.toISOString(); // Mengubah ke format ISO 8601
+  } catch (error) {
+    console.error("Gagal mengambil data:", error);
+    Swal.close();
+    return [];
+  }
 }
+
+document.getElementById('lihat-stok-sebelumnya').addEventListener('click', async function() {
+  if (currentPage > 1) {
+    currentPage--; // mundur satu halaman
+    const data = await fetchData(currentQuery, true, currentPage);
+    renderTablePrepend(data);
+
+    renderDetailBarang(currentQuery);
+  } else {
+    Swal.fire("anda harus klik Tampilkan stok detailnya dahulu", "Tidak ada data lebih lama lagi.", "info");
+  }
+});
+
+function renderTablePrepend(data) {
+  const tableBody = document.getElementById('data-table-body');
+
+  if (data.length === 0) return;
+
+  let newRows = '';
+
+  data.forEach((item, index) => {
+    const userGrafindo = localStorage.getItem("user-grafindo");
+    const bgColor = item.status.toLowerCase() === "keluar" ? "red" : "green";
+    const balanceColor = Number(item.balance) < 0 ? 'red' : 'black';
+    const penandaOk = item.penanda_stok === "ok";
+    const showHighlight = userGrafindo === "pika@gmail.com" && penandaOk;
+    const highlightStyle = showHighlight ? "background-color:#81c784" : "";
+    const balanceEmoji = showHighlight ? " ✔️" : "";
+
+    const balanceCell = userGrafindo === "pika@gmail.com"
+      ? `<td style="font-weight:bold;text-align:center;color:${balanceColor};cursor:pointer;${highlightStyle}" 
+           onclick="showPenandaModal('${item.id}', '${item.balance}')">
+           ${item.balance}${balanceEmoji}
+         </td>`
+      : `<td style="font-weight:bold;text-align:center;color:${balanceColor};${highlightStyle}">
+           ${item.balance}${balanceEmoji}
+         </td>`;
+
+    newRows += `
+      <tr>
+        <td style="background-color: ${bgColor}; color: white;font-weight:bold; text-align: center;">#</td>
+        <td style="font-weight:bold;text-align:center;color:blue">${item.qty_masuk}</td>
+        ${balanceCell}
+        <td style="font-weight:bold;text-align:center;color:red">${item.qty_scan}</td>
+        <td>${item.lot}</td>
+        <td style="font-weight:bold;text-align:center">${item.kode_depan} ${item.no_do.toUpperCase()}</td>
+        <td>${item.tgl_do}</td>
+        <td style="font-weight:bold;text-align:center">${item.nama_barang}</td>
+        <td>${item.tgl_pb}</td>
+        <td style="background-color: ${bgColor}; color: white;font-weight:bold; text-align: center;">${item.status}</td>
+        <td><i>${formatDate(item.created)}</i></td>
+      </tr>`;
+  });
+
+  // 🚀 Tambahkan efek shadow merah kelap-kelip ke tabel
+  const tableContainer = document.querySelector('.table-container') || tableBody.closest('table');
+  if (tableContainer) {
+    tableContainer.classList.add('red-blink-shadow');
+    // ⏳ Hapus efek setelah 15 detik
+    setTimeout(() => {
+      tableContainer.classList.remove('red-blink-shadow');
+    }, 15000);
+  }
+
+  // prepend data baru di atas data lama
+  tableBody.insertAdjacentHTML('afterbegin', newRows);
+}
+
 
 
 
 document.getElementById('filter-form').addEventListener('submit', async function(event) {
-    event.preventDefault(); // Prevent the default form submission
+  event.preventDefault();
+  const query = document.getElementById('part-number').value.trim();
 
-    const query = document.getElementById('part-number').value; // Bisa Part Number atau Nama Barang
-    const startDate = convertToTimestamp(document.getElementById('start-date').value);
-    const endDate = convertToTimestamp(document.getElementById('end-date').value, true);
+  // 🔹 Reset pagination setiap kali ganti part
+  currentPage = 0;
+  totalPages = 0;
+  currentQuery = query;
 
-    await authenticate(); // Authenticate user
-    const data = await fetchData(query, startDate, endDate,true); // Fetch data berdasarkan query
-
-    renderTable(data); // Render hasil ke tabel
-       renderDetailBarang(query); // Render detail barang
+  await authenticate();
+  const data = await fetchData(query, true);
+  renderTable(data);
+  renderDetailBarang(query);
 });
 
+document.getElementById('tampilkan-stok-terakhir').addEventListener('click', async function() {
+  const query = document.getElementById('part-number').value.trim();
 
-document.getElementById('tampilkan-stok-terakhir').addEventListener('click', async function(event) {
-    const query = document.getElementById('part-number').value; // Bisa Part Number atau Nama Barang
-    const startDate = convertToTimestamp(document.getElementById('start-date').value);
-    const endDate = convertToTimestamp(document.getElementById('end-date').value, true);
+  // 🔹 Reset pagination setiap kali ganti part
+  currentPage = 0;
+  totalPages = 0;
+  currentQuery = query;
 
-    // Tampilkan Stok Terakhir saja (fetch satu data terakhir)
-    const data = await fetchData(query, startDate, endDate, false);
-    renderTable(data); // Render hasil ke tabel
-    renderDetailBarang(query); // Render detail barang
+  const data = await fetchData(query, false);
+  renderTable(data);
+  renderDetailBarang(query);
 });
+
 
 
 //update cek tanda stok 
@@ -355,7 +409,7 @@ async function fetchLastBalance(partNumber) {
     }
 }
 
-async function renderDetailBarang(query) {
+async function  renderDetailBarang(query) {
     try {
         await authenticate(); // Pastikan user sudah login
         const result = await pb.collection('yamaha_data_barang').getList(1, 1, {
@@ -377,15 +431,9 @@ async function renderDetailBarang(query) {
                style="max-width: 150px;">` 
         : `<p style="color: red; font-weight: bold;">Tidak ada gambar</p>`;
 
-        // Ambil nilai tanggal dari input
-        const startDate = document.getElementById('start-date').value;
-        const endDate = document.getElementById('end-date').value;
-
+      
         // Format tanggal ke "22 January 2024"
-        const formatDate = (dateStr) => {
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
-        };
+        
          const lastBalance = await fetchLastBalance(item.part_number);
 
         detailDiv.innerHTML = `
@@ -393,8 +441,6 @@ async function renderDetailBarang(query) {
                 ${imageHtml}
                 <h5>${item.nama_barang}</h5>
                 <p><strong>Part Number:</strong> ${item.part_number}</p>
-                <p><strong>Dari Tanggal:</strong> ${formatDate(startDate)}</p>
-                <p><strong>Sampai Tanggal:</strong> ${formatDate(endDate)}</p>
                 <p><strong>Stok Sekarang:</strong> ${lastBalance}</p> 
 
             </div>
@@ -406,111 +452,76 @@ async function renderDetailBarang(query) {
 }
 
 
+document.getElementById('excel-btn').addEventListener('click', function() {
+    const tableBody = document.getElementById('data-table-body');
+    const rows = tableBody.querySelectorAll('tr');
 
-// Download Excel
-// Event listener untuk tombol Download Excel
-document.getElementById('excel-btn').addEventListener('click', async function() {
-    const query = document.getElementById('part-number').value; // Ambil query dari input
-    const startDate = convertToTimestamp(document.getElementById('start-date').value);
-    const endDate = convertToTimestamp(document.getElementById('end-date').value, true);
-
-    // Ambil data menggunakan getFullList
-    const records = await pb.collection('yamaha_kartu_stok').getFullList({
-        filter: `(part_number ~ "${query}" || nama_barang ~ "${query}") && created >= "${startDate}" && created <= "${endDate}"`
-    });
-
-    if (records.length === 0) {
-        Swal.fire('Data Kosong', 'Anda belum klik tampilkan atau belum ada datanya.', 'warning');
+    if (rows.length === 0) {
+        Swal.fire('Data Kosong', 'Tidak ada data di tabel untuk diunduh.', 'warning');
         return;
     }
 
-    // Panggil fungsi untuk mengunduh Excel
-    downloadExcel(records, query); // Pass query as partNumber
-});
-// Fungsi untuk mengunduh data sebagai Excel
-// Fungsi untuk mengunduh data sebagai Excel
-function downloadExcel(data) {
-    // Ambil partNumber dan namaBarang dari data
-    const partNumber = data[0].part_number; // Ambil part_number dari item pertama
-    const namaBarang = data[0].nama_barang; // Ambil nama_barang dari item pertama
+    // Ambil semua data dari tabel
+    const data = [];
+    rows.forEach((row, index) => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length > 0) {
+            data.push({
+                No: index + 1,
+                qty_masuk: cells[1].innerText,
+                balance: cells[2].innerText,
+                qty_scan: cells[3].innerText,
+                lot: cells[4].innerText,
+                no_do: cells[5].innerText,
+                tgl_do: cells[6].innerText,
+                nama_barang: cells[7].innerText,
+                tgl_pb: cells[8].innerText,
+                status: cells[9].innerText,
+                created: cells[10].innerText
+            });
+        }
+    });
 
+    // Ambil info tambahan
+    const query = document.getElementById('part-number').value.trim();
     const userGrafindo = localStorage.getItem("user-grafindo");
 
-    let a1Value = ""; // default kosong
+    let a1Value = "";
     if (userGrafindo === "kamto@gmail.com") {
         a1Value = "FRM-INV-06";
     } else if (userGrafindo === "pika@gmail.com") {
         a1Value = "FRM-DEPO-02";
     }
 
-
-    // Format data untuk worksheet
-    const formattedData = data.map((item, index) => ({
-        No: index + 1,
-        qty_masuk: item.qty_masuk,
-        balance: item.balance,
-        qty_scan: item.qty_scan,
-        part_number: item.part_number,
-        nama_barang: item.nama_barang,
-        no_do: item.no_do,
-        tgl_do: item.tgl_do, // Format tanggal
-        tgl_pb: formatDateExcel(item.tgl_pb), // Format tanggal
-        created: formatDateExcel(item.created) // Format tanggal
-    }));
-
-    // Buat workbook dan worksheet
+    // Buat workbook & worksheet
     const workbook = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet([]); // Buat worksheet kosong
+    const ws = XLSX.utils.json_to_sheet(data, { origin: "A3" });
 
-    // Tulis data mulai dari A3 agar tidak tabrakan dengan A1 & C1
-    XLSX.utils.sheet_add_json(ws, formattedData, { origin: "A3", skipHeader: false });
+    // Tambahkan header manual
+    ws['A1'] = { t: 's', v: a1Value };
+    ws['C1'] = { t: 's', v: 'KARTU STOK' };
 
+    ws['!merges'] = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 1 } },
+        { s: { r: 0, c: 2 }, e: { r: 0, c: 9 } }
+    ];
 
-    // Tambahkan header manual di baris 1 sesuai permintaan
-    // A1 : formFormat (merge A1:B1)
-        ws['A1'] = { t: 's', v: a1Value };
-
-        ws['C1'] = { t: 's', v: 'KARTU STOK' };
-
-        ws['!merges'] = ws['!merges'] || [];
-        ws['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: 1 } });
-        ws['!merges'].push({ s: { r: 0, c: 2 }, e: { r: 0, c: 9 } });
-
-        ws['C1'].s = { font: { bold: true, sz: 30 }, alignment: { horizontal: "center" } };
-        ws['A1'].s = { alignment: { horizontal: "center" } };
-
-    // Tambahkan worksheet ke workbook
     XLSX.utils.book_append_sheet(workbook, ws, 'Kartu Stok');
 
-    // Buat nama file dengan format yang diinginkan
+    // Nama file berdasarkan part_number + tanggal
     const currentDate = new Date();
-    const formattedDate = formatDate(currentDate); // Format tanggal saat ini
-    const fileName = `${partNumber}_${namaBarang}_${formattedDate}.xlsx`;
+    const formattedDate = formatDate(currentDate);
+    const partNumber = data[0]?.part_number || query || "data";
+    const fileName = `${partNumber}_${formattedDate}.xlsx`;
 
-    // Buat file Excel dan unduh
+    // Download file
     XLSX.writeFile(workbook, fileName);
 
-    // Tampilkan notifikasi bahwa file telah berhasil diunduh
     Swal.fire({
         title: 'Berhasil!',
-        text: 'File Excel telah berhasil diunduh.',
+        text: 'File Excel berhasil diunduh dari tabel yang tampil.',
         icon: 'success',
         timer: 1500,
         showConfirmButton: false
     });
-}
-
-// Fu
-// Fungsi untuk memformat tanggal
-function formatDateExcel(dateString) {
-    const date = new Date(dateString);
-    const options = { 
-        day: '2-digit', 
-        month: 'long', 
-        year: 'numeric', 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        hour12: false 
-    };
-    return date.toLocaleString('id-ID', options).replace(',', '').replace(' ', ' '); // Format date
-}
+});
