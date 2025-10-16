@@ -164,7 +164,126 @@ document.getElementById('filter-form').addEventListener('submit', async function
   const data = await fetchData(query, true);
   renderTable(data);
   renderDetailBarang(query);
+    document.getElementById('filter-tanggal-container').style.display = 'block';
 });
+
+document.getElementById("tanggal").addEventListener("change", async function() {
+  const tanggalDipilih = this.value;
+  const partNumber = document.getElementById("part-number").value.trim();
+
+  if (!tanggalDipilih || !partNumber) {
+    Swal.fire("Perhatian", "Pilih part number dan tanggal terlebih dahulu.", "warning");
+    return;
+  }
+
+  Swal.fire({
+    title: `mencari Kartu Stok tgl ${tanggalDipilih}`,
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading()
+  });
+
+  try {
+    await authenticate();
+
+    // Filter berdasarkan tanggal (gunakan rentang 1 hari agar presisi)
+    const startDate = new Date(`${tanggalDipilih}T00:00:00`);
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 1);
+
+    const startISO = startDate.toISOString();
+    const endISO = endDate.toISOString();
+
+    // 🔹 Ambil halaman pertama
+    const firstPage = await pb.collection('yamaha_kartu_stok').getList(1, 100, {
+      filter: `part_number = "${partNumber}" && created >= "${startISO}" && created < "${endISO}"`,
+      sort: 'created'
+    });
+
+    totalPages = firstPage.totalPages || 1;
+    const totalTransaksi = firstPage.totalItems || firstPage.items.length;
+    currentPage = 1;
+    currentQuery = `part_number = "${partNumber}" && created >= "${startISO}" && created < "${endISO}"`;
+
+    Swal.close();
+
+    // Format tanggal ke Indonesia
+    const tanggalFormatID = new Date(tanggalDipilih).toLocaleDateString('id-ID', {
+      day: '2-digit', month: 'long', year: 'numeric'
+    });
+
+    if (firstPage.items.length === 0) {
+      Swal.fire("Tidak Ada Data", `Tidak ada transaksi pada tanggal ${tanggalFormatID}.`, "info");
+      return;
+    }
+
+    renderTable(firstPage.items);
+    renderDetailBarang(partNumber);
+
+    document.getElementById("keteranganstok").textContent =
+      `Kartu Stok tanggal ${tanggalFormatID} - Halaman ${currentPage} dari ${totalPages} (Total: ${totalTransaksi} transaksi)`;
+
+    // 🔹 Tampilkan tombol navigasi manual
+    const navContainer = document.getElementById("nav-pagination");
+    if (navContainer) {
+      navContainer.innerHTML = `
+        <button type="button" id="prev-page" class="btn btn-info">⬅ Sebelumnya</button>
+        <button type="button" id="next-page" class="btn btn-info">Selanjutnya ➡</button>
+      `;
+
+      document.getElementById("prev-page").addEventListener("click", async () => {
+        if (currentPage > 1) {
+          await loadPage(currentPage - 1, partNumber, tanggalFormatID, totalPages, totalTransaksi);
+        } else {
+          Swal.fire("Info", "Ini sudah halaman pertama.", "info");
+        }
+      });
+
+      document.getElementById("next-page").addEventListener("click", async () => {
+        if (currentPage < totalPages) {
+          await loadPage(currentPage + 1, partNumber, tanggalFormatID, totalPages, totalTransaksi);
+        } else {
+          Swal.fire("Info", "Ini sudah halaman terakhir.", "info");
+        }
+      });
+    }
+
+  } catch (error) {
+    console.error("Gagal filter berdasarkan tanggal:", error);
+    Swal.close();
+    Swal.fire("Gagal!", "Tidak bisa memfilter data berdasarkan tanggal.", "error");
+  }
+});
+
+// 🔹 Fungsi Load Manual Tiap Halaman
+async function loadPage(pageNumber, partNumber, tanggalFormatID, totalPages, totalTransaksi) {
+  Swal.fire({
+    title: `Pindah Ke Halaman ${pageNumber}...`,
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading()
+  });
+
+  try {
+    await authenticate();
+    const nextPage = await pb.collection('yamaha_kartu_stok').getList(pageNumber, 100, {
+      filter: currentQuery,
+      sort: 'created'
+    });
+
+    currentPage = pageNumber;
+    renderTable(nextPage.items);
+    renderDetailBarang(partNumber);
+
+    document.getElementById("keteranganstok").textContent =
+      `Kartu Stok tanggal ${tanggalFormatID} - Halaman ${pageNumber} dari ${totalPages} (Total: ${totalTransaksi} transaksi)`;
+
+    Swal.close();
+  } catch (error) {
+    console.error("Gagal load halaman:", error);
+    Swal.close();
+    Swal.fire("Gagal!", "Tidak bisa memuat halaman berikutnya.", "error");
+  }
+}
+
 
 document.getElementById('tampilkan-stok-terakhir').addEventListener('click', async function() {
   const query = document.getElementById('part-number').value.trim();
