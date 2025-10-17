@@ -53,8 +53,15 @@ function renderHistoryTable(data) {
             <tr>
                 
                 <td><div style="font-weight:bold">
-                <p style="background-color:red;color:white;padding:1px;font-weight:bold">${item.kode_depan} ${item.no_do}</p>
-                ${item.part_number || ""}</div></td>
+            ${item.part_number || ""}
+                <p style="color:red;font-weight:bold">
+                ${item.kode_depan} ${item.no_do}</p>
+                </div>
+          <button class="btn btn-primary btn-kartu-stok" data-part-number="${item.part_number}">
+          Kartu Stok
+        </button>
+
+                </td>
                 <td>${item.nama_barang || ""}</td>
                 <td><p style="color:red;font-weight:bold">${item.qty_scan }</p></td>
                 <td>${item.lot || ""}</td>
@@ -167,6 +174,102 @@ function formatDate(dateString) {
     return `${day} ${monthName} ${year} ${hours}:${minutes}`;
 }
 
+//modal kartu stok
+
+//modal kartu stok
+//modal kartu stok
+async function bukaKartuStok(partNumber,btnElement) {
+  const tbody = document.getElementById("tbodyKartuStok");
+  const judul = document.getElementById("judulKartuStok");
+  const modal = new bootstrap.Modal(document.getElementById("modalKartuStok"));
+
+
+  // Ubah tampilan tombol jadi "Checking..."
+  if (btnElement) {
+    btnElement.disabled = true;
+    btnElement.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Checking...`;
+  }
+
+  judul.textContent = partNumber;
+  tbody.innerHTML = `<tr><td colspan="7" class="text-center text-info">Sedang Memuat data...</td></tr>`;
+
+  try {
+    const result = await pb.collection("yamaha_kartu_stok").getList(1, 15, {
+      sort: "-created",
+      filter: `part_number = "${partNumber}"`
+    });
+
+    const items = result.items.reverse(); // urutan dari lama ke baru
+
+    if (items.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-secondary">Tidak ada data kartu stok</td></tr>`;
+      modal.show();
+      return;
+    }
+
+    tbody.innerHTML = "";
+    items.forEach((item, i) => {
+      // Format tanggal manual
+      const d = new Date(item.created);
+      const bulanIndo = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+      ];
+      const tanggal = d.getDate();
+      const bulan = bulanIndo[d.getMonth()];
+      const tahun = d.getFullYear();
+      let jam = d.getHours();
+      let menit = d.getMinutes();
+      if (jam < 10) jam = "0" + jam;
+      if (menit < 10) menit = "0" + menit;
+
+      const tglManual = `${tanggal} ${bulan} ${tahun} ${jam}:${menit}`;
+
+       // Warna dan style balance
+      const balanceValue = item.balance || 0;
+      const balanceStyle = balanceValue < 0
+        ? 'color:red;font-weight:bold'
+        : 'font-weight:bold';
+
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${i + 1}</td>
+        <td style="color:purple;font-weight:bold">${item.qty_masuk || 0}</td>
+        <td style="${balanceStyle}">${balanceValue}</td>
+        <td style="color:red;font-weight:bold">${item.qty_scan || 0}</td>
+        <td style="font-weight:bold">${item.kode_depan + item.no_do || "-"}</td>
+        <td>${item.lot || "-"}</td>
+        <td>${tglManual}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    modal.show();
+  } catch (err) {
+    console.error("Gagal ambil kartu stok:", err);
+    tbody.innerHTML = `<tr><td colspan="7" class="text-danger text-center">Gagal mengambil data: ${err.message}</td></tr>`;
+    modal.show();
+  }finally {
+    // Balikkan tombol ke keadaan normal
+    if (btnElement) {
+      btnElement.disabled = false;
+      btnElement.innerHTML = "Kartu Stok";
+    }
+  }
+}
+
 
 // Auto load saat halaman ready
 document.addEventListener("DOMContentLoaded", loadHistoryKeluar);
+
+
+
+// Event delegasi untuk tombol "Lihat Kartu Stok"
+document.addEventListener("click", function(e) {
+  if (e.target.classList.contains("btn-kartu-stok")) {
+    const partNumber = e.target.getAttribute("data-part-number");
+    bukaKartuStok(partNumber, e.target);
+  }
+});
+

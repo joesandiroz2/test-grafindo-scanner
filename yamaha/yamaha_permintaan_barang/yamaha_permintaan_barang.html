@@ -158,6 +158,43 @@ style="font-weight: bold;color:red;font-size: 25px;"
 
 
 
+<!-- Modal Kartu Stok -->
+<div class="modal fade" id="modalKartuStok" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title"><b> Kartu Stok - 15 Transaksi Terakhir dari  <span id="judulKartuStok"></span> </b></h5> 
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped table-sm">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>in</th>
+                <th>Balance</th>
+                <th>out</th>
+                <th>No DO</th>
+                <th>Lot</th>
+                <th>Tgl</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyKartuStok">
+              <tr><td colspan="7" class="text-center text-secondary">Belum ada data</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 <script src="../../js/sdk/pocketbase.umd.js"></script>
 <script src="../../js/pocket_config.js"></script>
 <script src="./js/yamaha_kesalahan_input.js"></script>
