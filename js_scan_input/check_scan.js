@@ -260,6 +260,6 @@ if (items.length > 0) {
 } else {
     const audio = new Audio('../suara/do_belum_di_upload.mp3');
             audio.play();
-    resultContainer.html(`<h5 style="color:red;text-align:center;">Nomor DO <b>${inputValue}</b> ini belum Di UPLOAD di sistem ini. Minta Pa DEDE untuk Upload DO Excel</h5>`);
+    resultContainer.html(`<h5 style="color:red;text-align:center;">Nomor DO <b>${inputValue}</b> ini belum Di UPLOAD di sistem ini. </h5>`);
 }
 }
