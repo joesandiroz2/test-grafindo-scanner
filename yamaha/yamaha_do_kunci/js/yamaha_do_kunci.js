@@ -65,6 +65,8 @@ async function fetchDoTerkunci() {
             <tbody>
       `;
 
+      const currentUser = localStorage.getItem("user-grafindo") || "";
+
       uniqueNoDOs.forEach((item, index) => {
         html += `
           <tr>
@@ -73,10 +75,15 @@ async function fetchDoTerkunci() {
             <td>${item.is_lock_msg}</td>
             <td>${formatTanggal(item.created)}</td>
             <td>
-              <button class="btn btn-sm btn-success perbaiki-btn" data-nodo="${item.no_do}">
-                Buka Kunci dan kembalikan
-              </button>
+              ${
+                currentUser === "sopian@gmail.com"
+                  ? `<button class="btn btn-sm btn-success perbaiki-btn" data-nodo="${item.no_do}">
+                       Buka Kunci dan kembalikan
+                     </button>`
+                  : ""
+              }
             </td>
+
           </tr>
         `;
       });

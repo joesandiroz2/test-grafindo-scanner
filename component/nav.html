@@ -211,6 +211,13 @@ if (userEmail === "sopian@gmail.com") {
             if (menuItems[menuId]) menuItems[menuId].style.display = "block";
         });
     }
+ else if (userEmail === "dian_others@gmail.com") {
+        // Jika user pika@gmail.com, hanya tampilkan beberapa menu
+        let allowedMenus = ["dianscan-nav"];
+        allowedMenus.forEach(menuId => {
+            if (menuItems[menuId]) menuItems[menuId].style.display = "block";
+        });
+    }
 else if (userEmail === "kamto@gmail.com") {
         // Jika user pika@gmail.com, hanya tampilkan beberapa menu
         let allowedMenus = ["kartu-stok-nav", "kartu-stok-perbarang-nav","report-detail-nav","yamaha-nav","sales-nav"];
