@@ -40,7 +40,8 @@ async function proses_cek_scan(partno, qty, dataDo,nopo) {
     // Cari data dari DO untuk partno ini
     const remarks = found.remarks || "";
     const nama_barang = found.nama_barang || "";
-    const qty_do = found.qty || "";
+    const qty_do = parseInt(found.qty) || 0;
+
     const kode_depan = found.kode_depan || "";
     const no_do = found.no_do || "";
 
@@ -72,6 +73,7 @@ async function proses_cek_scan(partno, qty, dataDo,nopo) {
       return;
     }
 
+    const akanFull = (totalQtyScanned + qty_scan === qty_do);
 
     try {
      
@@ -89,12 +91,7 @@ async function proses_cek_scan(partno, qty, dataDo,nopo) {
       console.error("Gagal ambil balance terakhir:", error);
       showStatus("Gagal ambil saldo terakhir!");
       return;
-    }finally {
-    // enable kembali, sembunyikan spinner, fokus ke partno
-   
-        resetInputan()
-
-  }
+    }
     // ambil tgl do
     const found_tgl_do = dataDo.find(item => item.part_number === partno);
 
@@ -131,9 +128,14 @@ async function proses_cek_scan(partno, qty, dataDo,nopo) {
       playSound('../../../suara/yamaha_ok_berhasil.mp3');
       await searchDO(no_do)
       // ✅ Tambahkan pengecekan ini setelah create berhasil:
-      if ((totalQtyScanned + qty_scan) === qty_do) {
-        partnoYangHarusDiproses = null;
+      // if ((totalQtyScanned + qty_scan) === qty_do) {
+        //partnoYangHarusDiproses = null;
+     // }
+      if (akanFull) {
+        showStatus(`🔔 Part "${partno}" sudah FULL scan!`);
+        playSound('../../../suara/yamaha_scan_full.mp3');
       }
+      resetInputan();
   
     } catch (err) {
       console.error("Gagal create data baru:", err);
