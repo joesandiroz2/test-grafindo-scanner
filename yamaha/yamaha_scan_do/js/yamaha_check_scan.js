@@ -127,14 +127,29 @@ async function proses_cek_scan(partno, qty, dataDo,nopo) {
       showStatus("✅ Stok berhasil diperbarui!");
       playSound('../../../suara/yamaha_ok_berhasil.mp3');
       await searchDO(no_do)
-      // ✅ Tambahkan pengecekan ini setelah create berhasil:
-      // if ((totalQtyScanned + qty_scan) === qty_do) {
-        //partnoYangHarusDiproses = null;
-     // }
+       // Hitung ulang total scan untuk semua item DO ini
+    const semuaScanItems = await pb.collection("yamaha_kartu_stok").getFullList({
+      filter: `no_do = "${no_do}"`
+    });
+      
       if (akanFull) {
         showStatus(`🔔 Part "${partno}" sudah FULL scan!`);
         playSound('../../../suara/yamaha_scan_full.mp3');
       }
+       // 3️⃣ Cek apakah semua barang dalam DO sudah full
+  const semuaSelesai = dataDo.every(doItem => {
+    const scannedQty = semuaScanItems
+      .filter(x => x.part_number === doItem.part_number)
+      .reduce((sum, x) => sum + parseInt(x.qty_scan), 0);
+
+    return scannedQty >= parseInt(doItem.qty);
+  });
+
+  if (semuaSelesai) {
+    showStatus("🎯 DO SUDAH SELESAI ✔");
+    playSound('../../../suara/yamaha_udah_di_scan_semua.mp3');
+  }
+
       resetInputan();
   
     } catch (err) {

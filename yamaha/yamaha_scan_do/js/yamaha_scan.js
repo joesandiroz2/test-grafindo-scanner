@@ -186,6 +186,7 @@ function cekSemuaBarangSudahSelesai(data) {
   });
 
   if (semuaSelesai && data.length > 0) {
+    showStatus("🎯 DO SUDAH SELESAI ✔");
     
     playSound('../../../suara/yamaha_udah_di_scan_semua.mp3'); // (opsional: tambahkan file audio ini)
   }
