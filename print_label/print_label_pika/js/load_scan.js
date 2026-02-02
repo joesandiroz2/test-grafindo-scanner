@@ -23,7 +23,6 @@ async function loadData(page) {
         // Tampilkan data di tabel
         displayData(resultList.items);
         // Tampilkan pagination
-        displayPagination(page);
     } catch (error) {
         console.error('Error fetching data:', error);
         document.getElementById('databarang').innerHTML = '<p>Error loading data.</p>';
@@ -60,30 +59,7 @@ function displayData(items) {
     document.getElementById('databarang').innerHTML = tableHTML;
 }
 
-// Fungsi untuk menampilkan pagination
-function displayPagination(page) {
-    const totalPages = Math.ceil(totalItems / 50);
-    let paginationHTML = `<nav aria-label="Page navigation"><ul class="pagination">`;
 
-    // Previous button
-    if (page > 1) {
-        paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="loadData(${page - 1})">Previous</a></li>`;
-    } else {
-        paginationHTML += `<li class="page-item disabled"><span class="page-link">Previous</span></li>`;
-    }
-
-    // Next button
-    if (page < totalPages) {
-        paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="loadData(${page + 1})">Next</a></li>`;
-    } else {
-        paginationHTML += `<li class="page-item disabled"><span class="page-link">Next</span></li>`;
-    }
-
-    paginationHTML += `</ul></nav>`;
-    paginationHTML += `<p>Halaman ${page} dari ${totalPages} | Total Barang: ${totalItems}</p>`;
-
-    document.getElementById('pagination').innerHTML = paginationHTML;
-}
 
 // Memuat data saat halaman dimuat
 document.addEventListener('DOMContentLoaded', () => {

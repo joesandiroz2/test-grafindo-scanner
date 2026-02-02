@@ -33,7 +33,6 @@ async function loadInputData(page = 1) {
         // Menampilkan data dalam tabel
         displayDataInTable(items);
         // Menampilkan pagination
-        displayPagination(totalItems, page);
     } catch (error) {
         console.error('Error fetching data:', error);
         document.getElementById('loadinput').innerHTML = '<p>Error loading data.</p>';
@@ -285,40 +284,6 @@ function openBarenganPrint(merk, partNumber, namaBarang, qty, satuan, berapa_lem
 
 
 
-
-function displayPagination(totalItems, currentLoadPage) {
-    const totalPages = Math.ceil(totalItems / itemsPerPageLoad);
-    let paginationHTML = `<nav aria-label="Page navigation"><ul class="pagination">`;
-
-    // Previous button
-    if (currentLoadPage > 1) {
-        paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="loadInputData(${currentLoadPage - 1})">Previous</a></li>`;
-    } else {
-        paginationHTML += `<li class="page-item disabled"><span class="page-link ">Previous</span></li>`;
-    }
-
-    // Page numbers
-    for (let i = 1; i <= totalPages; i++) {
-        paginationHTML += `
-            <li class="page-item ${i === currentLoadPage ? 'active' : ''}">
-                <a class="page-link" href="#" onclick="loadInputData(${i})">${i}</a>
-            </li>
-        `;
-    }
-
-    // Next button
-    if (currentLoadPage < totalPages) {
-        paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="loadInputData(${currentLoadPage + 1})">Next</a></li>`;
-    } else {
-        paginationHTML += `<li class="page-item disabled"><span class="page-link">Next</span></li>`;
-    }
-
-    paginationHTML += `</ul></nav>`;
-    paginationHTML += `<p>Halaman ${currentLoadPage} dari ${totalPages} | Total Items: ${totalItems}</p>`;
-
-    // Update elemen loadinput dengan pagination
-    document.getElementById('loadinput').innerHTML += paginationHTML;
-}
 
 // Memanggil fungsi untuk memuat data saat halaman dimuat
 document.addEventListener('DOMContentLoaded', () => loadInputData(currentLoadPage));
