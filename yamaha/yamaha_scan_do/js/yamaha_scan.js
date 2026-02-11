@@ -36,24 +36,44 @@ window.onload = () => {
     timeoutId = setTimeout(() => {
       const value = input.value.trim();
       if (value) {
-        const illegalCharRegex = /[^a-zA-Z0-9\s\-#]/;
+        
 
-        if (illegalCharRegex.test(value)) {
+
+         // ===============================
+      // FORMAT BARCODE DENGAN "|"
+      // ===============================
+      // ===============================
+      // FORMAT BARCODE DENGAN "|"
+      // ===============================
+      if (value.includes('|')) {
+        const parts = value.split('|');
+
+        if (parts.length >= 4) {
+          inputPartNo = parts[0].toUpperCase().trim();
+          inputQty = parseInt(parts[2]) || 0;
+          inputPo = parts[3].toUpperCase().trim();
+
+          submitData();
+          input.value = '';
+          input.focus();
+          return;
+        } else {
           Swal.fire({
             icon: 'warning',
-            title: '⚠️ Input tidak standar',
-            html: `Mengandung karakter ilegal<br><br><strong>Input:</strong> ${value}`,
+            title: '⚠️ Format barcode tidak valid',
+            html: `Format tidak sesuai<br><br><strong>Input:</strong> ${value}`,
             timer: 1000,
             showConfirmButton: false,
             timerProgressBar: true
           });
-          playSound('../../../suara/yamaha_partnumber_ga_standar.mp3');
 
-             input.value = '';        // kosongkan input
-            input.focus();           // kembalikan fokus
+          resetInputan();
           return;
         }
+      }
 
+
+        //FORMAT SPASI KARTU DO
         const parts = value.split(/\s+/);
 
         // ❌ Jumlah blok tidak boleh 2 atau lebih dari 3

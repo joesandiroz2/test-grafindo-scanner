@@ -150,7 +150,7 @@ function renderKartuDO() {
         padding: 8px;
         margin-bottom: 5px;
         border-radius: 5px;
-    font-size:20px">
+    font-size:18px">
      ${text}
     </li>`;
   }
