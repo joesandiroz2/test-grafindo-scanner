@@ -90,10 +90,12 @@ function displayDataInTable(items) {
             data-depo="${item.depo}" 
             data-supplier_id="${item.supplier_id}" 
             data-tgl_inspeksi="${item.tgl_inspeksi}"
+            data-no_unik="${item.no_unik}"
+
         />
         </td>
                  <td>
-            <button class="btn btn-warning" onclick="openPrintModal('${item.merk}', '${item.part_number}', '${item.nama_barang}', '${item.qty}', '${item.satuan}', '${item.berapa_lembar}','${item.lot}', '${item.depo}', '${item.supplier_id}', '${item.tgl_inspeksi}')">Cetak</button>
+            <button class="btn btn-warning" onclick="openPrintModal('${item.merk}', '${item.part_number}', '${item.nama_barang}', '${item.qty}', '${item.satuan}', '${item.berapa_lembar}','${item.lot}', '${item.depo}', '${item.supplier_id}', '${item.tgl_inspeksi}','${item.no_unik}')">Cetak</button>
             ${showEditDeleteButtons ? `
                 <button class="btn btn-danger" onclick="openDeleteModal('${item.id}')">Hapus</button>
                 <button class="btn btn-success" onclick="openEditModal('${item.id}', '${item.merk}', '${item.part_number}', '${item.nama_barang}', '${item.qty}', '${item.satuan}','${item.berapa_lembar}','${item.depo}','${item.tgl_inspeksi}','${item.lot}')">Edit</button>
@@ -142,7 +144,9 @@ document.addEventListener('change', function(event) {
                 lot: checkbox.dataset.lot,
                 depo: checkbox.dataset.depo,
                 supplierId: checkbox.dataset.supplier_id,
-                tglInspeksi: checkbox.dataset.tgl_inspeksi
+                tglInspeksi: checkbox.dataset.tgl_inspeksi,
+                no_unik: checkbox.dataset.no_unik,
+
             };
         } else {
             delete selectedItems[itemId]; // Hapus jika tidak dicentang
@@ -191,7 +195,9 @@ function printSelectedItems() {
             item.lot,
             item.depo,
             item.supplierId,
-            item.tglInspeksi
+            item.tglInspeksi,
+            item.no_unik
+
         );
     }
 
@@ -199,7 +205,7 @@ function printSelectedItems() {
     $('#printModal').modal('show');
 }
 
-function openBarenganPrint(merk, partNumber, namaBarang, qty, satuan, berapa_lembar, lot, depo, supplierId, tglInspeksi) {
+function openBarenganPrint(merk, partNumber, namaBarang, qty, satuan, berapa_lembar, lot, depo, supplierId, tglInspeksi,no_unik) {
     const modalBody = document.getElementById('modalBody');
     const formattedPartNumber = partNumber.replace(/\s+/g, '').toUpperCase();
     
@@ -218,8 +224,8 @@ function openBarenganPrint(merk, partNumber, namaBarang, qty, satuan, berapa_lem
         // **Loop berdasarkan jumlah label tanpa memisahkan lembar**
         for (let i = 0; i < jumlahLabelPerLembar; i++) {
             let qrData = (merk.toLowerCase() === 'yamaha') 
-                ? `${partNumber}|${supplierId}|${qty}|${lot}` 
-                : `${partNumber}|${supplierId}|${qty}|${lot}`;
+                ? `${partNumber}|${supplierId}|${qty}|${lot}|${no_unik}` 
+                : `${partNumber}|${supplierId}|${qty}|${lot}|${no_unik}`;
             let qrId = `qrcode-${partNumber.replace(/\s+/g, '')}-${lot}-${qty}-${i}`;
 
         lembarHTML += `
@@ -260,8 +266,8 @@ function openBarenganPrint(merk, partNumber, namaBarang, qty, satuan, berapa_lem
 
                 if (qrElement) {
                     let qrText = (merk.toLowerCase() === 'yamaha') 
-                        ? `${partNumber}|${supplierId}|${qty}|${lot}`
-                        : `${partNumber}|${supplierId}|${qty}|${lot}`;
+                        ? `${partNumber}|${supplierId}|${qty}|${lot}|${no_unik}`
+                        : `${partNumber}|${supplierId}|${qty}|${lot}|${no_unik}`;
 
                     new QRCode(qrElement, {
                         text: qrText,
@@ -324,7 +330,7 @@ function displayPagination(totalItems, currentLoadPage) {
 // Memanggil fungsi untuk memuat data saat halaman dimuat
 document.addEventListener('DOMContentLoaded', () => loadInputData(currentLoadPage));
 
-function openPrintModal(merk, partNumber, namaBarang, qty, satuan, berapa_lembar, lot, depo, supplierId, tglInspeksi) {
+function openPrintModal(merk, partNumber, namaBarang, qty, satuan, berapa_lembar, lot, depo, supplierId, tglInspeksi,no_unik) {
     const modalBody = document.getElementById('modalBody');
     const formattedPartNumber = partNumber.replace(/\s+/g, '').toUpperCase();
 
@@ -356,8 +362,8 @@ function openPrintModal(merk, partNumber, namaBarang, qty, satuan, berapa_lembar
             // Loop untuk jumlah label per lembar
             for (let i = 0; i < satuan; i++) {
                 let qrData = (merk.toLowerCase() === 'yamaha') 
-                    ? `${partNumber}|${supplierId}|${qty}|${lot}`
-                    : `${partNumber}|${supplierId}|${qty}|${lot}`;
+                    ? `${partNumber}|${supplierId}|${qty}|${lot}|${no_unik}`
+                    : `${partNumber}|${supplierId}|${qty}|${lot}|${no_unik}`;
 
 lembarHTML += `
 <div  style="color:black;padding: 3px  6px; width: calc(33.33% - 10px);display:inline-block">
@@ -394,8 +400,8 @@ lembarHTML += `
                 for (let i = 0; i < satuan; i++) {
                     new QRCode(document.getElementById(`qrcode-${l}-${i}`), {
                         text: (merk.toLowerCase() === 'yamaha') 
-                            ? `${partNumber}|${supplierId}|${qty}|${lot}`
-                            : `${partNumber}|${supplierId}|${qty}|${lot}`,
+                            ? `${partNumber}|${supplierId}|${qty}|${lot}|${no_unik}`
+                            : `${partNumber}|${supplierId}|${qty}|${lot}|${no_unik}`,
                         width: 85,
                         height: 85,
                         colorDark: "#000000",

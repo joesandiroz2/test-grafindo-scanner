@@ -19,7 +19,9 @@ $(document).ready(function() {
             "depo": $("#depo").val(),
             "supplier_id": $("#supplier_id").val(),
             "berapa_lembar": $("#berapa_lembar").val(),
-            "tgl_inspeksi": $("#tgl_inspeksi").val()
+            "tgl_inspeksi": $("#tgl_inspeksi").val(),
+             "no_unik": $("#nomor_unik").val() // 🔥 INI KUNCI NYA
+            
         };
         console.log(data); // Debugging: lihat data yang akan dikirim
 

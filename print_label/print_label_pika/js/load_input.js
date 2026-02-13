@@ -1,5 +1,5 @@
 let currentLoadPage = 1; // Ganti nama variabel untuk halaman saat ini
-const itemsPerPageLoad = 50; // Ganti nama variabel untuk jumlah item per halaman
+const itemsPerPageLoad = 200; // Ganti nama variabel untuk jumlah item per halaman
 
 
 
@@ -294,7 +294,7 @@ function openBarenganPrint(merk, partNumber, namaBarang, qty, satuan, berapa_lem
 // Memanggil fungsi untuk memuat data saat halaman dimuat
 document.addEventListener('DOMContentLoaded', () => loadInputData(currentLoadPage));
 
-function openPrintModal(merk, partNumber, namaBarang, qty, satuan, berapa_lembar, lot, depo, supplierId, tglInspeksi) {
+function openPrintModal(merk, partNumber, namaBarang, qty, satuan, berapa_lembar, lot, depo, supplierId, tglInspeksi,no_unik) {
     const modalBody = document.getElementById('modalBody');
     const formattedPartNumber = partNumber.replace(/\s+/g, '').toUpperCase();
 

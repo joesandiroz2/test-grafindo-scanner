@@ -380,7 +380,7 @@
 const pb = new PocketBase(pocketbaseUrl);
 
 //nomor unik
-function randomString(length = 15) {
+function randomString(length = 6) {
     const chars =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
         "abcdefghijklmnopqrstuvwxyz" +
@@ -402,7 +402,7 @@ function initUniqPart() {
     const pad = (n) => n.toString().padStart(2, "0");
 
   
-    UNIQ_PART = randomString(15);
+    UNIQ_PART = randomString(8);
 }
 
 function generateNomorUnik() {
@@ -486,6 +486,13 @@ document.getElementById("printButton").addEventListener("click", function () {
 
 
 $(document).ready(function() {
+    initUniqPart()
+
+      // 🔥 langsung isi nomor unik walaupun LOT kosong
+    const val = generateNomorUnik();
+    document.getElementById("nomor_unik").value = val;
+
+
 $("#navbar-container").load("../../component/nav.html",function(){
         setTimeout(loginUser, 500);
     

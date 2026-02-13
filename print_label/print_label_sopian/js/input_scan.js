@@ -6,7 +6,6 @@ $(document).ready(function() {
         // Menonaktifkan tombol dan mengubah teks
         const submitButton = $(this).find('button[type="submit"]');
         submitButton.prop('disabled', true).text('Sedang membuat...');
-
         // Mengambil data dari input
         const data = {
             "operator": localStorage.getItem('operator_label'), // Ambil operator dari localStorage
@@ -19,7 +18,9 @@ $(document).ready(function() {
             "depo": $("#depo").val(),
             "supplier_id": $("#supplier_id").val(),
             "berapa_lembar": $("#berapa_lembar").val(),
-            "tgl_inspeksi": $("#tgl_inspeksi").val()
+            "tgl_inspeksi": $("#tgl_inspeksi").val(),
+             "no_unik": $("#nomor_unik").val() // 🔥 INI KUNCI NYA
+            
         };
         console.log(data); // Debugging: lihat data yang akan dikirim
 

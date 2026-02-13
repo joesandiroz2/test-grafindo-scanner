@@ -184,6 +184,15 @@
         </div>
     </div>
 </div>
+<div class="row"> 
+    <div class="col-md-6 col-lg-6">  
+        <h5>Nomor Unik :</h5>
+            <input type="text" class="form-control" 
+            style="font-weight:bold;color:purple"
+            readonly id="nomor_unik" required>
+
+    </div>
+</div>
 <button type="submit" class="btn btn-primary">Buat</button>
 </form>
 </div>
@@ -363,6 +372,47 @@
 
 const pb = new PocketBase(pocketbaseUrl);
 
+//nomor unik
+function randomString(length = 15) {
+    const chars =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+        "abcdefghijklmnopqrstuvwxyz" +
+        "0123456789" +
+        "!@#$%^&*()_+-=<>?"; // TIDAK ADA |
+
+    let result = "";
+    for (let i = 0; i < length; i++) {
+        result += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return result;
+}
+
+
+let UNIQ_PART = null;
+
+function initUniqPart() {
+    const now = new Date();
+    const pad = (n) => n.toString().padStart(2, "0");
+
+  
+    UNIQ_PART = randomString(6);
+}
+
+function generateNomorUnik() {
+    const lot = document.getElementById("lot").value || "";
+    return `${lot}-${UNIQ_PART}`;
+}
+
+
+
+document.getElementById("lot").addEventListener("input", function () {
+    const val = generateNomorUnik();
+    NO_UNIK_GLOBAL = val;
+    document.getElementById("nomor_unik").value = val;
+});
+
+
+
 document.getElementById('satuan').addEventListener('input', function () {
     const inputField = this;
     const errorMessage = document.getElementById('error-message');
@@ -430,6 +480,13 @@ document.getElementById("printButton").addEventListener("click", function () {
 
 
 $(document).ready(function() {
+
+  initUniqPart(); // <<< WAJIB INI
+
+  NO_UNIK_GLOBAL = generateNomorUnik();
+    $('#nomor_unik').val(NO_UNIK_GLOBAL);
+
+
 $("#navbar-container").load("../../component/nav.html",function(){
         setTimeout(loginUser, 500);
     

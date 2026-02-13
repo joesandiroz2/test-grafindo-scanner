@@ -20,25 +20,35 @@ $("#do-input").on("input", function() {
         timeout = setTimeout(async function() {
      const parts = inputValue.split('|');
 
-        // Validasi: harus ada 4 blok jika menggunakan '|', atau inputan standar tanpa '|'
-    if ((parts.length === 4 && inputValue.endsWith('|')) || (parts.length !== 4 && !/^[A-Z0-9-]+$/.test(inputValue))) {
-        // Tampilkan SweetAlert2 jika tidak sesuai
-        Swal.fire({
-            timer:1300,
-            icon: 'error',
-            title: 'Partnumber scan Tidak Standar, hanya 3 block',
-            text: 'Partnumber scan harus terdiri dari 4 blok dan tidak boleh diakhiri dengan "|", atau input standar tanpa "|".',
-        });
+     // Validasi baru
+        if (inputValue.includes('|')) {
 
-        // Memutar suara
-        const audio = new Audio('../../suara/partnumber_ga_standar_scan.mp3');
-        audio.play();
+            if (parts.length > 5) {
+                errorScan("Format harus di atas 5 blok: part|supplier|qty|lot");
+                return;
+            }
 
-        // Menghapus inputan setelah menampilkan pesan
-        $('#do-input').val('');
-        return; // Keluar dari fungsi jika format tidak sesuai
-    }
+            const partNumber = parts[0];
+            const supplierId = parts[1];
+            const qty = parts[2];
+            const lot = parts.slice(3).join('|'); 
+            // supaya kalau lot ada "|" tambahan tetap digabung
 
+            // Validasi partnumber (huruf, angka, strip)
+            if (!/^[A-Z0-9-]+$/.test(partNumber)) {
+                errorScan("Partnumber tidak valid");
+                return;
+            }
+
+            // Validasi qty harus angka
+            if (!/^\d+$/.test(qty)) {
+                errorScan("Qty harus angka");
+                return;
+            }
+
+        }
+
+    
 
          // Mengatur src audio dari JavaScript
             const audioSource = document.getElementById('audio-source');
@@ -262,4 +272,19 @@ if (items.length > 0) {
             audio.play();
     resultContainer.html(`<h5 style="color:red;text-align:center;">Nomor DO <b>${inputValue}</b> ini belum Di UPLOAD di sistem ini. </h5>`);
 }
+}
+
+
+function errorScan(message) {
+    Swal.fire({
+        timer:1300,
+        icon: 'error',
+        title: 'Scan Tidak Standar',
+        text: message,
+    });
+
+    const audio = new Audio('../../suara/partnumber_ga_standar_scan.mp3');
+    audio.play();
+
+    $('#do-input').val('');
 }
