@@ -23,8 +23,8 @@ $("#do-input").on("input", function() {
      // Validasi baru
         if (inputValue.includes('|')) {
 
-            if (parts.length > 5) {
-                errorScan("Format harus di atas 5 blok: part|supplier|qty|lot");
+            if (parts.length < 4 ) {
+                errorScan("Format harus di atas 4 blok minimal : part|supplier|qty|lot");
                 return;
             }
 
